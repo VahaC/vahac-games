@@ -2,9 +2,6 @@
 
 A collection of standalone browser games by Vahac. Each game is implemented with plain HTML, CSS, and JavaScript, so it can run locally without a backend. The Games section on vahac.com is currently private, so the page below opens only for a logged-in site editor until the section goes public.
 
-Main games page:
-- [vahac.com/games](https://vahac.com/games?utm_source=github)
-
 Documentation status:
 - Last updated: 2026-11-04 (repository created from the seven games on the site, grouped by genre here and on the index page)
 - Scope synchronized with current repository structure
