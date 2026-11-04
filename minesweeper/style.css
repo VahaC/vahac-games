@@ -1,0 +1,319 @@
+/* Minesweeper Game — style.css
+   Namespace: msp- (minesweeper)
+   All selectors use the msp- prefix to avoid conflicts with host page styles. */
+
+.msp-wrapper {
+  --msp-bg-primary: #0a0f1e;
+  --msp-bg-secondary: #111827;
+  --msp-bg-panel: #0d1424;
+  --msp-bg-card: #1a2236;
+  --msp-border: #2a3a5c;
+  --msp-blue: #3b82f6;
+  --msp-cyan: #22d3ee;
+  --msp-green: #10b981;
+  --msp-amber: #f59e0b;
+  --msp-red: #ef4444;
+  --msp-text: #dbeafe;
+  --msp-muted: #8aa4c8;
+
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.15), transparent 40%),
+    linear-gradient(180deg, #0a0f1e 0%, #111827 100%);
+  color: var(--msp-text);
+  font-family:
+    "Segoe UI",
+    "JetBrains Mono",
+    "Cascadia Code",
+    sans-serif;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.msp-wrapper * {
+  box-sizing: border-box;
+}
+
+.msp-header,
+.msp-toolbar,
+.msp-board-section,
+.msp-status-panel,
+.msp-footer {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 20px auto;
+}
+
+.msp-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.msp-title {
+  margin: 0;
+  font-size: 2.2rem;
+  color: var(--msp-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.5);
+}
+
+.msp-subtitle {
+  margin-top: 8px;
+  color: var(--msp-muted);
+}
+
+.msp-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.msp-button,
+.msp-select {
+  min-height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--msp-border);
+  background: rgba(26, 34, 54, 0.9);
+  color: var(--msp-text);
+  padding: 0 18px;
+  transition:
+    transform 0.15s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.msp-button {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.msp-button:hover,
+.msp-select:hover {
+  border-color: var(--msp-cyan);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.2);
+}
+
+.msp-button:active {
+  transform: scale(0.97);
+}
+
+.msp-button:focus-visible,
+.msp-select:focus-visible,
+.msp-cell:focus-visible {
+  outline: 2px solid var(--msp-cyan);
+  outline-offset: 2px;
+}
+
+.msp-button-secondary {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.msp-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.msp-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msp-label {
+  color: var(--msp-muted);
+  font-size: 0.9rem;
+}
+
+.msp-stats-panel {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.msp-stat-card {
+  min-width: 120px;
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(26, 34, 54, 0.95),
+      rgba(13, 20, 36, 0.95)
+    );
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 0 20px rgba(34, 211, 238, 0.05);
+}
+
+.msp-stat-label {
+  display: block;
+  color: var(--msp-muted);
+  margin-bottom: 8px;
+}
+
+.msp-stat-value {
+  font-size: 1.5rem;
+  color: var(--msp-cyan);
+  font-weight: 700;
+}
+
+.msp-main {
+  display: flex;
+  justify-content: center;
+}
+
+.msp-board-section {
+  overflow: auto;
+  padding-bottom: 12px;
+}
+
+.msp-board {
+  display: grid;
+  gap: 6px;
+  justify-content: center;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(17, 24, 39, 0.95),
+      rgba(10, 15, 30, 0.98)
+    );
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  box-shadow:
+    0 0 30px rgba(34, 211, 238, 0.08),
+    inset 0 0 25px rgba(34, 211, 238, 0.04);
+}
+
+.msp-cell {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(42, 58, 92, 0.9),
+      rgba(26, 34, 54, 0.95)
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.msp-cell:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+}
+
+.msp-cell-revealed {
+  background: rgba(13, 20, 36, 0.95);
+}
+
+.msp-cell-flagged {
+  color: var(--msp-amber);
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.msp-cell-mine {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--msp-red);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
+}
+
+.msp-status-panel {
+  text-align: center;
+}
+
+.msp-status-text {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.1);
+  color: var(--msp-cyan);
+}
+
+.msp-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(10, 15, 30, 0.95);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.msp-toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.msp-footer {
+  text-align: center;
+  color: var(--msp-muted);
+  padding-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+
+  .msp-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .msp-stats-panel {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .msp-button,
+  .msp-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .msp-cell {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .msp-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .msp-wrapper {
+    padding: 14px;
+  }
+
+  .msp-cell {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+  }
+}

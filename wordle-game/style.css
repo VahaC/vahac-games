@@ -1,0 +1,174 @@
+/* Cyberpunk Wordle — style.css
+   Namespace: wrd-
+   Dark neon palette; every selector carries the wrd- prefix, so nothing
+   leaks into the host page (no bare html/body rules). */
+
+.wrd-wrapper {
+  --wrd-bg: #0a0f1e;
+  --wrd-panel: #111827;
+  --wrd-border: #2a3a5c;
+  --wrd-cyan: #22d3ee;
+  --wrd-blue: #3b82f6;
+  --wrd-green: #10b981;
+  --wrd-orange: #f59e0b;
+  background: linear-gradient(180deg, #0a0f1e, #111827);
+  color: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+  padding: 20px;
+}
+
+.wrd-wrapper * {
+  box-sizing: border-box;
+}
+
+.wrd-header,
+.wrd-toolbar,
+.wrd-main,
+.wrd-footer {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto 20px;
+}
+
+.wrd-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--wrd-cyan);
+  text-shadow: 0 0 18px var(--wrd-cyan);
+}
+
+.wrd-subtitle {
+  text-align: center;
+  opacity: 0.8;
+}
+
+.wrd-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrd-toolbar button {
+  background: #1a2236;
+  border: 1px solid var(--wrd-blue);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.wrd-toolbar button:hover {
+  box-shadow: 0 0 14px var(--wrd-blue);
+  transform: translateY(-2px);
+}
+
+.wrd-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 auto 24px;
+}
+
+.wrd-cell {
+  aspect-ratio: 1;
+  border: 2px solid var(--wrd-border);
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.wrd-correct {
+  background: var(--wrd-green);
+}
+
+.wrd-present {
+  background: var(--wrd-orange);
+}
+
+.wrd-absent {
+  background: #243047;
+}
+
+.wrd-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wrd-key-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.wrd-key {
+  min-width: 44px;
+  min-height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--wrd-border);
+  background: #1a2236;
+  color: #fff;
+  cursor: pointer;
+}
+
+.wrd-key-wide {
+  min-width: 120px;
+}
+
+.wrd-toast {
+  text-align: center;
+  min-height: 28px;
+  color: var(--wrd-orange);
+  margin-bottom: 16px;
+}
+
+.wrd-footer {
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+  .wrd-wrapper {
+    padding: 16px 8px;
+  }
+
+  /* Ten keys must fit a 320px phone: each key takes a tenth of the row minus
+     the nine gaps (27px = 9 x 3px), up to the 44px desktop size, so all rows
+     share one key width and shorter rows stay centred. */
+  .wrd-key-row {
+    gap: 3px;
+  }
+
+  .wrd-key {
+    flex: 0 1 calc((100% - 27px) / 10);
+    min-width: 0;
+    max-width: 44px;
+    padding: 0;
+  }
+
+  .wrd-key-wide {
+    flex: 0 1 120px;
+    max-width: 120px;
+  }
+
+  .wrd-toolbar {
+    flex-direction: column;
+  }
+
+  .wrd-toolbar button {
+    width: 100%;
+  }
+
+  .wrd-cell {
+    font-size: 1.6rem;
+  }
+}

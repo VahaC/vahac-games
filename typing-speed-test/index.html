@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Speed Test — Logs from VahaC</title>
+  <meta name="description" content="Challenge your keyboard skills with a futuristic Typing Speed Test game featuring real-time WPM tracking, accuracy stats, responsive controls, offline gameplay, and cyberpunk UI design.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+    <div class="tst-wrapper">
+        <header class="tst-header">
+            <h1 class="tst-title">Typing Speed Test</h1>
+            <p class="tst-subtitle">Cyberpunk Keyboard Challenge</p>
+        </header>
+
+        <section class="tst-toolbar">
+            <div class="tst-toolbar-group">
+                <label class="tst-label" for="tst-difficulty">Difficulty</label>
+                <select id="tst-difficulty" class="tst-select" aria-label="Difficulty selector">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+
+            <div class="tst-toolbar-group">
+                <button id="tst-new-game" class="tst-button">New Game</button>
+                <button id="tst-restart-game" class="tst-button">Restart</button>
+            </div>
+        </section>
+
+        <main class="tst-main">
+            <section class="tst-panel">
+                <div id="tst-text-display" class="tst-text-display" aria-live="polite"></div>
+
+                <textarea
+                    id="tst-input"
+                    class="tst-input"
+                    placeholder="Start typing here..."
+                    aria-label="Typing input"
+                ></textarea>
+            </section>
+
+            <aside class="tst-stats">
+                <div class="tst-stat-card">
+                    <span class="tst-stat-label">WPM</span>
+                    <span id="tst-wpm" class="tst-stat-value">0</span>
+                </div>
+
+                <div class="tst-stat-card">
+                    <span class="tst-stat-label">Accuracy</span>
+                    <span id="tst-accuracy" class="tst-stat-value">100%</span>
+                </div>
+
+                <div class="tst-stat-card">
+                    <span class="tst-stat-label">Time</span>
+                    <span id="tst-timer" class="tst-stat-value">60</span>
+                </div>
+
+                <div class="tst-stat-card">
+                    <span class="tst-stat-label">Best WPM</span>
+                    <span id="tst-best" class="tst-stat-value">0</span>
+                </div>
+            </aside>
+        </main>
+
+        <section id="tst-result" class="tst-result tst-hidden">
+            <h2 class="tst-result-title">Session Complete</h2>
+            <p id="tst-result-text" class="tst-result-text"></p>
+        </section>
+
+        <div id="tst-toast" class="tst-toast tst-hidden" aria-live="assertive"></div>
+
+        <footer class="tst-footer">
+            Built by VahaC — 100% client-side, no data sent anywhere.
+        </footer>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

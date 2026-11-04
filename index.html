@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vahac Games</title>
+  <meta name="description" content="Local index page for all games in the vahac-games repository.">
+  <style>
+    body {
+      margin: 0;
+      background: #0a0f1e;
+    }
+
+    .hub-wrapper {
+      --hub-bg-primary: #0a0f1e;
+      --hub-bg-secondary: #111827;
+      --hub-bg-card: #1a2236;
+      --hub-bg-card-hover: #1f2a42;
+      --hub-bg-input: #0d1424;
+      --hub-border: #2a3a5c;
+      --hub-border-hover: #3a4d75;
+      --hub-border-focus: #3b82f6;
+      --hub-text-primary: #e2e8f0;
+      --hub-text-secondary: #94a3b8;
+      --hub-text-muted: #64748b;
+      --hub-accent-blue: #3b82f6;
+      --hub-accent-cyan: #22d3ee;
+      --hub-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+      --hub-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --hub-radius: 8px;
+
+      font-family: var(--hub-font-sans);
+      color: var(--hub-text-primary);
+      line-height: 1.6;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+      box-sizing: border-box;
+    }
+
+    .hub-wrapper *,
+    .hub-wrapper *::before,
+    .hub-wrapper *::after {
+      box-sizing: border-box;
+    }
+
+    .hub-wrapper a {
+      color: inherit;
+    }
+
+    .hub-wrapper :focus-visible {
+      outline: 2px solid var(--hub-accent-cyan);
+      outline-offset: 2px;
+    }
+
+    .hub-sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* ---------- Site links ---------- */
+
+    .hub-text-link {
+      color: var(--hub-text-secondary) !important;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .hub-text-link:hover {
+      color: var(--hub-accent-cyan) !important;
+    }
+
+    .hub-byline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem 0.6rem;
+      margin: 0.35rem 0 0;
+      font-size: 0.88rem;
+      color: var(--hub-text-muted);
+    }
+
+    .hub-byline a {
+      border-bottom: 1px dotted var(--hub-border-hover);
+    }
+
+    .hub-byline a:hover {
+      border-bottom-color: var(--hub-accent-cyan);
+    }
+
+    .hub-sep {
+      color: var(--hub-border-hover);
+    }
+
+    /* ---------- Header ---------- */
+
+    .hub-header {
+      background: linear-gradient(135deg, #111827, #1a2236 45%, #0d1424);
+      border: 1px solid var(--hub-border);
+      border-radius: var(--hub-radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .hub-title {
+      margin: 0;
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }
+
+    .hub-subtitle {
+      margin: 0.5rem 0 0;
+      color: var(--hub-text-secondary);
+      max-width: 70ch;
+    }
+
+    .hub-stats {
+      margin: 0.75rem 0 0;
+      font-size: 0.9rem;
+      color: var(--hub-text-secondary);
+    }
+
+    .hub-stats strong {
+      color: var(--hub-text-primary);
+      font-weight: 600;
+    }
+
+    .hub-search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .hub-search {
+      flex: 1;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0.6rem 0.9rem;
+      background: var(--hub-bg-input);
+      border: 1px solid var(--hub-border);
+      border-radius: 6px;
+      color: var(--hub-text-primary);
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    .hub-search::placeholder {
+      color: var(--hub-text-muted);
+    }
+
+    .hub-search:focus {
+      border-color: var(--hub-border-focus);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .hub-count {
+      font-size: 0.85rem;
+      color: var(--hub-text-muted);
+      white-space: nowrap;
+    }
+
+    /* ---------- Group chips ---------- */
+
+    .hub-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1.25rem;
+    }
+
+    .hub-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 36px;
+      padding: 0.3rem 0.8rem;
+      background: var(--hub-bg-secondary);
+      border: 1px solid var(--hub-border);
+      border-radius: 999px;
+      color: var(--hub-text-secondary);
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .hub-chip:hover {
+      color: var(--hub-text-primary);
+      border-color: var(--hub-border-hover);
+    }
+
+    .hub-chip[aria-pressed="true"] {
+      color: var(--hub-text-primary);
+      border-color: var(--hub-accent-blue);
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .hub-chip-n {
+      font-family: var(--hub-font-mono);
+      font-size: 0.75rem;
+      color: var(--hub-text-muted);
+    }
+
+    .hub-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--group, var(--hub-text-muted));
+    }
+
+    /* ---------- Groups and cards ---------- */
+
+    .hub-section {
+      margin-bottom: 1.75rem;
+    }
+
+    .hub-section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    .hub-section-head .hub-dot {
+      width: 10px;
+      height: 10px;
+    }
+
+    .hub-section-n {
+      font-family: var(--hub-font-mono);
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--hub-text-muted);
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .hub-card {
+      position: relative;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.95rem 1rem;
+      background: var(--hub-bg-card);
+      border: 1px solid var(--hub-border);
+      border-left: 3px solid var(--group, var(--hub-border));
+      border-radius: var(--hub-radius);
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .hub-card:hover {
+      background: var(--hub-bg-card-hover);
+      border-color: var(--hub-border-hover);
+      border-left-color: var(--group, var(--hub-border));
+    }
+
+    .hub-card-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .hub-card-link {
+      text-decoration: none;
+    }
+
+    .hub-card-link::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--hub-radius);
+    }
+
+    .hub-card-link:focus-visible {
+      outline: none;
+    }
+
+    .hub-card-link:focus-visible::after {
+      outline: 2px solid var(--hub-accent-cyan);
+      outline-offset: 2px;
+    }
+
+    .hub-card-desc {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--hub-text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ---------- Empty state and footer ---------- */
+
+    .hub-empty {
+      margin: 2rem 0;
+      text-align: center;
+      color: var(--hub-text-secondary);
+    }
+
+    .hub-footer {
+      margin-top: 1.5rem;
+      color: var(--hub-text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .hub-noscript {
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid var(--hub-border);
+      border-radius: var(--hub-radius);
+      color: var(--hub-text-primary);
+    }
+
+    /* ---------- Responsive ---------- */
+
+    @media (max-width: 640px) {
+      .hub-wrapper {
+        padding: 1rem 0.75rem 2rem;
+      }
+
+      .hub-title {
+        font-size: 1.5rem;
+      }
+
+      .hub-byline a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+      }
+
+      .hub-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hub-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        margin-right: -0.75rem;
+        padding-right: 0.75rem;
+        scrollbar-width: thin;
+      }
+
+      .hub-chip {
+        flex-shrink: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hub-wrapper * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="hub-wrapper">
+    <header class="hub-header">
+      <h1 class="hub-title">Vahac Games</h1>
+      <p class="hub-byline">
+        <a class="hub-text-link" href="https://vahac.com/">vahac.com</a>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <a class="hub-text-link" href="https://vahac.com/games/">games page</a>
+      </p>
+      <p class="hub-subtitle">
+        Every game in this repository. Each one is a standalone page that runs in the browser.
+      </p>
+      <p class="hub-stats" id="hub-stats"></p>
+      <div class="hub-search-row">
+        <label class="hub-sr" for="hub-search">Search games</label>
+        <input class="hub-search" id="hub-search" type="search" autocomplete="off" spellcheck="false">
+        <span class="hub-count" id="hub-count" aria-live="polite"></span>
+      </div>
+    </header>
+
+    <nav class="hub-chips" id="hub-chips" aria-label="Filter by genre"></nav>
+
+    <div id="hub-list"></div>
+
+    <p class="hub-empty" id="hub-empty" hidden></p>
+
+    <noscript>
+      <p class="hub-noscript">This index is built with JavaScript. Without it, open any game folder's <code>index.html</code> directly.</p>
+    </noscript>
+
+    <p class="hub-footer" id="hub-footer"></p>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // One entry per game folder; group is a key from GROUPS below.
+    // Adding a game: add its entry here in folder order. Counts update by themselves.
+    var GAMES = [
+      {
+        name: '2048 Game',
+        folder: '2048-game',
+        group: 'puzzle',
+        description: 'Slide and merge tiles on a 4x4 board with arrow keys or swipes until you reach 2048, with undo of up to 10 moves, a best score and auto save.'
+      },
+      {
+        name: 'Minesweeper Game',
+        folder: 'minesweeper',
+        group: 'puzzle',
+        description: 'Clear Easy, Medium or Hard boards with a safe first click, right-click flags and flood reveal, against the clock and your best time per difficulty.'
+      },
+      {
+        name: 'Reaction Time Test',
+        folder: 'reaction-time',
+        group: 'reflex',
+        description: 'Wait for the neon signal, then click, tap or press Space: four delay windows, false-start detection, and your current, best and average times over 10 rounds.'
+      },
+      {
+        name: 'Snake Game',
+        folder: 'snake-game',
+        group: 'arcade',
+        description: 'Steer the snake around a 30x30 grid with arrow keys, WASD or on-screen buttons at one of four speeds, eat energy nodes for points and beat your best score.'
+      },
+      {
+        name: 'Sudoku Game',
+        folder: 'sudoku',
+        group: 'puzzle',
+        description: 'Solve a freshly generated 9x9 Sudoku with hints, wrong digits shown in red, a restart, and progress saved after every move.'
+      },
+      {
+        name: 'Typing Speed Test',
+        folder: 'typing-speed-test',
+        group: 'reflex',
+        description: 'Type a random Easy, Medium or Hard sentence against a 60-second clock with live WPM and accuracy, and keep your best WPM.'
+      },
+      {
+        name: 'Cyberpunk Wordle',
+        folder: 'wordle-game',
+        group: 'word',
+        description: 'Guess the hidden five-letter word in six tries on the physical or on-screen keyboard; letters turn green, amber or grey, and your round and wins are saved.'
+      },
+    ];
+
+    // Genres: puzzles first, then word, arcade, and reflex and typing games.
+    var GROUPS = [
+      { key: 'puzzle', label: 'Puzzle', color: '#3b82f6' },
+      { key: 'word', label: 'Word', color: '#10b981' },
+      { key: 'arcade', label: 'Arcade', color: '#f59e0b' },
+      { key: 'reflex', label: 'Reflex and Typing', color: '#22d3ee' }
+    ];
+
+    var listEl = document.getElementById('hub-list');
+    var searchEl = document.getElementById('hub-search');
+    var countEl = document.getElementById('hub-count');
+    var emptyEl = document.getElementById('hub-empty');
+    var chipsEl = document.getElementById('hub-chips');
+    var groupByKey = {};
+    GROUPS.forEach(function (g) { groupByKey[g.key] = g; });
+
+    var state = { query: '', group: 'all' };
+
+    GAMES.forEach(function (t) {
+      t.groupInfo = groupByKey[t.group];
+      if (!t.groupInfo) throw new Error('Unknown group "' + t.group + '" for ' + t.folder);
+      t.haystack = (t.name + ' ' + t.description + ' ' + t.groupInfo.label).toLowerCase();
+    });
+
+    function el(tag, cls, text) {
+      var node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function dot(group) {
+      var d = el('span', 'hub-dot');
+      d.style.setProperty('--group', group.color);
+      d.setAttribute('aria-hidden', 'true');
+      return d;
+    }
+
+    function matchesQuery(t) {
+      if (!state.query) return true;
+      var words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
+      return words.every(function (w) { return t.haystack.indexOf(w) !== -1; });
+    }
+
+    function byName(a, b) {
+      return a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+    }
+
+    // Over HTTP link to the folder with a trailing slash: `npx serve` (the launch.json preview)
+    // redirects folder/index.html to /folder without one, and the game's relative style.css and
+    // script.js then load from the root and 404. Opened from disk, a folder link would show a
+    // directory listing, so file:// keeps the explicit index.html.
+    var FOLDER_PAGE = location.protocol === 'file:' ? '/index.html' : '/';
+
+    function card(t) {
+      var article = el('article', 'hub-card');
+      article.style.setProperty('--group', t.groupInfo.color);
+      var h = el('h3', 'hub-card-title');
+      var a = el('a', 'hub-card-link', t.name);
+      a.href = t.folder + FOLDER_PAGE;
+      h.appendChild(a);
+      article.appendChild(h);
+      var p = el('p', 'hub-card-desc', t.description);
+      p.title = t.description;
+      article.appendChild(p);
+      return article;
+    }
+
+    function renderChips(matched) {
+      chipsEl.textContent = '';
+      function chip(key, label, n, group) {
+        var b = el('button', 'hub-chip');
+        b.type = 'button';
+        b.setAttribute('aria-pressed', state.group === key ? 'true' : 'false');
+        if (group) b.appendChild(dot(group));
+        b.appendChild(document.createTextNode(label));
+        b.appendChild(el('span', 'hub-chip-n', String(n)));
+        b.addEventListener('click', function () {
+          state.group = state.group === key && key !== 'all' ? 'all' : key;
+          render();
+        });
+        chipsEl.appendChild(b);
+      }
+      chip('all', 'All', matched.length);
+      GROUPS.forEach(function (g) {
+        chip(g.key, g.label, matched.filter(function (t) { return t.group === g.key; }).length, g);
+      });
+    }
+
+    function render() {
+      listEl.textContent = '';
+      var matched = GAMES.filter(matchesQuery);
+      var shown = 0;
+      GROUPS.forEach(function (g) {
+        if (state.group !== 'all' && state.group !== g.key) return;
+        var items = matched.filter(function (t) { return t.group === g.key; }).sort(byName);
+        if (!items.length) return;
+        shown += items.length;
+        var sec = el('section', 'hub-section');
+        sec.setAttribute('aria-labelledby', 'hub-group-' + g.key);
+        var h = el('h2', 'hub-section-head');
+        h.id = 'hub-group-' + g.key;
+        h.appendChild(dot(g));
+        h.appendChild(document.createTextNode(g.label));
+        h.appendChild(el('span', 'hub-section-n', String(items.length)));
+        sec.appendChild(h);
+        var grid = el('div', 'hub-grid');
+        items.forEach(function (t) { grid.appendChild(card(t)); });
+        sec.appendChild(grid);
+        listEl.appendChild(sec);
+      });
+      renderChips(matched);
+      countEl.textContent = shown === GAMES.length ? '' : shown + ' of ' + GAMES.length;
+      emptyEl.hidden = shown !== 0;
+      if (shown === 0) {
+        emptyEl.textContent = 'No game matches “' + state.query + '”' + (state.group !== 'all' ? ' in this genre.' : '.');
+      }
+    }
+
+    var stats = document.getElementById('hub-stats');
+    stats.appendChild(el('strong', null, String(GAMES.length)));
+    stats.appendChild(document.createTextNode(' games in '));
+    stats.appendChild(el('strong', null, String(GROUPS.length)));
+    stats.appendChild(document.createTextNode(' genres'));
+    searchEl.placeholder = 'Search ' + GAMES.length + ' games by name or genre  (press /)';
+    document.getElementById('hub-footer').textContent = 'Local repository index page · ' + GAMES.length + ' games';
+
+    searchEl.addEventListener('input', function () {
+      state.query = searchEl.value.trim();
+      render();
+    });
+
+    searchEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && searchEl.value) {
+        searchEl.value = '';
+        state.query = '';
+        render();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      var tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      e.preventDefault();
+      searchEl.focus();
+    });
+
+    render();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Game — Logs from VahaC</title>
+  <meta name="description" content="Play a responsive Sudoku game with auto save and hints. Fully client-side, mobile-friendly, privacy-focused, and easy to embed.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+  <div class="sdk-wrapper">
+    <div class="sdk-header">
+      <h1 class="sdk-title">
+        Sudoku
+      </h1>
+
+      <p class="sdk-subtitle">
+        Responsive client-side Sudoku game with auto-save.
+      </p>
+    </div>
+
+    <div class="sdk-controls">
+      <button
+        id="sdk-new-game-btn"
+        class="sdk-btn"
+        type="button"
+      >
+        New Game
+      </button>
+
+      <button
+        id="sdk-restart-btn"
+        class="sdk-btn sdk-btn--secondary"
+        type="button"
+      >
+        Restart
+      </button>
+
+      <button
+        id="sdk-hint-btn"
+        class="sdk-btn sdk-btn--secondary"
+        type="button"
+      >
+        Hint
+      </button>
+    </div>
+
+    <div
+      id="sdk-board"
+      class="sdk-board"
+      aria-label="Sudoku Board"
+    ></div>
+
+    <div class="sdk-status-row">
+      <div
+        id="sdk-status"
+        class="sdk-status"
+      ></div>
+    </div>
+
+    <div
+      id="sdk-toast"
+      class="sdk-toast"
+    >
+      Saved
+    </div>
+
+    <footer class="sdk-footer">
+      Built by
+      <a
+        href="https://vahac.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        VahaC
+      </a>
+      — 100% client-side, no data sent anywhere.
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

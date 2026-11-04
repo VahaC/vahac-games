@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game — Logs from VahaC</title>
+  <meta name="description" content="Play Cyber Snake Game, a futuristic neon Snake browser game with responsive controls, touch support, score tracking, offline gameplay, and cyberpunk visuals.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+    <div class="snp-wrapper">
+        <header class="snp-header">
+            <div class="snp-header-top">
+                <div>
+                    <p class="snp-label">VahaC Mini Game</p>
+                    <h1 class="snp-title">Cyber Snake</h1>
+                </div>
+
+                <div class="snp-status-panel">
+                    <div class="snp-status-card">
+                        <span class="snp-status-label">Score</span>
+                        <strong id="snp-score">0</strong>
+                    </div>
+
+                    <div class="snp-status-card">
+                        <span class="snp-status-label">Best</span>
+                        <strong id="snp-best-score">0</strong>
+                    </div>
+
+                    <div class="snp-status-card">
+                        <span class="snp-status-label">Time</span>
+                        <strong id="snp-timer">00:00</strong>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="snp-toolbar">
+            <div class="snp-toolbar-group">
+                <label class="snp-toolbar-label" for="snp-speed-select">Difficulty</label>
+
+                <select id="snp-speed-select" class="snp-select" aria-label="Difficulty selector">
+                    <option value="160">Easy</option>
+                    <option value="120" selected>Normal</option>
+                    <option value="85">Hard</option>
+                    <option value="60">Insane</option>
+                </select>
+            </div>
+
+            <div class="snp-toolbar-buttons">
+                <button id="snp-new-game" class="snp-button" aria-label="Start new game">
+                    New Game
+                </button>
+
+                <button id="snp-restart-game" class="snp-button snp-button-alt" aria-label="Restart current game">
+                    Restart
+                </button>
+
+                <button id="snp-pause-game" class="snp-button snp-button-warning" aria-label="Start game">
+                    Start
+                </button>
+            </div>
+        </section>
+
+        <main class="snp-main">
+            <section class="snp-board-section">
+                <div class="snp-board-shell">
+                    <canvas
+                        id="snp-game-canvas"
+                        class="snp-game-canvas"
+                        width="600"
+                        height="600"
+                        aria-label="Snake game board"
+                    ></canvas>
+
+                    <div id="snp-start-hint" class="snp-start-hint snp-hidden" role="status">
+                        <strong class="snp-start-hint-title">System Ready</strong>
+                        <span class="snp-start-hint-text">Press an arrow key, WASD or tap a direction to start</span>
+                    </div>
+                </div>
+
+                <div class="snp-mobile-controls">
+                    <button class="snp-mobile-button" id="snp-up" aria-label="Move up">▲</button>
+
+                    <div class="snp-mobile-middle">
+                        <button class="snp-mobile-button" id="snp-left" aria-label="Move left">◀</button>
+                        <button class="snp-mobile-button" id="snp-down" aria-label="Move down">▼</button>
+                        <button class="snp-mobile-button" id="snp-right" aria-label="Move right">▶</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="snp-side-panel">
+                <div class="snp-panel-card">
+                    <h2 class="snp-panel-title">Mission</h2>
+
+                    <p class="snp-panel-text">
+                        Navigate the neon serpent through the cyber grid.
+                        Consume energy nodes, grow longer, and survive as long as possible.
+                    </p>
+                </div>
+
+                <div class="snp-panel-card">
+                    <h2 class="snp-panel-title">Controls</h2>
+
+                    <ul class="snp-controls-list">
+                        <li>Arrow Keys / WASD</li>
+                        <li>Touch Controls</li>
+                        <li>P = Pause</li>
+                        <li>Enter = Restart</li>
+                    </ul>
+                </div>
+
+                <div class="snp-panel-card">
+                    <h2 class="snp-panel-title">System Status</h2>
+
+                    <div class="snp-system-grid">
+                        <div class="snp-system-item">
+                            <span>Engine</span>
+                            <strong>Online</strong>
+                        </div>
+
+                        <div class="snp-system-item">
+                            <span>Persistence</span>
+                            <strong>Local</strong>
+                        </div>
+
+                        <div class="snp-system-item">
+                            <span>Input</span>
+                            <strong>Hybrid</strong>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <div id="snp-overlay" class="snp-overlay snp-hidden">
+            <div class="snp-overlay-card">
+                <h2 id="snp-overlay-title" class="snp-overlay-title">Game Over</h2>
+                <p id="snp-overlay-text" class="snp-overlay-text"></p>
+
+                <button id="snp-overlay-button" class="snp-button">
+                    Play Again
+                </button>
+            </div>
+        </div>
+
+        <div id="snp-toast" class="snp-toast snp-hidden"></div>
+
+        <footer class="snp-footer">
+            Built by VahaC — 100% client-side, no data sent anywhere.
+        </footer>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

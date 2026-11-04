@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper Game — Logs from VahaC</title>
+  <meta name="description" content="Play a futuristic cyberpunk Minesweeper game with glowing neon visuals, difficulty presets, timer tracking, local save support, and responsive controls. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="msp-wrapper">
+
+  <header class="msp-header">
+    <div class="msp-title-group">
+      <h1 class="msp-title">Cyber Minesweeper</h1>
+      <p class="msp-subtitle">
+        Neon tactical mine detection system
+      </p>
+    </div>
+
+    <div class="msp-header-actions">
+      <button
+        id="msp-new-game"
+        class="msp-button"
+        aria-label="Start new game"
+      >
+        New Game
+      </button>
+
+      <button
+        id="msp-restart-game"
+        class="msp-button msp-button-secondary"
+        aria-label="Restart current game"
+      >
+        Restart
+      </button>
+    </div>
+  </header>
+
+  <section class="msp-toolbar">
+
+    <div class="msp-control-group">
+      <label
+        class="msp-label"
+        for="msp-difficulty"
+      >
+        Difficulty
+      </label>
+
+      <select
+        id="msp-difficulty"
+        class="msp-select"
+        aria-label="Difficulty selector"
+      >
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <div class="msp-stats-panel">
+
+      <div class="msp-stat-card">
+        <span class="msp-stat-label">Mines</span>
+        <span
+          id="msp-mine-counter"
+          class="msp-stat-value"
+        >
+          0
+        </span>
+      </div>
+
+      <div class="msp-stat-card">
+        <span class="msp-stat-label">Time</span>
+        <span
+          id="msp-timer"
+          class="msp-stat-value"
+        >
+          0
+        </span>
+      </div>
+
+      <div class="msp-stat-card">
+        <span class="msp-stat-label">Best</span>
+        <span
+          id="msp-best-time"
+          class="msp-stat-value"
+        >
+          --
+        </span>
+      </div>
+
+    </div>
+
+  </section>
+
+  <main class="msp-main">
+
+    <section
+      class="msp-board-section"
+      aria-label="Minesweeper board"
+    >
+
+      <div
+        id="msp-board"
+        class="msp-board"
+        tabindex="0"
+      ></div>
+
+    </section>
+
+  </main>
+
+  <section class="msp-status-panel">
+
+    <div
+      id="msp-status-text"
+      class="msp-status-text"
+    >
+      Awaiting deployment...
+    </div>
+
+  </section>
+
+  <div
+    id="msp-toast"
+    class="msp-toast"
+    aria-live="polite"
+  ></div>
+
+  <footer class="msp-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

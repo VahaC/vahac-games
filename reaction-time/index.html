@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaction Time Test — Logs from VahaC</title>
+  <meta name="description" content="Test your reflexes in a futuristic cyberpunk reaction time game featuring neon visuals, score tracking, persistence, keyboard support, and ultra-responsive gameplay.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+    <div class="rxt-wrapper">
+        <header class="rxt-header">
+            <div>
+                <h1 class="rxt-title">Reaction Time Test</h1>
+                <p class="rxt-subtitle">
+                    Measure your reflex speed in a futuristic cyberpunk challenge.
+                </p>
+            </div>
+
+            <div class="rxt-status-pill" id="rxt-status-pill">
+                Ready
+            </div>
+        </header>
+
+        <section class="rxt-toolbar">
+            <div class="rxt-toolbar-group">
+                <label class="rxt-label" for="rxt-difficulty">
+                    Difficulty
+                </label>
+
+                <select
+                    class="rxt-select"
+                    id="rxt-difficulty"
+                    aria-label="Select difficulty"
+                >
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                    <option value="extreme">Extreme</option>
+                </select>
+            </div>
+
+            <div class="rxt-toolbar-group">
+                <button
+                    class="rxt-button rxt-button-primary"
+                    id="rxt-new-game"
+                    aria-label="Start new game"
+                >
+                    New Game
+                </button>
+
+                <button
+                    class="rxt-button"
+                    id="rxt-restart-game"
+                    aria-label="Restart current game"
+                >
+                    Restart
+                </button>
+            </div>
+        </section>
+
+        <main class="rxt-main">
+            <section class="rxt-board-panel">
+                <div
+                    class="rxt-board rxt-board-idle"
+                    id="rxt-board"
+                    tabindex="0"
+                    aria-label="Reaction board"
+                >
+                    <div class="rxt-board-content">
+                        <div class="rxt-board-label" id="rxt-board-label">
+                            Press Start
+                        </div>
+
+                        <div class="rxt-board-hint" id="rxt-board-hint">
+                            Wait for the neon signal, then react instantly.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="rxt-stats-panel">
+                <div class="rxt-stat-card">
+                    <span class="rxt-stat-title">Current Reaction</span>
+                    <span class="rxt-stat-value" id="rxt-current-reaction">0 ms</span>
+                </div>
+
+                <div class="rxt-stat-card">
+                    <span class="rxt-stat-title">Best Reaction</span>
+                    <span class="rxt-stat-value" id="rxt-best-reaction">0 ms</span>
+                </div>
+
+                <div class="rxt-stat-card">
+                    <span class="rxt-stat-title">Average</span>
+                    <span class="rxt-stat-value" id="rxt-average-reaction">0 ms</span>
+                </div>
+
+                <div class="rxt-stat-card">
+                    <span class="rxt-stat-title">Attempts</span>
+                    <span class="rxt-stat-value" id="rxt-attempts">0</span>
+                </div>
+
+                <div class="rxt-stat-card">
+                    <span class="rxt-stat-title">Timer</span>
+                    <span class="rxt-stat-value" id="rxt-timer">0.0s</span>
+                </div>
+            </aside>
+        </main>
+
+        <section class="rxt-actions">
+            <button
+                class="rxt-button rxt-button-success"
+                id="rxt-action-trigger"
+                aria-label="Trigger reaction test"
+            >
+                Start Reflex Test
+            </button>
+        </section>
+
+        <section
+            class="rxt-toast"
+            id="rxt-toast"
+            aria-live="polite"
+        ></section>
+
+        <section class="rxt-overlay" id="rxt-overlay">
+            <div class="rxt-overlay-card">
+                <h2 class="rxt-overlay-title" id="rxt-overlay-title">
+                    Session Complete
+                </h2>
+
+                <p class="rxt-overlay-text" id="rxt-overlay-text"></p>
+
+                <button
+                    class="rxt-button rxt-button-primary"
+                    id="rxt-overlay-button"
+                >
+                    Play Again
+                </button>
+            </div>
+        </section>
+
+        <footer class="rxt-footer">
+            Built by VahaC — 100% client-side, no data sent anywhere.
+        </footer>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

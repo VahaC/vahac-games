@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyberpunk Wordle Game — Logs from VahaC</title>
+  <meta name="description" content="Play a futuristic cyberpunk Wordle game with neon visuals, offline gameplay, responsive design, keyboard support, and local progress saving.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+  <div class="wrd-wrapper">
+    <header class="wrd-header">
+      <h1 class="wrd-title">Cyberpunk Wordle</h1>
+      <p class="wrd-subtitle">Guess the hidden 5-letter word</p>
+    </header>
+
+    <section class="wrd-toolbar">
+      <button id="wrd-new-game">New Game</button>
+      <button id="wrd-restart-game">Restart</button>
+
+      <div class="wrd-stats">
+        <span id="wrd-timer">00:00</span>
+        <span id="wrd-games-won">Wins: 0</span>
+      </div>
+    </section>
+
+    <main class="wrd-main">
+      <div id="wrd-board" class="wrd-board"></div>
+      <div id="wrd-keyboard" class="wrd-keyboard"></div>
+    </main>
+
+    <div id="wrd-toast" class="wrd-toast"></div>
+
+    <footer class="wrd-footer">
+      Built by VahaC — 100% client-side, no data sent anywhere.
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

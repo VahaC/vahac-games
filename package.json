@@ -1,0 +1,12 @@
+{
+  "name": "vahac-games",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone browser games by Vahac (tested with Node's built-in test runner).",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

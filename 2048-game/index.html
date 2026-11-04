@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 Game — Logs from VahaC</title>
+  <meta name="description" content="Play a responsive 2048 game with auto save, swipe controls, undo support, score tracking, and mobile-friendly gameplay. Fully client-side with no external dependencies.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+  <div class="tf8-wrapper">
+    <div class="tf8-header">
+      <h1 class="tf8-title">
+        2048
+      </h1>
+
+      <p class="tf8-subtitle">
+        Swipe, merge, survive.
+      </p>
+    </div>
+
+    <div class="tf8-topbar">
+      <div class="tf8-score-card">
+        <span class="tf8-score-label">
+          Score
+        </span>
+
+        <span
+          id="tf8-score"
+          class="tf8-score-value"
+        >
+          0
+        </span>
+      </div>
+
+      <div class="tf8-score-card">
+        <span class="tf8-score-label">
+          Best
+        </span>
+
+        <span
+          id="tf8-best-score"
+          class="tf8-score-value"
+        >
+          0
+        </span>
+      </div>
+    </div>
+
+    <div class="tf8-controls">
+      <button
+        id="tf8-new-game-btn"
+        class="tf8-btn"
+        type="button"
+      >
+        New Game
+      </button>
+
+      <button
+        id="tf8-undo-btn"
+        class="tf8-btn tf8-btn--secondary"
+        type="button"
+      >
+        Undo
+      </button>
+
+      <button
+        id="tf8-restart-btn"
+        class="tf8-btn tf8-btn--secondary"
+        type="button"
+      >
+        Restart
+      </button>
+    </div>
+
+    <div
+      id="tf8-board"
+      class="tf8-board"
+    ></div>
+
+    <div
+      id="tf8-message"
+      class="tf8-message"
+    ></div>
+
+    <div
+      id="tf8-toast"
+      class="tf8-toast"
+    >
+      Saved
+    </div>
+
+    <footer class="tf8-footer">
+      Built by
+      <a
+        href="https://vahac.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        VahaC
+      </a>
+      — 100% client-side, no data sent anywhere.
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

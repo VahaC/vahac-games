@@ -1,0 +1,425 @@
+/* Snake Game — style.css
+   Namespace: snp-
+   Neon dark palette. Every selector is an snp- class (the wrapper, its
+   children, the fixed overlay and toast), so nothing touches the host page. */
+
+.snp-wrapper {
+    --snp-bg-main: #0a0f1e;
+    --snp-bg-secondary: #111827;
+    --snp-bg-panel: rgba(17, 24, 39, 0.82);
+    --snp-bg-board: #0d1424;
+    --snp-border: rgba(59, 130, 246, 0.24);
+    --snp-text: #e5f3ff;
+    --snp-muted: #8aa4c8;
+    --snp-cyan: #22d3ee;
+    --snp-blue: #3b82f6;
+    --snp-green: #10b981;
+    --snp-orange: #f59e0b;
+    --snp-red: #ef4444;
+    --snp-shadow: 0 0 30px rgba(34, 211, 238, 0.18);
+
+    min-height: 100vh;
+    padding: 24px;
+    background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.15), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.12), transparent 28%),
+        var(--snp-bg-main);
+
+    color: var(--snp-text);
+    font-family: 'Segoe UI', 'JetBrains Mono', 'Fira Code', sans-serif;
+    box-sizing: border-box;
+}
+
+.snp-wrapper * {
+    box-sizing: border-box;
+}
+
+.snp-header {
+    margin-bottom: 20px;
+}
+
+.snp-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.snp-label {
+    margin: 0 0 8px;
+    color: var(--snp-cyan);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+}
+
+.snp-title {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.snp-status-panel {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.snp-status-card {
+    min-width: 110px;
+    padding: 14px;
+    border: 1px solid var(--snp-border);
+    border-radius: 18px;
+    background: var(--snp-bg-panel);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--snp-shadow);
+}
+
+.snp-status-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--snp-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.snp-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid var(--snp-border);
+    background: var(--snp-bg-panel);
+}
+
+.snp-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.snp-toolbar-label {
+    color: var(--snp-muted);
+}
+
+.snp-select,
+.snp-button,
+.snp-mobile-button {
+    border: 1px solid rgba(34, 211, 238, 0.28);
+    border-radius: 14px;
+    background: rgba(13, 20, 36, 0.92);
+    color: var(--snp-text);
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.snp-select {
+    min-height: 46px;
+    padding: 0 14px;
+}
+
+.snp-button {
+    min-height: 46px;
+    padding: 0 18px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.snp-button:hover,
+.snp-mobile-button:hover,
+.snp-select:hover {
+    transform: translateY(-2px);
+    border-color: var(--snp-cyan);
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.22);
+}
+
+.snp-button:focus-visible,
+.snp-mobile-button:focus-visible,
+.snp-select:focus-visible {
+    outline: 2px solid var(--snp-cyan);
+    outline-offset: 2px;
+}
+
+.snp-button-alt {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.snp-button-warning {
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.snp-toolbar-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.snp-main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+}
+
+.snp-board-shell {
+    position: relative;
+    border-radius: 24px;
+    border: 1px solid var(--snp-border);
+    background: rgba(13, 20, 36, 0.88);
+    padding: 18px;
+    box-shadow:
+        0 0 60px rgba(59, 130, 246, 0.14),
+        inset 0 0 30px rgba(34, 211, 238, 0.04);
+}
+
+.snp-game-canvas {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(10, 15, 30, 1));
+}
+
+/* Start prompt over the board while a new or restored game waits for the
+   first direction. It sits above the middle row, where a new snake starts:
+   that row's top edge is exactly half-way down the shell (equal padding
+   above and below a square canvas), so anchoring the prompt's bottom edge
+   10px above 50% keeps it off the snake however its text wraps. Its font
+   sizes are fixed so the host page's larger text (18px on vahac.com) cannot
+   make it taller. It never takes taps (pointer-events: none) and sets no
+   display, so .snp-hidden below still hides it. */
+.snp-start-hint {
+    position: absolute;
+    bottom: calc(50% + 10px);
+    left: 50%;
+    width: calc(100% - 72px);
+    max-width: 380px;
+    margin: 0;
+    padding: 18px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(34, 211, 238, 0.32);
+    background: rgba(10, 15, 30, 0.88);
+    box-shadow: var(--snp-shadow);
+    text-align: center;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.snp-start-hint-title {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--snp-cyan);
+    font-size: 13px;
+    line-height: 1.3;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.snp-start-hint-text {
+    display: block;
+    color: var(--snp-text);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.snp-side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.snp-panel-card {
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--snp-border);
+    background: var(--snp-bg-panel);
+    backdrop-filter: blur(12px);
+}
+
+.snp-panel-title {
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: var(--snp-cyan);
+}
+
+.snp-panel-text {
+    margin: 0;
+    line-height: 1.7;
+    color: var(--snp-muted);
+}
+
+.snp-controls-list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--snp-muted);
+    line-height: 1.9;
+}
+
+.snp-system-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.snp-system-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.snp-mobile-controls {
+    display: none;
+    margin-top: 20px;
+}
+
+.snp-mobile-middle {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.snp-mobile-button {
+    width: 64px;
+    height: 64px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.snp-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(5, 8, 18, 0.82);
+    backdrop-filter: blur(8px);
+    z-index: 20;
+}
+
+.snp-overlay-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    border-radius: 24px;
+    border: 1px solid rgba(34, 211, 238, 0.26);
+    background: rgba(17, 24, 39, 0.96);
+    text-align: center;
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.18);
+}
+
+.snp-overlay-title {
+    margin-top: 0;
+    font-size: 34px;
+}
+
+.snp-overlay-text {
+    margin-bottom: 24px;
+    color: var(--snp-muted);
+}
+
+.snp-hidden {
+    display: none;
+}
+
+.snp-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: rgba(17, 24, 39, 0.94);
+    border: 1px solid rgba(34, 211, 238, 0.28);
+    box-shadow: 0 0 28px rgba(34, 211, 238, 0.18);
+    z-index: 40;
+}
+
+.snp-footer {
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(59, 130, 246, 0.18);
+    color: var(--snp-muted);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .snp-main {
+        grid-template-columns: 1fr;
+    }
+
+    .snp-mobile-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .snp-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .snp-toolbar-buttons {
+        width: 100%;
+    }
+
+    .snp-button,
+    .snp-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .snp-wrapper {
+        padding: 14px;
+    }
+
+    .snp-title {
+        font-size: 32px;
+    }
+
+    .snp-status-panel {
+        width: 100%;
+    }
+
+    .snp-status-card {
+        flex: 1;
+    }
+}
+
+@media (max-width: 400px) {
+    .snp-title {
+        font-size: 28px;
+    }
+
+    .snp-mobile-button {
+        width: 58px;
+        height: 58px;
+    }
+
+    .snp-overlay-card {
+        padding: 24px;
+    }
+
+    /* Smaller prompt, so on a phone it stays two or three short lines
+       inside the top half of the board. */
+    .snp-start-hint {
+        width: calc(100% - 40px);
+        padding: 12px 14px;
+    }
+
+    .snp-start-hint-text {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+}

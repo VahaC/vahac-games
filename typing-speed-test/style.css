@@ -1,0 +1,228 @@
+/* Typing Speed Test — style.css
+   Namespace: tst- (typing speed test)
+   Every selector is a tst- class scoped to this game, so nothing leaks into the host page. */
+
+.tst-wrapper {
+    --tst-bg: #0a0f1e;
+    --tst-panel: #111827;
+    --tst-panel-alt: #1a2236;
+    --tst-border: #2a3a5c;
+    --tst-text: #e5f0ff;
+    --tst-muted: #94a3b8;
+    --tst-blue: #22d3ee;
+    --tst-blue-strong: #3b82f6;
+    --tst-green: #10b981;
+    --tst-orange: #f59e0b;
+    --tst-red: #ef4444;
+
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #111827, #0a0f1e);
+    color: var(--tst-text);
+    font-family: "Segoe UI", "JetBrains Mono", sans-serif;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.tst-wrapper * {
+    box-sizing: border-box;
+}
+
+.tst-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.tst-title {
+    font-size: 42px;
+    margin: 0;
+    color: var(--tst-blue);
+    text-shadow: 0 0 16px rgba(34, 211, 238, 0.6);
+}
+
+.tst-subtitle {
+    color: var(--tst-muted);
+}
+
+.tst-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.tst-toolbar-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tst-select,
+.tst-button,
+.tst-input {
+    border: 1px solid var(--tst-border);
+    background: rgba(17, 24, 39, 0.9);
+    color: var(--tst-text);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.tst-select,
+.tst-button {
+    min-height: 44px;
+    padding: 10px 16px;
+}
+
+.tst-button {
+    cursor: pointer;
+}
+
+.tst-button:hover,
+.tst-select:hover,
+.tst-input:hover {
+    border-color: var(--tst-blue);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
+}
+
+.tst-button:focus,
+.tst-select:focus,
+.tst-input:focus {
+    outline: 2px solid var(--tst-blue);
+}
+
+.tst-main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+}
+
+.tst-panel,
+.tst-stats,
+.tst-result {
+    background: rgba(17, 24, 39, 0.75);
+    border: 1px solid var(--tst-border);
+    border-radius: 18px;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+}
+
+.tst-text-display {
+    min-height: 180px;
+    line-height: 1.9;
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+.tst-char-correct {
+    color: var(--tst-green);
+}
+
+.tst-char-wrong {
+    color: var(--tst-red);
+    text-decoration: underline;
+}
+
+.tst-char-current {
+    background: rgba(34, 211, 238, 0.2);
+    border-radius: 4px;
+}
+
+.tst-input {
+    width: 100%;
+    min-height: 150px;
+    padding: 16px;
+    resize: vertical;
+    font-size: 16px;
+}
+
+.tst-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tst-stat-card {
+    background: rgba(26, 34, 54, 0.85);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid var(--tst-border);
+    text-align: center;
+}
+
+.tst-stat-label {
+    display: block;
+    color: var(--tst-muted);
+    margin-bottom: 8px;
+}
+
+.tst-stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--tst-blue);
+}
+
+.tst-result {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.tst-result-title {
+    color: var(--tst-orange);
+}
+
+.tst-hidden {
+    display: none;
+}
+
+.tst-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid var(--tst-blue);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.3);
+}
+
+.tst-footer {
+    margin-top: 32px;
+    text-align: center;
+    color: var(--tst-muted);
+}
+
+@media (max-width: 768px) {
+    .tst-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .tst-toolbar {
+        flex-direction: column;
+    }
+
+    .tst-toolbar-group {
+        width: 100%;
+    }
+
+    .tst-button,
+    .tst-select {
+        width: 100%;
+    }
+
+    .tst-title {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 400px) {
+    .tst-wrapper {
+        padding: 16px;
+    }
+
+    .tst-text-display {
+        font-size: 18px;
+    }
+}
