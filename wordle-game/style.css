@@ -11,7 +11,7 @@
   --wrd-blue: #3b82f6;
   --wrd-green: #10b981;
   --wrd-orange: #f59e0b;
-  background: linear-gradient(180deg, #0a0f1e, #111827);
+  background: linear-gradient(180deg, var(--wrd-bg), var(--wrd-panel));
   color: #ffffff;
   font-family: "Segoe UI", sans-serif;
   padding: 20px;

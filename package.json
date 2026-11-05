@@ -4,9 +4,10 @@
   "private": true,
   "description": "Standalone browser games by Vahac (tested with Node's built-in test runner).",
   "scripts": {
-    "test": "node tests/run.js"
+    "test": "node tests/run.js",
+    "coverage": "node tests/run.js --coverage"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.11"
   }
 }

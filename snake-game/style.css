@@ -277,8 +277,13 @@
     background: rgba(59, 130, 246, 0.08);
 }
 
+/* On-screen arrows: hidden on desktop, shown (display: flex) up to 768px
+   and on touch screens of any width, see the media queries at the end. */
 .snp-mobile-controls {
     display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
     margin-top: 20px;
 }
 
@@ -332,10 +337,13 @@
     display: none;
 }
 
+/* It never takes taps (pointer-events: none): on a phone it sits over the
+   touch arrows for 2.2 s after every energy node. */
 .snp-toast {
     position: fixed;
     bottom: 24px;
     right: 24px;
+    pointer-events: none;
     padding: 14px 18px;
     border-radius: 14px;
     background: rgba(17, 24, 39, 0.94);
@@ -359,9 +367,6 @@
 
     .snp-mobile-controls {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
     }
 
     .snp-toolbar {
@@ -376,6 +381,14 @@
     .snp-button,
     .snp-select {
         width: 100%;
+    }
+}
+
+/* Touch screens wider than 768px (a phone held sideways, a tablet) have no
+   keyboard either. */
+@media (hover: none) and (pointer: coarse) {
+    .snp-mobile-controls {
+        display: flex;
     }
 }
 

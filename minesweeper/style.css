@@ -15,6 +15,7 @@
   --msp-red: #ef4444;
   --msp-text: #dbeafe;
   --msp-muted: #8aa4c8;
+  --msp-cell-size: 42px;
 
   min-height: 100vh;
   background:
@@ -177,6 +178,7 @@
   display: grid;
   gap: 6px;
   justify-content: center;
+  min-width: max-content;
   padding: 18px;
   border-radius: 24px;
   background:
@@ -192,8 +194,9 @@
 }
 
 .msp-cell {
-  width: 42px;
-  height: 42px;
+  width: var(--msp-cell-size);
+  height: var(--msp-cell-size);
+  padding: 0;
   border-radius: 12px;
   border: 1px solid rgba(59, 130, 246, 0.18);
   background:
@@ -205,6 +208,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--msp-text);
+  font-family: inherit;
   font-weight: 700;
   cursor: pointer;
   user-select: none;
@@ -293,9 +298,11 @@
 
 @media (max-width: 640px) {
 
+  .msp-wrapper {
+    --msp-cell-size: 36px;
+  }
+
   .msp-cell {
-    width: 36px;
-    height: 36px;
     font-size: 0.9rem;
   }
 
@@ -304,16 +311,38 @@
   }
 }
 
+@media (max-width: 480px) {
+
+  .msp-wrapper {
+    --msp-cell-size: 32px;
+  }
+
+  .msp-board {
+    gap: 4px;
+    padding: 12px;
+  }
+}
+
 @media (max-width: 400px) {
 
   .msp-wrapper {
+    --msp-cell-size: 30px;
     padding: 14px;
   }
 
+  .msp-board {
+    padding: 10px;
+  }
+
   .msp-cell {
-    width: 30px;
-    height: 30px;
     border-radius: 8px;
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 359px) {
+
+  .msp-wrapper {
+    --msp-cell-size: 26px;
   }
 }

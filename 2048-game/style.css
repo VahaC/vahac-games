@@ -189,7 +189,7 @@
 
   border-radius: 12px;
 
-  background: #111827;
+  background: var(--tf8-bg-secondary);
 
   color: var(--tf8-text-primary);
 
@@ -207,7 +207,7 @@
 }
 
 .tf8-tile-0 {
-  background: #111827;
+  background: var(--tf8-bg-secondary);
 }
 
 .tf8-tile-2 {
@@ -314,17 +314,7 @@
     padding: 1rem 0.75rem;
   }
 
-  .tf8-controls {
-    //flex-direction: column;
-  }
-
-  .tf8-btn {
-    //width: 100%;
-  }
-
   .tf8-topbar {
-    //flex-direction: column;
-
     align-items: center;
   }
 }

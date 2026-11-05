@@ -24,18 +24,12 @@
 
   width: 100%;
   max-width: 860px;
-
   margin: 0 auto;
-
   padding: 2rem 1rem;
-
   /* Padding inside the 100% width, or the wrapper is wider than a phone screen. */
   box-sizing: border-box;
-
   font-family: var(--sdk-font-sans);
-
   color: var(--sdk-text-primary);
-
   line-height: 1.6;
 }
 
@@ -45,63 +39,46 @@
   box-sizing: border-box;
 }
 
+/* === Header and controls === */
+
 .sdk-header {
   margin-bottom: 1.5rem;
-
   text-align: center;
 }
 
 .sdk-title {
   margin: 0;
-
   font-size: 2rem;
-
   color: var(--sdk-text-primary);
 }
 
 .sdk-subtitle {
   margin-top: 0.5rem;
-
   color: var(--sdk-text-secondary);
-
   font-size: 0.95rem;
 }
 
 .sdk-controls {
   display: flex;
   gap: 0.75rem;
-
   margin-bottom: 1.5rem;
-
   flex-wrap: wrap;
-
   align-items: center;
   justify-content: center;
 }
 
 .sdk-btn {
   min-height: 46px;
-
   padding: 0.65rem 1.5rem;
-
   background: var(--sdk-accent-blue);
-
   color: #ffffff;
-
   border: none;
   border-radius: 6px;
-
   font-size: 0.95rem;
   font-weight: 600;
-
   cursor: pointer;
-
-  transition:
-    background 0.2s,
-    transform 0.1s;
-
+  transition: background 0.2s, transform 0.1s;
   white-space: nowrap;
-
   font-family: inherit;
 }
 
@@ -115,81 +92,61 @@
 
 .sdk-btn--secondary {
   background: transparent;
-
   border: 1px solid var(--sdk-border);
-
   color: var(--sdk-text-secondary);
 }
 
 .sdk-btn--secondary:hover {
   background: var(--sdk-bg-secondary);
-
   color: var(--sdk-text-primary);
 }
 
+/* === Board === */
+
 .sdk-board {
   display: grid;
-
   grid-template-columns: repeat(9, 1fr);
-
   width: 100%;
   max-width: 640px;
   aspect-ratio: 1;
-
   margin: 0 auto;
-
   border: 4px solid var(--sdk-border-focus);
-
   background: var(--sdk-border);
-
   overflow: hidden;
 }
 
 .sdk-cell {
   width: 100%;
   aspect-ratio: 1;
-
   border: 1px solid var(--sdk-border);
-
   background: var(--sdk-bg-input);
-
   color: var(--sdk-text-primary);
-
   text-align: center;
-
   font-family: var(--sdk-font-mono);
-
   font-size: clamp(16px, 2vw, 28px);
   font-weight: 500;
-
   outline: none;
-
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .sdk-cell:focus {
   background: #172554;
-
   border-color: var(--sdk-accent-cyan);
-
   position: relative;
-
   z-index: 2;
 }
 
 .sdk-cell-fixed {
   background: #1e293b;
-
   color: #ffffff;
-
   font-weight: 700;
 }
 
-.sdk-cell-invalid {
+/* The :focus selector matches .sdk-cell:focus in weight and comes later, so a
+   wrong digit stays red while its cell has focus (the cyan border remains). */
+.sdk-cell-invalid,
+.sdk-cell-invalid:focus {
   background: rgba(239, 68, 68, 0.2);
-
   color: #ffffff;
 }
 
@@ -201,70 +158,51 @@
   border-bottom: 3px solid var(--sdk-accent-cyan);
 }
 
+/* === Status, toast and footer === */
+
 .sdk-status-row {
   min-height: 32px;
-
   margin-top: 1rem;
-
   text-align: center;
 }
 
 .sdk-status {
   color: var(--sdk-accent-green);
-
   font-size: 1rem;
   font-weight: 600;
 }
 
 .sdk-toast {
   position: fixed;
-
   left: 50%;
   bottom: 2rem;
-
   transform: translateX(-50%) translateY(100px);
-
   background: var(--sdk-accent-green);
-
   color: #ffffff;
-
   padding: 0.6rem 1.2rem;
-
   border-radius: 6px;
-
   font-size: 0.85rem;
   font-weight: 600;
-
   opacity: 0;
-
-  transition:
-    transform 0.3s,
-    opacity 0.3s;
-
+  transition: transform 0.3s, opacity 0.3s;
   z-index: 10000;
-
   pointer-events: none;
 }
 
 .sdk-toast.sdk-show {
   transform: translateX(-50%) translateY(0);
-
   opacity: 1;
 }
 
 .sdk-footer {
   margin-top: 2rem;
-
   text-align: center;
-
   color: var(--sdk-text-muted);
-
   font-size: 0.85rem;
 }
 
 .sdk-footer a {
   color: var(--sdk-accent-cyan);
-
   text-decoration: none;
 }
 

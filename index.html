@@ -64,14 +64,14 @@
 
     /* ---------- Site links ---------- */
 
-    .hub-text-link {
-      color: var(--hub-text-secondary) !important;
+    .hub-wrapper .hub-text-link {
+      color: var(--hub-text-secondary);
       text-decoration: none;
       transition: color 0.15s;
     }
 
-    .hub-text-link:hover {
-      color: var(--hub-accent-cyan) !important;
+    .hub-wrapper .hub-text-link:hover {
+      color: var(--hub-accent-cyan);
     }
 
     .hub-byline {
@@ -211,7 +211,7 @@
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
-      background: var(--group, var(--hub-text-muted));
+      background: var(--hub-group, var(--hub-text-muted));
     }
 
     /* ---------- Groups and cards ---------- */
@@ -256,7 +256,7 @@
       padding: 0.95rem 1rem;
       background: var(--hub-bg-card);
       border: 1px solid var(--hub-border);
-      border-left: 3px solid var(--group, var(--hub-border));
+      border-left: 3px solid var(--hub-group, var(--hub-border));
       border-radius: var(--hub-radius);
       transition: background 0.15s, border-color 0.15s;
     }
@@ -264,7 +264,7 @@
     .hub-card:hover {
       background: var(--hub-bg-card-hover);
       border-color: var(--hub-border-hover);
-      border-left-color: var(--group, var(--hub-border));
+      border-left-color: var(--hub-group, var(--hub-border));
     }
 
     .hub-card-title {
@@ -310,6 +310,7 @@
       margin: 2rem 0;
       text-align: center;
       color: var(--hub-text-secondary);
+      overflow-wrap: anywhere;
     }
 
     .hub-footer {
@@ -405,8 +406,11 @@
   (function () {
     'use strict';
 
-    // One entry per game folder; group is a key from GROUPS below.
-    // Adding a game: add its entry here in folder order. Counts update by themselves.
+    // ---------- Games and genres ----------
+
+    // One entry per game folder, in folder order; group is a key from GROUPS below.
+    // Adding a game: add its entry here and its line under the same genre in README's
+    // Repository Structure. The counts on the page update by themselves.
     var GAMES = [
       {
         name: '2048 Game',
@@ -449,10 +453,10 @@
         folder: 'wordle-game',
         group: 'word',
         description: 'Guess the hidden five-letter word in six tries on the physical or on-screen keyboard; letters turn green, amber or grey, and your round and wins are saved.'
-      },
+      }
     ];
 
-    // Genres: puzzles first, then word, arcade, and reflex and typing games.
+    // Genres in display order: puzzles first, then word, arcade, and reflex and typing games.
     var GROUPS = [
       { key: 'puzzle', label: 'Puzzle', color: '#3b82f6' },
       { key: 'word', label: 'Word', color: '#10b981' },
@@ -460,147 +464,273 @@
       { key: 'reflex', label: 'Reflex and Typing', color: '#22d3ee' }
     ];
 
-    var listEl = document.getElementById('hub-list');
-    var searchEl = document.getElementById('hub-search');
-    var countEl = document.getElementById('hub-count');
-    var emptyEl = document.getElementById('hub-empty');
-    var chipsEl = document.getElementById('hub-chips');
-    var groupByKey = {};
-    GROUPS.forEach(function (g) { groupByKey[g.key] = g; });
+    // The genre filter of the All chip.
+    var ALL = 'all';
 
-    var state = { query: '', group: 'all' };
+    // ---------- Search and filter logic (no DOM) ----------
 
-    GAMES.forEach(function (t) {
-      t.groupInfo = groupByKey[t.group];
-      if (!t.groupInfo) throw new Error('Unknown group "' + t.group + '" for ' + t.folder);
-      t.haystack = (t.name + ' ' + t.description + ' ' + t.groupInfo.label).toLowerCase();
-    });
-
-    function el(tag, cls, text) {
-      var node = document.createElement(tag);
-      if (cls) node.className = cls;
-      if (text != null) node.textContent = text;
-      return node;
+    function indexGroups(groups) {
+      var byKey = {};
+      groups.forEach(function (group) { byKey[group.key] = group; });
+      return byKey;
     }
 
-    function dot(group) {
-      var d = el('span', 'hub-dot');
-      d.style.setProperty('--group', group.color);
-      d.setAttribute('aria-hidden', 'true');
-      return d;
+    // One entry per game: the game, its genre and the lower-case text a search looks in (name,
+    // description and genre label). A genre that GROUPS lacks stops the page with an error.
+    function indexGames(games, groupByKey) {
+      return games.map(function (game) {
+        if (!Object.prototype.hasOwnProperty.call(groupByKey, game.group)) {
+          throw new Error('Unknown group "' + game.group + '" for ' + game.folder);
+        }
+        var group = groupByKey[game.group];
+        return {
+          game: game,
+          group: group,
+          haystack: (game.name + ' ' + game.description + ' ' + group.label).toLowerCase()
+        };
+      });
     }
 
-    function matchesQuery(t) {
-      if (!state.query) return true;
-      var words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
-      return words.every(function (w) { return t.haystack.indexOf(w) !== -1; });
+    // The words of a search: lower-case, split at whitespace, empty ones dropped.
+    function queryWords(query) {
+      return query.toLowerCase().split(/\s+/).filter(Boolean);
+    }
+
+    // True when every word occurs in the entry's text; no words at all match every entry.
+    function matchesWords(entry, words) {
+      return words.every(function (word) { return entry.haystack.indexOf(word) !== -1; });
+    }
+
+    function inGroup(entries, key) {
+      return entries.filter(function (entry) { return entry.group.key === key; });
     }
 
     function byName(a, b) {
-      return a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+      return a.game.name.localeCompare(b.game.name, 'en', { sensitivity: 'base' });
+    }
+
+    // The sections to show, in GROUPS order: { group, entries } with the entries sorted by name.
+    // Genres outside the filter and genres without a match are left out.
+    function sectionsFor(matched, groupKey) {
+      var sections = [];
+      GROUPS.forEach(function (group) {
+        if (groupKey !== ALL && groupKey !== group.key) return;
+        var entries = inGroup(matched, group.key).sort(byName);
+        if (entries.length) sections.push({ group: group, entries: entries });
+      });
+      return sections;
+    }
+
+    // How many matched games a chip counts: all of them on All, else those of its genre.
+    function chipCount(matched, key) {
+      return key === ALL ? matched.length : inGroup(matched, key).length;
+    }
+
+    // The genre filter after a chip click: clicking the active genre goes back to All.
+    function nextGroup(current, clicked) {
+      return clicked === current ? ALL : clicked;
+    }
+
+    // '' while every game is shown, else 'N of M'.
+    function countLabel(shown, total) {
+      return shown === total ? '' : shown + ' of ' + total;
+    }
+
+    function emptyMessage(query, groupKey) {
+      return 'No game matches “' + query + '”' + (groupKey === ALL ? '.' : ' in this genre.');
     }
 
     // Over HTTP link to the folder with a trailing slash: `npx serve` (the launch.json preview)
     // redirects folder/index.html to /folder without one, and the game's relative style.css and
     // script.js then load from the root and 404. Opened from disk, a folder link would show a
     // directory listing, so file:// keeps the explicit index.html.
-    var FOLDER_PAGE = location.protocol === 'file:' ? '/index.html' : '/';
+    function folderHref(folder, protocol) {
+      return folder + (protocol === 'file:' ? '/index.html' : '/');
+    }
 
-    function card(t) {
-      var article = el('article', 'hub-card');
-      article.style.setProperty('--group', t.groupInfo.color);
-      var h = el('h3', 'hub-card-title');
-      var a = el('a', 'hub-card-link', t.name);
-      a.href = t.folder + FOLDER_PAGE;
-      h.appendChild(a);
-      article.appendChild(h);
-      var p = el('p', 'hub-card-desc', t.description);
-      p.title = t.description;
-      article.appendChild(p);
+    // ---------- Page state ----------
+
+    var ENTRIES = indexGames(GAMES, indexGroups(GROUPS));
+    var state = { query: '', group: ALL };
+    var els = null;
+    var chips = [];
+
+    // ---------- DOM helpers ----------
+
+    function make(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    // The colour dot of a genre; decorative, so screen readers skip it.
+    function dot(group) {
+      var node = make('span', 'hub-dot');
+      node.style.setProperty('--hub-group', group.color);
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    }
+
+    // ---------- Rendering ----------
+
+    function renderHeader() {
+      els.stats.appendChild(make('strong', null, String(GAMES.length)));
+      els.stats.appendChild(document.createTextNode(' games in '));
+      els.stats.appendChild(make('strong', null, String(GROUPS.length)));
+      els.stats.appendChild(document.createTextNode(' genres'));
+      els.search.placeholder = 'Search ' + GAMES.length + ' games by name or genre  (press /)';
+      els.footer.textContent = 'Local repository index page · ' + GAMES.length + ' games';
+    }
+
+    function createChip(key, label, group) {
+      var button = make('button', 'hub-chip');
+      var count = make('span', 'hub-chip-n');
+      button.type = 'button';
+      if (group) button.appendChild(dot(group));
+      button.appendChild(document.createTextNode(label));
+      button.appendChild(count);
+      button.addEventListener('click', function () { onChipClick(key); });
+      els.chips.appendChild(button);
+      chips.push({ key: key, button: button, count: count });
+    }
+
+    // The chips are built once and afterwards only updated: a chip rebuilt on every render
+    // would take the keyboard focus with it when Enter or Space activates it.
+    function buildChips() {
+      createChip(ALL, 'All', null);
+      GROUPS.forEach(function (group) { createChip(group.key, group.label, group); });
+    }
+
+    function updateChips(matched) {
+      chips.forEach(function (chip) {
+        chip.button.setAttribute('aria-pressed', chip.key === state.group ? 'true' : 'false');
+        chip.count.textContent = String(chipCount(matched, chip.key));
+      });
+    }
+
+    function card(entry) {
+      var game = entry.game;
+      var article = make('article', 'hub-card');
+      var heading = make('h3', 'hub-card-title');
+      var link = make('a', 'hub-card-link', game.name);
+      article.style.setProperty('--hub-group', entry.group.color);
+      // The link's ::after overlay covers the whole card, so the pointer is always over the
+      // link: the full text of the clamped description is the link's tooltip (a title on the
+      // paragraph would never show). On the link it is also the link's accessible description,
+      // while its name stays the game's name and the card stays unnamed. Screen readers that
+      // announce descriptions read the text twice (on the link, then the paragraph); that is
+      // the accepted trade-off. Moving the title to the paragraph hides the tooltip again, and
+      // moving it to the article makes the description the card's name.
+      link.title = game.description;
+      link.href = folderHref(game.folder, location.protocol);
+      heading.appendChild(link);
+      article.appendChild(heading);
+      article.appendChild(make('p', 'hub-card-desc', game.description));
       return article;
     }
 
-    function renderChips(matched) {
-      chipsEl.textContent = '';
-      function chip(key, label, n, group) {
-        var b = el('button', 'hub-chip');
-        b.type = 'button';
-        b.setAttribute('aria-pressed', state.group === key ? 'true' : 'false');
-        if (group) b.appendChild(dot(group));
-        b.appendChild(document.createTextNode(label));
-        b.appendChild(el('span', 'hub-chip-n', String(n)));
-        b.addEventListener('click', function () {
-          state.group = state.group === key && key !== 'all' ? 'all' : key;
-          render();
-        });
-        chipsEl.appendChild(b);
-      }
-      chip('all', 'All', matched.length);
-      GROUPS.forEach(function (g) {
-        chip(g.key, g.label, matched.filter(function (t) { return t.group === g.key; }).length, g);
+    function section(group, entries) {
+      var node = make('section', 'hub-section');
+      var heading = make('h2', 'hub-section-head');
+      var grid = make('div', 'hub-grid');
+      heading.id = 'hub-group-' + group.key;
+      node.setAttribute('aria-labelledby', heading.id);
+      heading.appendChild(dot(group));
+      heading.appendChild(document.createTextNode(group.label));
+      heading.appendChild(make('span', 'hub-section-n', String(entries.length)));
+      entries.forEach(function (entry) { grid.appendChild(card(entry)); });
+      node.appendChild(heading);
+      node.appendChild(grid);
+      return node;
+    }
+
+    // Rebuilds the list from the sections and returns how many games it shows.
+    function renderList(sections) {
+      var shown = 0;
+      els.list.textContent = '';
+      sections.forEach(function (item) {
+        shown += item.entries.length;
+        els.list.appendChild(section(item.group, item.entries));
       });
+      return shown;
+    }
+
+    function renderStatus(shown) {
+      els.count.textContent = countLabel(shown, GAMES.length);
+      els.empty.hidden = shown !== 0;
+      els.empty.textContent = shown ? '' : emptyMessage(state.query, state.group);
     }
 
     function render() {
-      listEl.textContent = '';
-      var matched = GAMES.filter(matchesQuery);
-      var shown = 0;
-      GROUPS.forEach(function (g) {
-        if (state.group !== 'all' && state.group !== g.key) return;
-        var items = matched.filter(function (t) { return t.group === g.key; }).sort(byName);
-        if (!items.length) return;
-        shown += items.length;
-        var sec = el('section', 'hub-section');
-        sec.setAttribute('aria-labelledby', 'hub-group-' + g.key);
-        var h = el('h2', 'hub-section-head');
-        h.id = 'hub-group-' + g.key;
-        h.appendChild(dot(g));
-        h.appendChild(document.createTextNode(g.label));
-        h.appendChild(el('span', 'hub-section-n', String(items.length)));
-        sec.appendChild(h);
-        var grid = el('div', 'hub-grid');
-        items.forEach(function (t) { grid.appendChild(card(t)); });
-        sec.appendChild(grid);
-        listEl.appendChild(sec);
-      });
-      renderChips(matched);
-      countEl.textContent = shown === GAMES.length ? '' : shown + ' of ' + GAMES.length;
-      emptyEl.hidden = shown !== 0;
-      if (shown === 0) {
-        emptyEl.textContent = 'No game matches “' + state.query + '”' + (state.group !== 'all' ? ' in this genre.' : '.');
-      }
+      var words = queryWords(state.query);
+      var matched = ENTRIES.filter(function (entry) { return matchesWords(entry, words); });
+      renderStatus(renderList(sectionsFor(matched, state.group)));
+      updateChips(matched);
     }
 
-    var stats = document.getElementById('hub-stats');
-    stats.appendChild(el('strong', null, String(GAMES.length)));
-    stats.appendChild(document.createTextNode(' games in '));
-    stats.appendChild(el('strong', null, String(GROUPS.length)));
-    stats.appendChild(document.createTextNode(' genres'));
-    searchEl.placeholder = 'Search ' + GAMES.length + ' games by name or genre  (press /)';
-    document.getElementById('hub-footer').textContent = 'Local repository index page · ' + GAMES.length + ' games';
+    // ---------- Input ----------
 
-    searchEl.addEventListener('input', function () {
-      state.query = searchEl.value.trim();
+    function onSearchInput() {
+      state.query = els.search.value.trim();
       render();
-    });
+    }
 
-    searchEl.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && searchEl.value) {
-        searchEl.value = '';
-        state.query = '';
-        render();
-      }
-    });
+    // Escape in a non-empty search box clears it; the chosen genre stays.
+    function onSearchKeydown(event) {
+      if (event.key !== 'Escape' || !els.search.value) return;
+      els.search.value = '';
+      state.query = '';
+      render();
+    }
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
-      var tag = (document.activeElement && document.activeElement.tagName) || '';
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      e.preventDefault();
-      searchEl.focus();
-    });
+    // '/' focuses the search box unless Ctrl, Meta or Alt is held (Shift is allowed: '/' is
+    // Shift+7 on German keyboards) or the focus is already in a form field, where it types.
+    function onDocumentKeydown(event) {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (isFormField(document.activeElement)) return;
+      event.preventDefault();
+      els.search.focus();
+    }
 
-    render();
+    function isFormField(node) {
+      var tag = (node && node.tagName) || '';
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    }
+
+    function onChipClick(key) {
+      state.group = nextGroup(state.group, key);
+      render();
+    }
+
+    // ---------- Start-up ----------
+
+    function init() {
+      els = {
+        stats: document.getElementById('hub-stats'),
+        search: document.getElementById('hub-search'),
+        count: document.getElementById('hub-count'),
+        chips: document.getElementById('hub-chips'),
+        list: document.getElementById('hub-list'),
+        empty: document.getElementById('hub-empty'),
+        footer: document.getElementById('hub-footer')
+      };
+      // The box is normally empty here (autocomplete is off and a back/forward restore does
+      // not run init again); reading it anyway keeps the first render in step with the box.
+      state.query = els.search.value.trim();
+      renderHeader();
+      buildChips();
+      render();
+      els.search.addEventListener('input', onSearchInput);
+      els.search.addEventListener('keydown', onSearchKeydown);
+      document.addEventListener('keydown', onDocumentKeydown);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   })();
   </script>
 </body>
