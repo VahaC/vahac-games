@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hash Cracker — Logs from VahaC</title>
+  <meta name="description" content="Crack a hidden 4- or 5-symbol hex key in 10 attempts: a terminal logic game where each try prints HIT and NEAR counts, the keys left and their entropy in bits. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="hcr-wrapper" id="hcr-game">
+
+  <header class="hcr-header">
+    <div class="hcr-title-group">
+      <h1 class="hcr-title">Hash Cracker</h1>
+      <p class="hcr-subtitle">
+        Brute-force the vault key in 10 attempts. HIT: right symbol, right place.
+        NEAR: right symbol, wrong place.
+      </p>
+    </div>
+
+    <div class="hcr-header-actions">
+      <button
+        id="hcr-new-game"
+        class="hcr-btn"
+        type="button"
+        aria-label="Start a new game with a new key"
+      >New Game</button>
+    </div>
+  </header>
+
+  <div class="hcr-modes" role="group" aria-label="Mode">
+    <button id="hcr-mode-easy" class="hcr-mode hcr-mode--active" type="button" aria-pressed="true">
+      <span class="hcr-mode-name">Easy</span>
+      <span class="hcr-mode-info">4 digits 0-9</span>
+    </button>
+    <button id="hcr-mode-normal" class="hcr-mode" type="button" aria-pressed="false">
+      <span class="hcr-mode-name">Normal</span>
+      <span class="hcr-mode-info">4 hex 0-F</span>
+    </button>
+    <button id="hcr-mode-hard" class="hcr-mode" type="button" aria-pressed="false">
+      <span class="hcr-mode-name">Hard</span>
+      <span class="hcr-mode-info">5 hex, repeats</span>
+    </button>
+  </div>
+
+  <section class="hcr-stats" aria-label="Game stats">
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">Attempts</span>
+      <span id="hcr-attempts" class="hcr-stat-value">0/10</span>
+    </div>
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">Keys left</span>
+      <span id="hcr-keys" class="hcr-stat-value">5,040</span>
+    </div>
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">Bits</span>
+      <span id="hcr-bits" class="hcr-stat-value">12.30</span>
+    </div>
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">Streak</span>
+      <span id="hcr-streak" class="hcr-stat-value">0</span>
+    </div>
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">Best</span>
+      <span id="hcr-best" class="hcr-stat-value">0</span>
+    </div>
+    <div class="hcr-stat">
+      <span class="hcr-stat-label">W / L</span>
+      <span id="hcr-record" class="hcr-stat-value">0 / 0</span>
+    </div>
+  </section>
+
+  <div
+    id="hcr-meter"
+    class="hcr-meter"
+    role="progressbar"
+    aria-label="Key space cracked, percent of the starting entropy"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+  >
+    <div id="hcr-meter-fill" class="hcr-meter-fill"></div>
+  </div>
+
+  <section id="hcr-terminal" class="hcr-terminal" aria-label="Terminal">
+    <div class="hcr-term-bar" aria-hidden="true">
+      <span class="hcr-dot hcr-dot--red"></span>
+      <span class="hcr-dot hcr-dot--amber"></span>
+      <span class="hcr-dot hcr-dot--green"></span>
+      <span class="hcr-term-title">root@homelab: ~/vault</span>
+    </div>
+    <div id="hcr-log" class="hcr-log" role="log" aria-live="polite" aria-label="Crack log"></div>
+    <div id="hcr-prompt" class="hcr-prompt" role="status" aria-label="Key: empty"></div>
+  </section>
+
+  <p id="hcr-status" class="hcr-status" role="status">Booting the vault...</p>
+  <p id="hcr-warning" class="hcr-warning" role="alert"></p>
+
+  <div id="hcr-keypad" class="hcr-keypad" role="group" aria-label="Hex keypad"></div>
+
+  <p class="hcr-help">
+    Keyboard: 0-9 and A-F type, Backspace deletes, Enter cracks the key.
+  </p>
+
+  <div id="hcr-toast" class="hcr-toast" role="status" aria-live="polite"></div>
+
+  <footer class="hcr-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

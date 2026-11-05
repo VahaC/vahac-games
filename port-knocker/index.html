@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Port Knocker — Logs from VahaC</title>
+  <meta name="description" content="Port Knocker: a homelab memory game. Watch the patch panel flash a port-knocking sequence and knock it back in Forward (FIFO), Reverse (LIFO) or Stride mode, beat the knock window, and play the same Daily sequence as everyone else. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="pkn-wrapper" id="pkn-game">
+
+  <header class="pkn-header">
+    <h1 class="pkn-title">Port Knocker</h1>
+    <p class="pkn-subtitle">
+      The firewall opens only for the right knock sequence. Watch the patch panel, then knock it back.
+    </p>
+  </header>
+
+  <section class="pkn-toolbar" aria-label="Game settings">
+    <div class="pkn-control">
+      <label class="pkn-label" for="pkn-mode">Mode</label>
+      <select id="pkn-mode" class="pkn-select">
+        <option value="forward">Forward (FIFO)</option>
+        <option value="reverse">Reverse (LIFO)</option>
+        <option value="stride">Stride (every 2nd)</option>
+      </select>
+    </div>
+
+    <div class="pkn-control">
+      <label class="pkn-label" for="pkn-size">Ports</label>
+      <select id="pkn-size" class="pkn-select">
+        <option value="4">4 ports</option>
+        <option value="6">6 ports</option>
+        <option value="9">9 ports</option>
+      </select>
+    </div>
+
+    <div class="pkn-actions">
+      <button type="button" id="pkn-new-game" class="pkn-btn" aria-label="Start a new practice game">New Game</button>
+      <button type="button" id="pkn-restart" class="pkn-btn pkn-btn--secondary" aria-label="Restart the current game from round 1">Restart</button>
+      <button type="button" id="pkn-daily" class="pkn-btn pkn-btn--daily">Daily</button>
+      <button type="button" id="pkn-sound" class="pkn-btn pkn-btn--secondary" aria-pressed="false" aria-label="Sound off: turn the sound on">Sound: off</button>
+    </div>
+  </section>
+
+  <section class="pkn-stats" aria-label="Score">
+    <div class="pkn-stat">
+      <span class="pkn-stat-label">Round</span>
+      <span id="pkn-round" class="pkn-stat-value">1</span>
+    </div>
+    <div class="pkn-stat">
+      <span class="pkn-stat-label">Longest</span>
+      <span id="pkn-longest" class="pkn-stat-value">0</span>
+    </div>
+    <div class="pkn-stat">
+      <span class="pkn-stat-label">Best</span>
+      <span id="pkn-best" class="pkn-stat-value">--</span>
+    </div>
+    <div class="pkn-stat">
+      <span class="pkn-stat-label">Daily streak</span>
+      <span id="pkn-streak" class="pkn-stat-value">0</span>
+    </div>
+  </section>
+
+  <section
+    id="pkn-stage"
+    class="pkn-stage"
+    tabindex="0"
+    aria-label="Patch panel. Keys 1 to 9 knock a port, Enter or Space starts the round."
+  >
+    <div class="pkn-console">
+      <div id="pkn-command" class="pkn-command">$ knock --fifo homelab.lan</div>
+      <div id="pkn-log" class="pkn-log" aria-live="polite"></div>
+      <div id="pkn-output" class="pkn-output">knockd: listening on homelab.lan</div>
+    </div>
+
+    <div class="pkn-faceplate">
+      <div class="pkn-faceplate-label">
+        <span class="pkn-faceplate-name">HOMELAB-SW01</span>
+        <span class="pkn-faceplate-speed">1GbE</span>
+      </div>
+      <div id="pkn-panel" class="pkn-panel" role="group" aria-label="Ports"></div>
+    </div>
+
+    <div class="pkn-meter">
+      <div id="pkn-progress" class="pkn-progress" aria-label="0 of 0 knocks entered"></div>
+      <div class="pkn-window" aria-hidden="true">
+        <div id="pkn-window-fill" class="pkn-window-fill"></div>
+      </div>
+    </div>
+
+    <p id="pkn-hint" class="pkn-hint">Forward (FIFO): knock the ports in the order they flashed.</p>
+  </section>
+
+  <div class="pkn-start-row">
+    <button type="button" id="pkn-start" class="pkn-btn pkn-btn--start">Start</button>
+  </div>
+
+  <p id="pkn-status" class="pkn-status" aria-live="polite">Press Start to watch the first sequence.</p>
+  <p id="pkn-note" class="pkn-note pkn-hidden" role="alert"></p>
+
+  <section id="pkn-result" class="pkn-result pkn-hidden" aria-label="Daily result">
+    <h2 id="pkn-result-title" class="pkn-result-title">Daily</h2>
+    <p id="pkn-result-text" class="pkn-result-text"></p>
+    <div class="pkn-result-actions">
+      <button type="button" id="pkn-share" class="pkn-btn">Share</button>
+      <button type="button" id="pkn-replay" class="pkn-btn pkn-btn--secondary">Replay unscored</button>
+      <button type="button" id="pkn-result-close" class="pkn-btn pkn-btn--secondary">Close</button>
+    </div>
+    <input type="text" id="pkn-share-text" class="pkn-share-text pkn-hidden" readonly aria-label="Daily result to copy">
+  </section>
+
+  <div id="pkn-toast" class="pkn-toast" aria-live="polite"></div>
+
+  <footer class="pkn-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

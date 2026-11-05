@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitmap Decoder — Logs from VahaC</title>
+  <meta name="description" content="Bitmap Decoder: a nonogram picture-logic puzzle whose clues are run-length encoding. Fill the grid until every row and column matches and a hidden 1-bit pixel icon decodes into a hex dump and ASCII art. A daily icon with a streak, Endless boards from 5x5 to 15x15, Easy and Hard rules, a timer and best times. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="bmd-wrapper">
+
+  <header class="bmd-header">
+    <h1 class="bmd-title">Bitmap Decoder</h1>
+    <p class="bmd-subtitle">
+      The clues are run-length encoding: each number is a run of filled cells.
+      Make every row and column match and a hidden 1-bit icon decodes.
+    </p>
+  </header>
+
+  <section class="bmd-controls" aria-label="Game settings">
+    <div class="bmd-modes" role="group" aria-label="Mode">
+      <button id="bmd-tab-daily" class="bmd-mode" type="button" aria-pressed="true">Daily</button>
+      <button id="bmd-tab-endless" class="bmd-mode" type="button" aria-pressed="false">Endless</button>
+    </div>
+
+    <div class="bmd-field">
+      <label class="bmd-label" for="bmd-size">Size</label>
+      <select id="bmd-size" class="bmd-select" aria-label="Endless board size">
+        <option value="5">5x5</option>
+        <option value="10" selected>10x10</option>
+        <option id="bmd-size-15" value="15">15x15</option>
+      </select>
+    </div>
+
+    <div class="bmd-field">
+      <label class="bmd-label" for="bmd-rules">Rules</label>
+      <select id="bmd-rules" class="bmd-select" aria-label="Rules for the next puzzle, and for this one while it has no moves">
+        <option value="easy">Easy: 3 mistakes</option>
+        <option value="hard">Hard: no checks</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="bmd-actions" aria-label="Game actions">
+    <button id="bmd-new-game" class="bmd-btn" type="button" aria-label="Start a new puzzle">New Daily</button>
+    <button id="bmd-restart" class="bmd-btn bmd-btn--secondary" type="button" aria-label="Clear the board">Restart</button>
+    <div class="bmd-tools" role="group" aria-label="What a tap does">
+      <button id="bmd-tool-fill" class="bmd-tool" type="button" aria-pressed="true">&#9632; Fill</button>
+      <button id="bmd-tool-mark" class="bmd-tool" type="button" aria-pressed="false">&#10005; Mark</button>
+    </div>
+  </section>
+
+  <section class="bmd-stats" aria-label="Statistics">
+    <div class="bmd-stat">
+      <span class="bmd-stat-label">Time</span>
+      <span id="bmd-time" class="bmd-stat-value">0:00</span>
+    </div>
+    <div class="bmd-stat">
+      <span class="bmd-stat-label">Mistakes</span>
+      <span id="bmd-mistakes" class="bmd-stat-value">0/3</span>
+    </div>
+    <div class="bmd-stat">
+      <span class="bmd-stat-label">Best</span>
+      <span id="bmd-best-time" class="bmd-stat-value">--</span>
+    </div>
+    <div class="bmd-stat">
+      <span class="bmd-stat-label">Streak</span>
+      <span id="bmd-streak" class="bmd-stat-value">0</span>
+    </div>
+  </section>
+
+  <p id="bmd-puzzle" class="bmd-puzzle">Loading the bitmap...</p>
+
+  <section class="bmd-panel" aria-label="Puzzle">
+    <div id="bmd-board" class="bmd-board bmd-board--s10">
+      <div class="bmd-corner" aria-hidden="true">RLE</div>
+      <div id="bmd-col-clues" class="bmd-col-clues" aria-label="Column clues"></div>
+      <div id="bmd-row-clues" class="bmd-row-clues" aria-label="Row clues"></div>
+      <div id="bmd-grid" class="bmd-grid" role="grid" tabindex="0" aria-label="Bitmap grid"></div>
+    </div>
+  </section>
+
+  <p id="bmd-status" class="bmd-status" role="status">Tap a cell to fill it; drag to paint a run.</p>
+  <p id="bmd-warning" class="bmd-warning" role="alert" hidden></p>
+
+  <section id="bmd-decode" class="bmd-decode" aria-label="Decoded bitmap" hidden>
+    <h2 class="bmd-decode-title"><span id="bmd-decode-label">Decoded:</span> <span id="bmd-decode-name">?</span></h2>
+    <p id="bmd-stream" class="bmd-stream"></p>
+    <div class="bmd-dumps">
+      <pre id="bmd-hex" class="bmd-pre" aria-label="Hex dump of the rows"></pre>
+      <pre id="bmd-ascii" class="bmd-pre" aria-label="ASCII art"></pre>
+    </div>
+    <div class="bmd-share-row">
+      <button id="bmd-share" class="bmd-btn" type="button" aria-label="Copy the result line">Copy result</button>
+      <input id="bmd-share-field" class="bmd-share-field" type="text" readonly aria-label="Result line" hidden>
+    </div>
+  </section>
+
+  <div id="bmd-toast" class="bmd-toast" aria-live="polite"></div>
+
+  <footer class="bmd-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

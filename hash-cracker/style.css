@@ -1,0 +1,584 @@
+/* Hash Cracker — style.css
+   Namespace: hcr- (hash cracker)
+   All selectors use the hcr- prefix to avoid conflicts with host page styles. */
+
+.hcr-wrapper {
+  --hcr-bg-primary: #0a0f1e;
+  --hcr-bg-secondary: #111827;
+  --hcr-bg-card: #1a2236;
+  --hcr-bg-input: #0d1424;
+  --hcr-bg-terminal: #060a14;
+  --hcr-border: #2a3a5c;
+  --hcr-border-focus: #3b82f6;
+  --hcr-text-primary: #e2e8f0;
+  --hcr-text-secondary: #94a3b8;
+  --hcr-text-muted: #64748b;
+  --hcr-accent-blue: #3b82f6;
+  --hcr-accent-cyan: #22d3ee;
+  --hcr-accent-green: #10b981;
+  --hcr-accent-amber: #f59e0b;
+  --hcr-accent-red: #ef4444;
+  --hcr-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --hcr-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --hcr-radius: 8px;
+  --hcr-key-size: 52px;
+
+  font-family: var(--hcr-font-sans);
+  color: var(--hcr-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--hcr-bg-primary) 0%, var(--hcr-bg-secondary) 100%);
+}
+
+.hcr-wrapper *,
+.hcr-wrapper *::before,
+.hcr-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.hcr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.hcr-title-group {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.hcr-title {
+  margin: 0;
+  font-family: var(--hcr-font-mono);
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--hcr-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.hcr-subtitle {
+  margin: 0.4rem 0 0;
+  color: var(--hcr-text-secondary);
+  font-size: 0.92rem;
+}
+
+.hcr-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+.hcr-btn {
+  padding: 0.65rem 1.5rem;
+  min-height: 44px;
+  background: var(--hcr-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+  /* Quick repeated taps never zoom the page; panning and pinch still work. */
+  touch-action: manipulation;
+}
+
+.hcr-btn:hover { background: #2563eb; }
+.hcr-btn:active { transform: scale(0.97); }
+
+.hcr-btn.hcr-armed,
+.hcr-btn.hcr-armed:hover {
+  background: var(--hcr-accent-red);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.45);
+}
+
+.hcr-btn:focus-visible,
+.hcr-mode:focus-visible,
+.hcr-key:focus-visible {
+  outline: 2px solid var(--hcr-accent-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Modes ──────────────────────────────────────────────────────────────── */
+
+.hcr-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.hcr-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0.5rem 0.4rem;
+  background: var(--hcr-bg-card);
+  color: var(--hcr-text-secondary);
+  border: 1px solid var(--hcr-border);
+  border-radius: var(--hcr-radius);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  touch-action: manipulation;
+}
+
+.hcr-mode:hover {
+  border-color: var(--hcr-accent-cyan);
+  color: var(--hcr-text-primary);
+}
+
+.hcr-mode--active {
+  border-color: var(--hcr-accent-cyan);
+  color: var(--hcr-text-primary);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25), inset 0 0 12px rgba(34, 211, 238, 0.08);
+}
+
+.hcr-mode.hcr-armed {
+  border-color: var(--hcr-accent-red);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+}
+
+.hcr-mode-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.hcr-mode-info {
+  max-width: 100%;
+  font-family: var(--hcr-font-mono);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: var(--hcr-text-muted);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ── Stats and meter ────────────────────────────────────────────────────── */
+
+.hcr-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.hcr-stat {
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  background: var(--hcr-bg-card);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--hcr-radius);
+}
+
+.hcr-stat-label {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--hcr-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hcr-stat-value {
+  display: block;
+  font-family: var(--hcr-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--hcr-accent-cyan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hcr-meter {
+  height: 6px;
+  margin-bottom: 1rem;
+  background: var(--hcr-bg-input);
+  border: 1px solid var(--hcr-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hcr-meter.hcr-meter--unknown {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.hcr-meter-fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--hcr-accent-blue), var(--hcr-accent-cyan), var(--hcr-accent-green));
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+  transition: width 0.4s ease;
+}
+
+/* ── Terminal ───────────────────────────────────────────────────────────── */
+
+.hcr-terminal {
+  background: var(--hcr-bg-terminal);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.08), inset 0 0 25px rgba(34, 211, 238, 0.04);
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.hcr-terminal.hcr-granted {
+  border-color: var(--hcr-accent-green);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+}
+
+.hcr-terminal.hcr-denied {
+  border-color: var(--hcr-accent-red);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+}
+
+.hcr-term-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--hcr-bg-secondary);
+  border-bottom: 1px solid var(--hcr-border);
+}
+
+.hcr-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.hcr-dot--red { background: var(--hcr-accent-red); }
+.hcr-dot--amber { background: var(--hcr-accent-amber); }
+.hcr-dot--green { background: var(--hcr-accent-green); }
+
+.hcr-term-title {
+  margin-left: 0.4rem;
+  font-family: var(--hcr-font-mono);
+  font-size: 0.75rem;
+  color: var(--hcr-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hcr-log {
+  max-height: 22rem;
+  overflow-y: auto;
+  padding: 0.75rem 0.85rem 0.25rem;
+  font-family: var(--hcr-font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--hcr-text-primary);
+}
+
+.hcr-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.hcr-line--head,
+.hcr-line--keys {
+  color: var(--hcr-text-muted);
+}
+
+.hcr-line--keys {
+  margin-bottom: 0.2rem;
+}
+
+.hcr-line--won {
+  margin-top: 0.4rem;
+  color: var(--hcr-accent-green);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+.hcr-line--lost {
+  margin-top: 0.4rem;
+  color: var(--hcr-accent-red);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.hcr-line--new {
+  animation: hcr-type-in 0.35s ease-out;
+}
+
+.hcr-num { color: var(--hcr-text-muted); }
+.hcr-cmd { color: var(--hcr-accent-cyan); }
+.hcr-guess { color: var(--hcr-accent-amber); font-weight: 700; letter-spacing: 0.08em; }
+.hcr-hit { color: var(--hcr-accent-green); font-weight: 700; }
+.hcr-near { color: var(--hcr-accent-amber); }
+
+.hcr-prompt {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  min-height: 2.6rem;
+  padding: 0.35rem 0.85rem 0.6rem;
+  font-family: var(--hcr-font-mono);
+  font-size: 1.1rem;
+}
+
+.hcr-prompt .hcr-cmd {
+  margin-right: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.hcr-slot {
+  display: inline-block;
+  min-width: 1.3em;
+  text-align: center;
+  color: var(--hcr-text-muted);
+  border-bottom: 2px solid var(--hcr-border);
+}
+
+.hcr-slot--filled {
+  color: var(--hcr-accent-amber);
+  font-weight: 700;
+  border-bottom-color: var(--hcr-accent-amber);
+}
+
+.hcr-slot--cursor {
+  border-bottom-color: var(--hcr-accent-cyan);
+  animation: hcr-blink 1s step-end infinite;
+}
+
+@keyframes hcr-blink {
+  50% { border-bottom-color: transparent; }
+}
+
+@keyframes hcr-type-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── Status, warning and help ───────────────────────────────────────────── */
+
+.hcr-status {
+  margin: 0.85rem 0 0;
+  padding: 0.6rem 0.85rem;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  border-radius: var(--hcr-radius);
+  color: var(--hcr-accent-cyan);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.hcr-warning {
+  display: none;
+  margin: 0.6rem 0 0;
+  color: var(--hcr-accent-amber);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.hcr-warning.hcr-visible {
+  display: block;
+}
+
+.hcr-help {
+  margin: 0.75rem 0 0;
+  color: var(--hcr-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* ── Keypad ─────────────────────────────────────────────────────────────── */
+
+.hcr-keypad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  max-width: 360px;
+  margin: 1rem auto 0;
+}
+
+.hcr-key {
+  min-width: 0;
+  height: var(--hcr-key-size);
+  padding: 0;
+  background: linear-gradient(180deg, rgba(42, 58, 92, 0.9), rgba(26, 34, 54, 0.95));
+  color: var(--hcr-text-primary);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--hcr-radius);
+  font-family: var(--hcr-font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  /* A double tap on a key (AA3F0, two Backspaces) types twice, never zooms. */
+  touch-action: manipulation;
+  transition: transform 0.1s, border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.hcr-key:hover {
+  border-color: var(--hcr-accent-cyan);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+}
+
+.hcr-key:active { transform: scale(0.96); }
+
+.hcr-key:disabled,
+.hcr-key:disabled:hover {
+  opacity: 0.3;
+  cursor: default;
+  border-color: rgba(59, 130, 246, 0.15);
+  box-shadow: none;
+  transform: none;
+}
+
+.hcr-key--action {
+  font-size: 0.85rem;
+  color: var(--hcr-text-secondary);
+}
+
+.hcr-key--crack {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--hcr-text-secondary);
+}
+
+.hcr-key--crack.hcr-ready {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.55), rgba(16, 120, 90, 0.6));
+  border-color: var(--hcr-accent-green);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+/* ── Toast and footer ───────────────────────────────────────────────────── */
+
+.hcr-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  /* As wide as the message, up to the viewport less 1rem a side (with auto
+     width a box at left: 50% would only get the right half of the screen). */
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--hcr-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.hcr-toast.hcr-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.hcr-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--hcr-text-muted);
+  font-size: 0.8rem;
+}
+
+/* ── Phones ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .hcr-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .hcr-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .hcr-title {
+    font-size: 1.6rem;
+  }
+
+  .hcr-log {
+    max-height: 16rem;
+    font-size: 0.8rem;
+    padding: 0.6rem 0.65rem 0.2rem;
+  }
+
+  .hcr-prompt {
+    padding: 0.3rem 0.65rem 0.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hcr-wrapper {
+    --hcr-key-size: 48px;
+  }
+
+  .hcr-header-actions,
+  .hcr-btn {
+    width: 100%;
+  }
+
+  .hcr-modes {
+    gap: 0.4rem;
+  }
+
+  .hcr-mode-info {
+    font-size: 0.66rem;
+  }
+
+  .hcr-stats {
+    gap: 0.35rem;
+  }
+
+  .hcr-stat {
+    padding: 0.4rem 0.45rem;
+  }
+
+  .hcr-stat-value {
+    font-size: 0.85rem;
+  }
+
+  .hcr-log {
+    font-size: 0.75rem;
+  }
+
+  .hcr-keypad {
+    gap: 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hcr-line--new,
+  .hcr-slot--cursor {
+    animation: none;
+  }
+
+  .hcr-meter-fill,
+  .hcr-toast {
+    transition: none;
+  }
+}

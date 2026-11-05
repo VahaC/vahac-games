@@ -1,0 +1,840 @@
+/* On-Call Shift — style.css
+   Namespace: ocs- (on-call shift)
+   All selectors use the ocs- prefix to avoid conflicts with host page styles. */
+
+.ocs-wrapper {
+  --ocs-bg-primary: #0a0f1e;
+  --ocs-bg-secondary: #111827;
+  --ocs-bg-card: #1a2236;
+  --ocs-bg-input: #0d1424;
+  --ocs-border: #2a3a5c;
+  --ocs-border-focus: #3b82f6;
+  --ocs-text-primary: #e2e8f0;
+  --ocs-text-secondary: #94a3b8;
+  --ocs-text-muted: #64748b;
+  --ocs-accent-blue: #3b82f6;
+  --ocs-accent-cyan: #22d3ee;
+  --ocs-accent-green: #10b981;
+  --ocs-accent-amber: #f59e0b;
+  --ocs-accent-red: #ef4444;
+  --ocs-accent-violet: #a78bfa;
+  --ocs-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --ocs-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ocs-radius: 8px;
+  --ocs-kind: var(--ocs-accent-cyan);
+  --ocs-tile-font: 0.78rem;
+  --ocs-tile-pad: 8px;
+  --ocs-rack-gap: 8px;
+  --ocs-rack-pad: 12px;
+
+  font-family: var(--ocs-font-sans);
+  color: var(--ocs-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--ocs-bg-primary) 0%, var(--ocs-bg-secondary) 100%);
+}
+
+.ocs-wrapper *,
+.ocs-wrapper *::before,
+.ocs-wrapper *::after {
+  box-sizing: border-box;
+}
+
+.ocs-wrapper [hidden] {
+  display: none;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────── */
+
+.ocs-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ocs-title-group {
+  min-width: 0;
+}
+
+.ocs-title {
+  margin: 0;
+  font-family: var(--ocs-font-mono);
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--ocs-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.ocs-subtitle {
+  margin: 6px 0 0;
+  color: var(--ocs-text-secondary);
+  font-size: 0.9rem;
+}
+
+.ocs-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ocs-btn {
+  padding: 0.65rem 1.25rem;
+  background: var(--ocs-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.ocs-btn:hover { background: #2563eb; }
+.ocs-btn:active { transform: scale(0.97); }
+
+.ocs-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+  transform: none;
+}
+
+.ocs-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--ocs-border);
+  color: var(--ocs-text-secondary);
+}
+
+.ocs-btn-secondary:hover {
+  background: var(--ocs-bg-secondary);
+  color: var(--ocs-text-primary);
+}
+
+.ocs-level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ocs-level-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ocs-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ocs-select {
+  padding: 0.55rem 0.7rem;
+  background: var(--ocs-bg-input);
+  border: 1px solid var(--ocs-border);
+  border-radius: 6px;
+  color: var(--ocs-text-primary);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.9rem;
+}
+
+.ocs-btn:focus-visible,
+.ocs-select:focus-visible,
+.ocs-act:focus-visible,
+.ocs-overlay:focus-visible,
+.ocs-help-title:focus-visible {
+  outline: 2px solid var(--ocs-accent-cyan);
+  outline-offset: 2px;
+}
+
+/* ── HUD ─────────────────────────────────────────────────────────────── */
+
+.ocs-hud {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ocs-stat {
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--ocs-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.ocs-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ocs-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ocs-stat-value {
+  display: block;
+  font-family: var(--ocs-font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ocs-accent-cyan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Uptime and grades coloured by their nines. */
+.ocs-nines-5 { color: var(--ocs-accent-cyan); }
+.ocs-nines-4 { color: var(--ocs-accent-green); }
+.ocs-nines-3 { color: var(--ocs-accent-green); }
+.ocs-nines-2 { color: var(--ocs-accent-amber); }
+.ocs-nines-1 { color: var(--ocs-accent-red); }
+.ocs-nines-0 { color: var(--ocs-accent-red); }
+
+.ocs-timeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: var(--ocs-font-mono);
+  font-size: 0.7rem;
+  color: var(--ocs-text-muted);
+}
+
+.ocs-timeline-label {
+  flex: none;
+}
+
+.ocs-progress {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ocs-bg-input);
+  border: 1px solid var(--ocs-border);
+  overflow: hidden;
+}
+
+.ocs-progress-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ocs-accent-blue), var(--ocs-accent-cyan));
+}
+
+/* ── Rack ────────────────────────────────────────────────────────────── */
+
+.ocs-rack-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.ocs-rack {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ocs-rack-gap);
+  padding: var(--ocs-rack-pad);
+  border-radius: 12px;
+  border: 1px solid var(--ocs-border);
+  background:
+    repeating-linear-gradient(180deg, rgba(42, 58, 92, 0.18) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(10, 15, 30, 0.98));
+  box-shadow: inset 0 0 25px rgba(34, 211, 238, 0.05), 0 10px 30px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.ocs-rack:focus-visible {
+  border-color: var(--ocs-accent-cyan);
+}
+
+.ocs-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 82px;
+  padding: var(--ocs-tile-pad);
+  border-radius: var(--ocs-radius);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(180deg, rgba(42, 58, 92, 0.55), rgba(26, 34, 54, 0.9));
+  color: var(--ocs-text-secondary);
+  font-family: var(--ocs-font-mono);
+  font-size: var(--ocs-tile-font);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ocs-tile:hover {
+  border-color: var(--ocs-accent-cyan);
+}
+
+.ocs-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ocs-tile-led {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ocs-accent-green);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+}
+
+.ocs-tile-name,
+.ocs-tile-state,
+.ocs-tile-timer {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ocs-tile-name {
+  color: var(--ocs-text-primary);
+  font-weight: 700;
+}
+
+.ocs-tile-state {
+  color: var(--ocs-text-muted);
+}
+
+.ocs-tile-timer {
+  min-height: 1.35em;
+  color: var(--ocs-text-secondary);
+}
+
+.ocs-tile-bar {
+  display: block;
+  height: 4px;
+  margin-top: auto;
+  border-radius: 2px;
+  background: rgba(13, 20, 36, 0.9);
+  overflow: hidden;
+}
+
+.ocs-tile-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ocs-kind);
+  transition: width 0.1s linear;
+}
+
+/* Incident kinds: the tile border, its bar and the matching action button. */
+.ocs-kind-cleanup { --ocs-kind: var(--ocs-accent-amber); }
+.ocs-kind-restart { --ocs-kind: var(--ocs-accent-cyan); }
+.ocs-kind-scale { --ocs-kind: var(--ocs-accent-blue); }
+.ocs-kind-renew { --ocs-kind: var(--ocs-accent-violet); }
+
+.ocs-tile-ok .ocs-tile-state {
+  color: var(--ocs-accent-green);
+}
+
+.ocs-tile-alert {
+  border-color: var(--ocs-kind);
+  background: linear-gradient(180deg, rgba(42, 58, 92, 0.75), rgba(26, 34, 54, 0.95));
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
+}
+
+.ocs-tile-alert .ocs-tile-led {
+  background: var(--ocs-kind);
+  box-shadow: 0 0 8px var(--ocs-kind);
+  animation: ocs-blink 0.8s steps(2, start) infinite;
+}
+
+.ocs-tile-alert .ocs-tile-state {
+  color: var(--ocs-kind);
+  font-weight: 700;
+}
+
+.ocs-tile-down {
+  border-color: var(--ocs-accent-red);
+  background: linear-gradient(180deg, rgba(127, 29, 29, 0.55), rgba(26, 34, 54, 0.95));
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  animation: ocs-pulse 1.2s ease-in-out infinite;
+}
+
+.ocs-tile-down .ocs-tile-led {
+  background: var(--ocs-accent-red);
+  box-shadow: 0 0 8px var(--ocs-accent-red);
+}
+
+.ocs-tile-down .ocs-tile-state {
+  color: var(--ocs-accent-red);
+  font-weight: 700;
+}
+
+.ocs-tile-down .ocs-tile-fill {
+  background: var(--ocs-accent-red);
+}
+
+/* The keyboard cursor shows while the rack has the focus; a server picked
+   by a tap (waiting for its action) always shows. */
+.ocs-rack:focus .ocs-tile-cursor,
+.ocs-rack:focus-within .ocs-tile-cursor {
+  outline: 2px dashed var(--ocs-accent-cyan);
+  outline-offset: 2px;
+}
+
+.ocs-tile-picked {
+  box-shadow: 0 0 0 2px var(--ocs-accent-amber), 0 0 14px rgba(245, 158, 11, 0.45);
+}
+
+.ocs-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(10, 15, 30, 0.78);
+  color: var(--ocs-text-primary);
+  font-family: var(--ocs-font-mono);
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ocs-overlay-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ocs-accent-cyan);
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+}
+
+.ocs-overlay-text {
+  font-size: 0.85rem;
+  color: var(--ocs-text-secondary);
+}
+
+/* ── Actions ─────────────────────────────────────────────────────────── */
+
+.ocs-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ocs-act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 8px 6px;
+  border-radius: var(--ocs-radius);
+  border: 1px solid var(--ocs-kind);
+  background: var(--ocs-bg-card);
+  color: var(--ocs-text-primary);
+  font-family: var(--ocs-font-mono);
+  line-height: 1.3;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.ocs-act:active {
+  transform: scale(0.97);
+}
+
+.ocs-act-key {
+  font-size: 0.65rem;
+  color: var(--ocs-text-muted);
+}
+
+.ocs-act-name,
+.ocs-act-hint {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ocs-act-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ocs-kind);
+}
+
+.ocs-act-hint {
+  font-size: 0.65rem;
+  color: var(--ocs-text-secondary);
+}
+
+.ocs-act-armed {
+  background: var(--ocs-kind);
+  box-shadow: 0 0 16px var(--ocs-kind);
+}
+
+.ocs-act-armed .ocs-act-name,
+.ocs-act-armed .ocs-act-hint,
+.ocs-act-armed .ocs-act-key {
+  color: var(--ocs-bg-primary);
+}
+
+/* ── Status, warning and panels ──────────────────────────────────────── */
+
+.ocs-status {
+  min-height: 3.4em;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--ocs-radius);
+  background: var(--ocs-bg-input);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  color: var(--ocs-accent-cyan);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.ocs-warning {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--ocs-radius);
+  border: 1px solid var(--ocs-accent-amber);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--ocs-accent-amber);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.ocs-panel {
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: var(--ocs-radius);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid var(--ocs-border);
+}
+
+.ocs-panel-title {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ocs-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ocs-feed,
+.ocs-pm-log,
+.ocs-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.ocs-feed {
+  min-height: 6em;
+}
+
+.ocs-feed-line,
+.ocs-pm-line,
+.ocs-history-line,
+.ocs-history-empty {
+  overflow-wrap: anywhere;
+  color: var(--ocs-text-secondary);
+}
+
+.ocs-log-start,
+.ocs-log-end {
+  color: var(--ocs-text-muted);
+}
+
+.ocs-log-alert {
+  color: var(--ocs-text-secondary);
+}
+
+.ocs-log-cascade {
+  color: var(--ocs-accent-violet);
+}
+
+.ocs-log-breach {
+  color: var(--ocs-accent-red);
+}
+
+.ocs-log-fix {
+  color: var(--ocs-accent-green);
+}
+
+.ocs-log-restore {
+  color: var(--ocs-accent-cyan);
+}
+
+.ocs-log-wrong {
+  color: var(--ocs-accent-amber);
+}
+
+.ocs-postmortem {
+  border-color: var(--ocs-accent-cyan);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+}
+
+.ocs-pm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.ocs-pm-uptime {
+  font-family: var(--ocs-font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ocs-text-primary);
+}
+
+.ocs-pm-grade {
+  font-family: var(--ocs-font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ocs-pm-note {
+  margin: 4px 0 8px;
+  color: var(--ocs-text-primary);
+}
+
+.ocs-pm-stats {
+  margin: 0 0 8px;
+  color: var(--ocs-text-secondary);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.ocs-pm-log {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--ocs-bg-input);
+  border: 1px solid var(--ocs-border);
+}
+
+.ocs-pm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ocs-share {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--ocs-border-focus);
+  background: var(--ocs-bg-input);
+  color: var(--ocs-text-primary);
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75rem;
+  resize: vertical;
+}
+
+.ocs-help {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: var(--ocs-radius);
+  border: 1px solid var(--ocs-border);
+  color: var(--ocs-text-secondary);
+  font-size: 0.85rem;
+}
+
+.ocs-help-title {
+  cursor: pointer;
+  color: var(--ocs-text-primary);
+  font-weight: 600;
+}
+
+.ocs-help-list {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+}
+
+.ocs-help-list strong {
+  color: var(--ocs-accent-cyan);
+}
+
+/* ── Toast and footer ────────────────────────────────────────────────── */
+
+.ocs-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--ocs-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.ocs-toast.ocs-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.ocs-footer {
+  text-align: center;
+  color: var(--ocs-text-muted);
+  font-size: 0.8rem;
+}
+
+@keyframes ocs-blink {
+  to { opacity: 0.25; }
+}
+
+@keyframes ocs-pulse {
+  50% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocs-tile-alert .ocs-tile-led,
+  .ocs-tile-down {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .ocs-wrapper {
+    --ocs-tile-font: 0.7rem;
+    --ocs-tile-pad: 6px;
+    --ocs-rack-gap: 6px;
+    --ocs-rack-pad: 8px;
+  }
+
+  .ocs-title {
+    font-size: 1.6rem;
+  }
+
+  .ocs-hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ocs-act-name {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ocs-wrapper {
+    padding: 16px 12px;
+    --ocs-tile-font: 0.66rem;
+    --ocs-rack-gap: 5px;
+    --ocs-rack-pad: 6px;
+  }
+
+  .ocs-controls {
+    width: 100%;
+  }
+
+  .ocs-controls .ocs-btn {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .ocs-tile {
+    min-height: 74px;
+  }
+
+  .ocs-actions {
+    gap: 6px;
+  }
+
+  .ocs-act {
+    padding: 6px 4px;
+  }
+
+  .ocs-act-name {
+    font-size: 0.74rem;
+  }
+
+  .ocs-act-hint {
+    font-size: 0.58rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .ocs-wrapper {
+    --ocs-tile-font: 0.62rem;
+    --ocs-tile-pad: 5px;
+  }
+
+  .ocs-stat {
+    padding: 6px 8px;
+  }
+
+  .ocs-stat-value {
+    font-size: 1.05rem;
+  }
+}
+
+/* ── Short screens (a phone in landscape, 320-420 px tall) ───────────── */
+/* The rack and the action bar together stay well under 320 px: tighter
+   tiles and gaps, and action buttons without the key digit line (name and
+   hint stay; the aria-label still names the key). Last in the file, so it
+   wins over the width rules above. */
+
+@media (max-height: 420px) {
+  .ocs-wrapper {
+    --ocs-tile-pad: 4px;
+    --ocs-rack-gap: 4px;
+    --ocs-rack-pad: 5px;
+  }
+
+  .ocs-rack-wrap {
+    margin-bottom: 8px;
+  }
+
+  .ocs-tile {
+    min-height: 0;
+    gap: 1px;
+    line-height: 1.2;
+  }
+
+  .ocs-tile-timer {
+    min-height: 1.2em;
+  }
+
+  .ocs-actions {
+    gap: 6px;
+  }
+
+  .ocs-act-key {
+    display: none;
+  }
+}

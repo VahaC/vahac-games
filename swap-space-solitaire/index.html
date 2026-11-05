@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swap Space Solitaire — Logs from VahaC</title>
+  <meta name="description" content="Play Swap Space Solitaire, an open card solitaire of skill: 8 cascades, 4 swap slots and 4 /dev/sd* disks, numbered deals you can replay, a daily deal, undo of up to 500 moves, win streaks and two-tap moves that work on phones. Fully client-side and offline.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="swp-wrapper" id="swp-wrapper">
+
+  <header class="swp-header">
+    <div class="swp-title-group">
+      <h1 class="swp-title">Swap Space Solitaire</h1>
+      <p class="swp-subtitle">Page all 52 cards out to /dev/sda–sdd. Every card is face up: skill, not luck.</p>
+    </div>
+
+    <div class="swp-tabs" role="group" aria-label="Game mode">
+      <button id="swp-tab-deals" class="swp-tab swp-tab-active" type="button" aria-pressed="true">Deals</button>
+      <button id="swp-tab-daily" class="swp-tab" type="button" aria-pressed="false">Daily</button>
+    </div>
+  </header>
+
+  <section class="swp-toolbar" aria-label="Game controls">
+    <div id="swp-deal-controls" class="swp-controls">
+      <button id="swp-new-deal" class="swp-btn" type="button" aria-label="Start a new random deal">New Deal</button>
+      <label class="swp-deal-field">
+        <span class="swp-label">Deal #</span>
+        <input id="swp-deal-input" class="swp-input" type="text" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="1-999999" aria-label="Deal number to play">
+      </label>
+      <button id="swp-play-deal" class="swp-btn swp-btn--secondary" type="button" aria-label="Play the deal number typed">Play</button>
+    </div>
+
+    <div class="swp-controls">
+      <button id="swp-undo" class="swp-btn swp-btn--secondary" type="button" aria-label="Undo the last move (U)">Undo</button>
+      <button id="swp-restart" class="swp-btn swp-btn--secondary" type="button" aria-label="Restart this deal from its first layout">Restart</button>
+      <button id="swp-give-up" class="swp-btn swp-btn--secondary" type="button" aria-label="Give up this deal">Give Up</button>
+      <button id="swp-practice" class="swp-btn swp-btn--secondary swp-hidden" type="button" aria-label="Replay today's daily deal unscored">Practice</button>
+      <button id="swp-share" class="swp-btn swp-hidden" type="button" aria-label="Copy the result as text">Share</button>
+    </div>
+  </section>
+
+  <section class="swp-stats" aria-label="Statistics">
+    <div class="swp-stat">
+      <span class="swp-stat-label">Page faults</span>
+      <span id="swp-faults" class="swp-stat-value">0</span>
+    </div>
+    <div class="swp-stat">
+      <span class="swp-stat-label">Time</span>
+      <span id="swp-time" class="swp-stat-value">0:00</span>
+    </div>
+    <div class="swp-stat">
+      <span class="swp-stat-label">Won</span>
+      <span id="swp-won" class="swp-stat-value">0/0</span>
+    </div>
+    <div class="swp-stat">
+      <span class="swp-stat-label">Streak</span>
+      <span id="swp-streak" class="swp-stat-value">0</span>
+    </div>
+    <div class="swp-stat">
+      <span class="swp-stat-label">Best</span>
+      <span id="swp-best" class="swp-stat-value">0</span>
+    </div>
+    <div class="swp-stat">
+      <span class="swp-stat-label">Daily streak</span>
+      <span id="swp-daily-streak" class="swp-stat-value">0</span>
+    </div>
+  </section>
+
+  <p id="swp-label" class="swp-deal-label">Deal</p>
+
+  <div id="swp-warning" class="swp-warning swp-hidden" role="alert"></div>
+
+  <div
+    id="swp-table"
+    class="swp-table"
+    tabindex="0"
+    role="group"
+    aria-label="Card table. Keys: 1 to 8 pick or drop on a cascade, Q W E R a swap slot, F sends to the disk, U or Ctrl+Z undo, Escape cancels the pick."
+  ></div>
+
+  <div id="swp-status" class="swp-status" aria-live="polite">Loading the deal...</div>
+
+  <input id="swp-share-field" class="swp-share-field swp-hidden" type="text" readonly aria-label="Result to copy">
+
+  <details class="swp-help">
+    <summary>How to play</summary>
+    <ul>
+      <li>Get every suit from ace to king onto its disk: <code>/dev/sda</code> spades, <code>sdb</code> hearts, <code>sdc</code> diamonds, <code>sdd</code> clubs.</li>
+      <li>In a cascade a card goes on the next higher card of the other colour; any card or run may go to an empty cascade.</li>
+      <li>A swap slot parks one card. A run of cards moves only while it is no longer than (free swap slots + 1) × 2 for every empty cascade.</li>
+      <li>Tap a card, then tap where it goes. Tap the picked card again to send it to its disk, or else to the first free swap slot. Cards no longer needed go to the disks by themselves.</li>
+      <li>Every move is a page fault. Undo takes back the last one (up to 500); Restart, pressed twice, goes back to the first layout and counts the moves it takes back as undos. The clock runs from your first move.</li>
+      <li>Keys, with the focus on the game: 1–8 cascades, Q W E R swap slots, F the disk, U or Ctrl+Z undo, Esc cancel.</li>
+      <li>Every deal number replays the same deal; the daily deal is the same for everyone and scores once a day. Nearly every deal can be solved, but none is guaranteed.</li>
+    </ul>
+  </details>
+
+  <div id="swp-toast" class="swp-toast" aria-live="polite"></div>
+
+  <footer class="swp-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

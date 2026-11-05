@@ -1,0 +1,1055 @@
+/* Patch Panel — style.css
+   Namespace: ppn- (patch panel)
+   All selectors use the ppn- prefix to avoid conflicts with host page styles.
+   Tile sizes: each board size has its own --ppn-tile per screen width, so a
+   9x9 board fits a 320 px phone with 30 px tiles; .ppn-board-wrap scrolls
+   sideways (never the page) if a host column is narrower than the screen. */
+
+.ppn-wrapper {
+  --ppn-bg-primary: #0a0f1e;
+  --ppn-bg-secondary: #111827;
+  --ppn-bg-card: #1a2236;
+  --ppn-bg-input: #0d1424;
+  --ppn-border: #2a3a5c;
+  --ppn-border-focus: #3b82f6;
+  --ppn-text-primary: #e2e8f0;
+  --ppn-text-secondary: #94a3b8;
+  --ppn-text-muted: #64748b;
+  --ppn-accent-blue: #3b82f6;
+  --ppn-accent-cyan: #22d3ee;
+  --ppn-accent-green: #10b981;
+  --ppn-accent-amber: #f59e0b;
+  --ppn-accent-red: #ef4444;
+  --ppn-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --ppn-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ppn-radius: 8px;
+  --ppn-wire-down: #3a4a6b;
+  --ppn-led-off: #475569;
+
+  font-family: var(--ppn-font-sans);
+  color: var(--ppn-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--ppn-bg-primary) 0%, var(--ppn-bg-secondary) 100%);
+}
+
+.ppn-wrapper *,
+.ppn-wrapper *::before,
+.ppn-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────────── */
+
+.ppn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.ppn-title {
+  margin: 0;
+  font-family: var(--ppn-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--ppn-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.ppn-subtitle {
+  margin: 6px 0 0;
+  max-width: 520px;
+  color: var(--ppn-text-secondary);
+  font-size: 0.92rem;
+}
+
+.ppn-header-actions,
+.ppn-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ppn-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--ppn-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.ppn-btn:hover {
+  background: #2563eb;
+}
+
+.ppn-btn:active {
+  transform: scale(0.97);
+}
+
+.ppn-btn:focus-visible,
+.ppn-select:focus-visible,
+.ppn-help-title:focus-visible {
+  outline: 2px solid var(--ppn-accent-cyan);
+  outline-offset: 2px;
+}
+
+.ppn-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--ppn-border);
+  color: var(--ppn-text-secondary);
+}
+
+.ppn-btn--secondary:hover {
+  background: var(--ppn-bg-secondary);
+  color: var(--ppn-text-primary);
+}
+
+.ppn-btn--secondary[aria-pressed="true"] {
+  border-color: var(--ppn-accent-amber);
+  color: var(--ppn-accent-amber);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.ppn-btn--daily {
+  background: linear-gradient(135deg, #0e7490, var(--ppn-accent-blue));
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+}
+
+.ppn-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ppn-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ppn-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ppn-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ppn-select {
+  min-width: 150px;
+  padding: 0.6rem 0.85rem;
+  background: var(--ppn-bg-input);
+  border: 1px solid var(--ppn-border);
+  border-radius: 6px;
+  color: var(--ppn-text-primary);
+  font-family: var(--ppn-font-mono);
+  font-size: 0.9rem;
+}
+
+.ppn-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ppn-stat {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--ppn-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(59, 130, 246, 0.22);
+}
+
+.ppn-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ppn-text-muted);
+}
+
+/* Values wrap instead of being cut off: a long best ('59:59 / 999') breaks
+   after the slash in a narrow card, and nothing is ever hidden. */
+.ppn-stat-value {
+  display: block;
+  font-family: var(--ppn-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ppn-accent-cyan);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ── The rack ────────────────────────────────────────────────────────────── */
+
+.ppn-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ppn-rack {
+  position: relative;
+  max-width: 100%;
+  padding: 12px 28px 16px;
+  border: 1px solid #23314f;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.03) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #151f35, #0c1324);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(148, 163, 184, 0.08);
+}
+
+/* Rack ears with their screws. */
+.ppn-rack::before,
+.ppn-rack::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #64748b 0 30%, #1e293b 35% 100%);
+  box-shadow: 0 0 0 2px #0a0f1e;
+}
+
+.ppn-rack::before {
+  left: 9px;
+}
+
+.ppn-rack::after {
+  right: 9px;
+}
+
+.ppn-rack-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-family: var(--ppn-font-mono);
+  font-size: 0.75rem;
+  color: var(--ppn-text-secondary);
+}
+
+.ppn-mode {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ppn-rack-leds {
+  flex: none;
+  width: 34px;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--ppn-accent-green) 0 6px, transparent 6px 10px);
+  opacity: 0.8;
+}
+
+/* A scroll container clips at its edges, so everything the board draws
+   (the win glow, the focus ring) stays inside the board's own box. */
+.ppn-board-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ppn-board {
+  --ppn-tile: 64px;
+  --ppn-rim-len: 7px;
+  position: relative;
+  display: grid;
+  gap: 4px;
+  width: max-content;
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 8px;
+  background: #070b16;
+  box-shadow: inset 0 0 22px rgba(34, 211, 238, 0.05);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ppn-board--n5 {
+  --ppn-tile: 64px;
+}
+
+.ppn-board--n7 {
+  --ppn-tile: 56px;
+}
+
+.ppn-board--n9 {
+  --ppn-tile: 48px;
+}
+
+.ppn-board:focus {
+  outline: none;
+}
+
+.ppn-board:focus-visible {
+  outline: 2px solid var(--ppn-accent-cyan);
+  outline-offset: -2px;
+}
+
+/* Wrap boards have dashed edges: a cable leaving one edge enters the other. */
+.ppn-board--wrap {
+  border-style: dashed;
+  border-color: rgba(34, 211, 238, 0.45);
+}
+
+/* The rim marks of a wrap board: one in the padding beside each end of every
+   row and column, where a cable can cross to the opposite edge.  A mark is an
+   absolutely positioned grid item placed on its tile's cell, so it is
+   positioned against that cell and needs no tile size: it touches the cell
+   from outside and ends short of the board's border (--ppn-rim-len is less
+   than the padding at every width). */
+.ppn-rim {
+  position: absolute;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* No cable crosses here: a faint mark that only shows the edge wraps. */
+.ppn-rim--idle {
+  background: rgba(34, 211, 238, 0.28);
+}
+
+.ppn-rim--w,
+.ppn-rim--e {
+  top: 50%;
+  width: var(--ppn-rim-len);
+  height: 4px;
+  margin-top: -2px;
+}
+
+.ppn-rim--n,
+.ppn-rim--s {
+  left: 50%;
+  width: 4px;
+  height: var(--ppn-rim-len);
+  margin-left: -2px;
+}
+
+.ppn-rim--w {
+  right: 100%;
+}
+
+.ppn-rim--e {
+  left: 100%;
+}
+
+.ppn-rim--n {
+  bottom: 100%;
+}
+
+.ppn-rim--s {
+  top: 100%;
+}
+
+/* Cables meet across the rim: each end takes its tile's colour, green on the
+   switch's network, red in a loop, cyan on a dark tile. */
+.ppn-rim--link {
+  background: var(--ppn-accent-cyan);
+  box-shadow: 0 0 6px rgba(34, 211, 238, 0.7);
+}
+
+.ppn-rim--up {
+  background: var(--ppn-accent-green);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+}
+
+.ppn-rim--storm {
+  background: var(--ppn-accent-red);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
+}
+
+/* A cable crosses the rim and nobody answers on the other side: amber when
+   its tile is live (like a live cable's open end), the dark wire colour
+   when it is not. */
+.ppn-rim--open {
+  background: var(--ppn-accent-amber);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.ppn-rim--loose {
+  background: var(--ppn-wire-down);
+}
+
+/* The rim tile under the cursor and the tile(s) across the rim from it. */
+.ppn-tile--twin {
+  outline: 2px dashed var(--ppn-text-secondary);
+  outline-offset: -5px;
+}
+
+.ppn-board--lockmode {
+  border-color: var(--ppn-accent-amber);
+}
+
+.ppn-board--solved {
+  border-color: var(--ppn-accent-green);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.55), inset 0 0 26px rgba(16, 185, 129, 0.22);
+  animation: ppn-converge 1.2s ease-out 1;
+}
+
+/* ── Tiles ───────────────────────────────────────────────────────────────── */
+
+.ppn-tile {
+  --ppn-wire-color: var(--ppn-wire-down);
+  --ppn-led: var(--ppn-led-off);
+  position: relative;
+  width: var(--ppn-tile);
+  height: var(--ppn-tile);
+  border: 1px solid #1c2842;
+  border-radius: 6px;
+  background: linear-gradient(160deg, #141e33 0%, #0b1222 100%);
+  box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.06);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+.ppn-tile:active {
+  transform: scale(0.95);
+}
+
+.ppn-board--lockmode .ppn-tile {
+  cursor: cell;
+}
+
+.ppn-tile--up {
+  --ppn-wire-color: var(--ppn-accent-green);
+  --ppn-led: var(--ppn-accent-green);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.ppn-tile--storm {
+  --ppn-wire-color: var(--ppn-accent-red);
+  --ppn-led: var(--ppn-accent-red);
+  border-color: rgba(239, 68, 68, 0.6);
+  background: linear-gradient(160deg, #2a1220 0%, #12091a 100%);
+}
+
+.ppn-tile--locked {
+  border-color: var(--ppn-accent-amber);
+}
+
+/* A small padlock in the corner of a locked tile. */
+.ppn-tile--locked::before,
+.ppn-tile--locked::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  z-index: 2;
+}
+
+.ppn-tile--locked::before {
+  top: 3px;
+  width: 8px;
+  height: 7px;
+  border: 2px solid var(--ppn-accent-amber);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.ppn-tile--locked::after {
+  top: 9px;
+  width: 8px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--ppn-accent-amber);
+}
+
+.ppn-board:focus-visible .ppn-tile--cursor,
+.ppn-board--keys:focus .ppn-tile--cursor {
+  border-color: var(--ppn-accent-cyan);
+  box-shadow: inset 0 0 0 2px var(--ppn-accent-cyan), 0 0 10px rgba(34, 211, 238, 0.45);
+}
+
+/* The cable layer turns with the tile; the device on top stays upright. */
+.ppn-cable {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transition: transform 0.16s ease-out;
+}
+
+.ppn-tile--storm .ppn-cable {
+  animation: ppn-storm 0.6s steps(2) infinite;
+}
+
+.ppn-arm,
+.ppn-hub {
+  position: absolute;
+  background-color: var(--ppn-wire-color);
+}
+
+.ppn-arm {
+  border-radius: 2px;
+}
+
+/* Packets run out from the switch.  Every arm carries a moving light that
+   only tiles linked up show: ppn-flow-v moves it up its arm and ppn-flow-h
+   to the left, across the arm in half a period.  Along the uplink (the arm
+   that leads back to the switch) it runs in from the tip to the hub, along
+   the other arms out from the hub to the tip, half a period later, so it
+   flows on from tile to tile.  The animations start when the board is built
+   and never restart (the tile classes only show or hide the light), so all
+   tiles keep the same beat. */
+.ppn-arm-n,
+.ppn-arm-s {
+  background-size: 100% 300%;
+  animation: ppn-flow-v 1.6s linear infinite;
+}
+
+.ppn-arm-e,
+.ppn-arm-w {
+  background-size: 300% 100%;
+  animation: ppn-flow-h 1.6s linear infinite;
+}
+
+.ppn-arm-s,
+.ppn-arm-e,
+.ppn-arm-n.ppn-arm--uplink,
+.ppn-arm-w.ppn-arm--uplink {
+  animation-direction: reverse;
+}
+
+.ppn-arm-s.ppn-arm--uplink,
+.ppn-arm-e.ppn-arm--uplink {
+  animation-direction: normal;
+}
+
+.ppn-arm--uplink {
+  animation-delay: -0.8s;
+}
+
+.ppn-arm-n,
+.ppn-arm-s {
+  left: 40%;
+  width: 20%;
+  height: 52%;
+}
+
+.ppn-arm-n {
+  top: -2px;
+}
+
+.ppn-arm-s {
+  bottom: -2px;
+}
+
+.ppn-arm-e,
+.ppn-arm-w {
+  top: 40%;
+  width: 52%;
+  height: 20%;
+}
+
+.ppn-arm-e {
+  right: -2px;
+}
+
+.ppn-arm-w {
+  left: -2px;
+}
+
+/* The keystone coupler where the arms meet. */
+.ppn-hub {
+  top: 32%;
+  left: 32%;
+  width: 36%;
+  height: 36%;
+  border-radius: 24%;
+}
+
+.ppn-tile--up .ppn-arm,
+.ppn-tile--up .ppn-hub {
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.55);
+}
+
+/* The packet light on the cables that are linked up. */
+.ppn-tile--up .ppn-arm-n,
+.ppn-tile--up .ppn-arm-s {
+  background-image: linear-gradient(180deg, rgba(209, 250, 229, 0) 38%, rgba(209, 250, 229, 0.9) 50%, rgba(209, 250, 229, 0) 62%);
+}
+
+.ppn-tile--up .ppn-arm-e,
+.ppn-tile--up .ppn-arm-w {
+  background-image: linear-gradient(90deg, rgba(209, 250, 229, 0) 38%, rgba(209, 250, 229, 0.9) 50%, rgba(209, 250, 229, 0) 62%);
+}
+
+/* A cable of the live network that nobody answers: amber, no packets. */
+.ppn-tile--up .ppn-arm--open {
+  background-color: var(--ppn-accent-amber);
+  background-image: none;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.ppn-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--ppn-wire-color);
+  border-radius: 3px;
+  background: #0f1a30;
+  pointer-events: none;
+}
+
+.ppn-node::before,
+.ppn-node::after {
+  content: '';
+  position: absolute;
+}
+
+/* Status LED of every device. */
+.ppn-node::after {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ppn-led);
+  box-shadow: 0 0 4px var(--ppn-led);
+}
+
+.ppn-tile--up .ppn-node::after {
+  animation: ppn-blink 1.4s steps(2) infinite;
+}
+
+/* A 1U server: drive slots and a LED on the right. */
+.ppn-node-server {
+  width: 66%;
+  height: 40%;
+}
+
+.ppn-node-server::before {
+  top: 25%;
+  bottom: 25%;
+  left: 10%;
+  width: 52%;
+  background: repeating-linear-gradient(90deg, #334155 0 2px, transparent 2px 4px);
+}
+
+.ppn-node-server::after {
+  top: 50%;
+  right: 10%;
+  margin-top: -2.5px;
+}
+
+/* A NAS: a tower of drive bays and a LED at the foot. */
+.ppn-node-nas {
+  width: 46%;
+  height: 58%;
+}
+
+.ppn-node-nas::before {
+  top: 12%;
+  left: 15%;
+  right: 15%;
+  height: 50%;
+  background: repeating-linear-gradient(180deg, #334155 0 2px, transparent 2px 4px);
+}
+
+.ppn-node-nas::after {
+  bottom: 10%;
+  left: 50%;
+  margin-left: -2.5px;
+}
+
+/* An access point: a round puck with a LED in the middle. */
+.ppn-node-ap {
+  width: 48%;
+  height: 48%;
+  border-radius: 50%;
+}
+
+.ppn-node-ap::before {
+  top: 20%;
+  left: 20%;
+  right: 20%;
+  bottom: 20%;
+  border: 1px solid #334155;
+  border-radius: 50%;
+}
+
+.ppn-node-ap::after {
+  top: 50%;
+  left: 50%;
+  margin: -2.5px 0 0 -2.5px;
+}
+
+/* The core switch: a row of port LEDs. */
+.ppn-node-switch {
+  width: 82%;
+  height: 46%;
+  border-color: var(--ppn-accent-cyan);
+  background: #0c2238;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+}
+
+.ppn-node-switch::before {
+  top: 30%;
+  left: 9%;
+  right: 22%;
+  height: 40%;
+  background: repeating-linear-gradient(90deg, var(--ppn-led) 0 3px, transparent 3px 5px);
+}
+
+.ppn-node-switch::after {
+  top: 50%;
+  right: 7%;
+  margin-top: -2.5px;
+}
+
+/* ── Status, hint, share ─────────────────────────────────────────────────── */
+
+.ppn-hint {
+  margin: 10px 0 0;
+  min-height: 1.4em;
+  font-family: var(--ppn-font-mono);
+  font-size: 0.8rem;
+  color: var(--ppn-text-secondary);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.ppn-wrap-note {
+  max-width: 560px;
+  margin: 6px auto 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ppn-text-secondary);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.ppn-status-panel {
+  margin-top: 14px;
+}
+
+.ppn-status {
+  padding: 12px 14px;
+  border-radius: var(--ppn-radius);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  color: var(--ppn-accent-cyan);
+  font-family: var(--ppn-font-mono);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* The next rung of the size ladder, offered after a win. */
+.ppn-btn--next {
+  display: block;
+  margin: 10px auto 0;
+  background: linear-gradient(135deg, #047857, var(--ppn-accent-green));
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+}
+
+.ppn-btn--next:hover {
+  background: #059669;
+}
+
+.ppn-warning {
+  display: block;
+  margin-top: 8px;
+  color: var(--ppn-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.ppn-share {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ppn-share-text {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  padding: 0.55rem 0.75rem;
+  background: var(--ppn-bg-input);
+  border: 1px solid var(--ppn-border);
+  border-radius: 6px;
+  color: var(--ppn-text-primary);
+  font-family: var(--ppn-font-mono);
+  font-size: 0.85rem;
+}
+
+.ppn-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--ppn-border);
+  border-radius: var(--ppn-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--ppn-text-secondary);
+  font-size: 0.85rem;
+}
+
+.ppn-help-title {
+  cursor: pointer;
+  color: var(--ppn-text-primary);
+  font-weight: 600;
+}
+
+.ppn-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.ppn-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--ppn-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.ppn-toast.ppn-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.ppn-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--ppn-text-muted);
+  font-size: 0.8rem;
+}
+
+.ppn-hidden {
+  display: none;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes ppn-flow-v {
+  from { background-position: 0 0%; }
+  to { background-position: 0 100%; }
+}
+
+@keyframes ppn-flow-h {
+  from { background-position: 0% 0; }
+  to { background-position: 100% 0; }
+}
+
+@keyframes ppn-storm {
+  50% { opacity: 0.45; }
+}
+
+@keyframes ppn-blink {
+  50% { opacity: 0.35; }
+}
+
+@keyframes ppn-converge {
+  from { box-shadow: inset 0 0 0 3px rgba(16, 185, 129, 0.9), inset 0 0 60px rgba(16, 185, 129, 0.55); }
+}
+
+@media (hover: hover) {
+  .ppn-tile:hover {
+    border-color: #33507f;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppn-cable,
+  .ppn-tile,
+  .ppn-btn,
+  .ppn-toast {
+    transition: none;
+  }
+
+  .ppn-board--solved,
+  .ppn-tile--storm .ppn-cable,
+  .ppn-arm,
+  .ppn-tile--up .ppn-node::after {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .ppn-wrapper {
+    padding: 20px 12px;
+  }
+
+  .ppn-title {
+    font-size: 1.6rem;
+  }
+
+  .ppn-toolbar {
+    align-items: stretch;
+  }
+
+  .ppn-control,
+  .ppn-toolbar-actions {
+    width: 100%;
+  }
+
+  .ppn-toolbar-actions .ppn-btn {
+    flex: 1 1 0;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .ppn-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ppn-rack {
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .ppn-rack::before,
+  .ppn-rack::after {
+    content: none;
+  }
+
+  .ppn-board {
+    --ppn-rim-len: 5px;
+    gap: 3px;
+    padding: 6px;
+  }
+
+  /* On a wrap board a rim tile's hint takes a second line ('· wraps W→I1,
+     N→A9'): keep both lines, so nothing below jumps from tap to tap. */
+  .ppn-hint--wrap {
+    min-height: 3.2em;
+  }
+
+  .ppn-board--n5 {
+    --ppn-tile: 64px;
+  }
+
+  .ppn-board--n7 {
+    --ppn-tile: 56px;
+  }
+
+  .ppn-board--n9 {
+    --ppn-tile: 46px;
+  }
+}
+
+@media (max-width: 479px) {
+  .ppn-board {
+    gap: 2px;
+  }
+
+  .ppn-board--n5 {
+    --ppn-tile: 60px;
+  }
+
+  .ppn-board--n7 {
+    --ppn-tile: 48px;
+  }
+
+  .ppn-board--n9 {
+    --ppn-tile: 38px;
+  }
+
+  .ppn-tile {
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 399px) {
+  .ppn-board--n5 {
+    --ppn-tile: 56px;
+  }
+
+  .ppn-board--n7 {
+    --ppn-tile: 44px;
+  }
+
+  .ppn-board--n9 {
+    --ppn-tile: 34px;
+  }
+
+  .ppn-header-actions {
+    width: 100%;
+  }
+
+  .ppn-header-actions .ppn-btn {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 359px) {
+  .ppn-wrapper {
+    padding: 16px 8px;
+  }
+
+  .ppn-board {
+    --ppn-rim-len: 4px;
+    padding: 4px;
+  }
+
+  /* A wrap board keeps 5px of padding for its rim marks; a 7x7 one still fits 320px. */
+  .ppn-board--wrap {
+    padding: 5px;
+  }
+
+  .ppn-board--n5 {
+    --ppn-tile: 52px;
+  }
+
+  .ppn-board--n7 {
+    --ppn-tile: 40px;
+  }
+
+  .ppn-board--n9 {
+    --ppn-tile: 30px;
+  }
+
+  .ppn-stat {
+    padding: 6px 7px;
+  }
+
+  .ppn-stat-value {
+    font-size: 0.92rem;
+  }
+}

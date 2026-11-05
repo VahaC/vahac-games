@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flip-Flop — Logs from VahaC</title>
+  <meta name="description" content="Flip-Flop: Reversi in ones and zeros on a neon memory dump. Play the computer at Easy, Normal or Hard, or a friend on the same device, with popcount and hex scores, an XOR flip hint, undo and auto save. Fully client-side and offline.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="ffl-wrapper" id="ffl-game">
+
+  <header class="ffl-header">
+    <h1 class="ffl-title">Flip-Flop</h1>
+    <p class="ffl-subtitle">Reversi in ones and zeros: write a bit, trap a line, flip every bit in it.</p>
+  </header>
+
+  <section class="ffl-toolbar" aria-label="Game controls">
+    <div class="ffl-field">
+      <label class="ffl-label" for="ffl-mode">Opponent</label>
+      <select id="ffl-mode" class="ffl-select">
+        <option value="easy">CPU · Easy</option>
+        <option value="normal" selected>CPU · Normal</option>
+        <option value="hard">CPU · Hard</option>
+        <option value="pvp">Two players (hot-seat)</option>
+      </select>
+    </div>
+    <div class="ffl-actions">
+      <button id="ffl-new-game" class="ffl-btn" type="button" aria-label="Start a new game">New Game</button>
+      <button id="ffl-undo" class="ffl-btn ffl-btn--secondary" type="button" aria-label="Undo your last move">Undo</button>
+      <button id="ffl-hint" class="ffl-btn ffl-btn--secondary" type="button" aria-pressed="true" aria-label="Show legal moves and the bits they flip">XOR hint: on</button>
+    </div>
+  </section>
+
+  <main class="ffl-main">
+
+    <section class="ffl-play" aria-label="Board">
+      <div class="ffl-sides">
+        <div id="ffl-side-one" class="ffl-side ffl-side--one">
+          <span id="ffl-name-one" class="ffl-side-name">1s · You</span>
+          <span id="ffl-count-one" class="ffl-side-count">2</span>
+          <span id="ffl-mask-one" class="ffl-side-mask">popcnt(0x0000000810000000)</span>
+        </div>
+        <div id="ffl-side-zero" class="ffl-side ffl-side--zero">
+          <span id="ffl-name-zero" class="ffl-side-name">0s · CPU Normal</span>
+          <span id="ffl-count-zero" class="ffl-side-count">2</span>
+          <span id="ffl-mask-zero" class="ffl-side-mask">popcnt(0x0000001008000000)</span>
+        </div>
+      </div>
+
+      <div id="ffl-board" class="ffl-board" role="group" aria-label="Flip-Flop board, 8 by 8 cells"></div>
+
+      <div id="ffl-status" class="ffl-status" aria-live="polite">Loading the board...</div>
+      <div id="ffl-log" class="ffl-log" role="status"></div>
+      <div id="ffl-warning" class="ffl-warning" role="alert" hidden></div>
+    </section>
+
+    <aside class="ffl-panel">
+      <section class="ffl-card" aria-label="Memory dump">
+        <h2 class="ffl-card-title">Memory dump</h2>
+        <div class="ffl-dump-head" aria-hidden="true">
+          <span>addr</span><span>bits</span><span>1s</span><span>0s</span>
+        </div>
+        <div id="ffl-dump" class="ffl-dump"></div>
+        <p id="ffl-moves" class="ffl-moves">Moves played: 0 · free cells: 60</p>
+      </section>
+
+      <section class="ffl-card" aria-label="Record against the computer">
+        <h2 class="ffl-card-title">Record vs CPU</h2>
+        <div class="ffl-stats">
+          <div id="ffl-stat-easy" class="ffl-stat">Easy: W 0 · L 0 · D 0</div>
+          <div id="ffl-stat-normal" class="ffl-stat">Normal: W 0 · L 0 · D 0</div>
+          <div id="ffl-stat-hard" class="ffl-stat">Hard: W 0 · L 0 · D 0</div>
+        </div>
+      </section>
+
+      <section class="ffl-card" aria-label="How to play">
+        <h2 class="ffl-card-title">How to play</h2>
+        <ul class="ffl-help">
+          <li>Write your bit next to the other side's bits so a straight line of them is trapped between the new bit and one of yours: the whole line flips.</li>
+          <li>A side without a legal move passes. When neither side can move, the most bits win.</li>
+          <li>Keys on the board: <kbd class="ffl-kbd">←↑→↓</kbd> move, <kbd class="ffl-kbd">Enter</kbd> or <kbd class="ffl-kbd">Space</kbd> write, <kbd class="ffl-kbd">U</kbd> undo, <kbd class="ffl-kbd">N</kbd> new game.</li>
+        </ul>
+      </section>
+    </aside>
+
+  </main>
+
+  <div id="ffl-toast" class="ffl-toast" aria-live="polite"></div>
+
+  <footer class="ffl-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere. The computer is a plain alpha-beta search running in your browser.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

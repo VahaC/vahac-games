@@ -245,15 +245,22 @@ Replace `{p}` with the chosen namespace prefix (e.g. `sdk`, `tf8`, `wrd`).
 Keep this list updated to avoid prefix collisions. The prefix starts every CSS class, element id
 and localStorage key of a game (`.{p}-wrapper`, `#{p}-board`, `{p}-state`).
 
-| Prefix | Game               | Folder               | Status   |
-|--------|--------------------|----------------------|----------|
-| `msp`  | Minesweeper Game   | `minesweeper/`       | Built    |
-| `rxt`  | Reaction Time Test | `reaction-time/`     | Built    |
-| `sdk`  | Sudoku Game        | `sudoku/`            | Built    |
-| `snp`  | Snake Game         | `snake-game/`        | Built    |
-| `tf8`  | 2048 Game          | `2048-game/`         | Built    |
-| `tst`  | Typing Speed Test  | `typing-speed-test/` | Built    |
-| `wrd`  | Cyberpunk Wordle   | `wordle-game/`       | Built    |
+| Prefix | Game                 | Folder                  | Status |
+|--------|----------------------|-------------------------|--------|
+| `bmd`  | Bitmap Decoder       | `bitmap-decoder/`       | Built  |
+| `ffl`  | Flip-Flop            | `flip-flop/`            | Built  |
+| `hcr`  | Hash Cracker         | `hash-cracker/`         | Built  |
+| `msp`  | Minesweeper Game     | `minesweeper/`          | Built  |
+| `ocs`  | On-Call Shift        | `oncall-shift/`         | Built  |
+| `pkn`  | Port Knocker         | `port-knocker/`         | Built  |
+| `ppn`  | Patch Panel          | `patch-panel/`          | Built  |
+| `rxt`  | Reaction Time Test   | `reaction-time/`        | Built  |
+| `sdk`  | Sudoku Game          | `sudoku/`               | Built  |
+| `snp`  | Snake Game           | `snake-game/`           | Built  |
+| `swp`  | Swap Space Solitaire | `swap-space-solitaire/` | Built  |
+| `tf8`  | 2048 Game            | `2048-game/`            | Built  |
+| `tst`  | Typing Speed Test    | `typing-speed-test/`    | Built  |
+| `wrd`  | Cyberpunk Wordle     | `wordle-game/`          | Built  |
 
 ## Prefixes already used by vahac-tools
 

@@ -419,10 +419,46 @@
         description: 'Slide and merge tiles on a 4x4 board with arrow keys or swipes until you reach 2048, with undo of up to 10 moves, a best score and auto save.'
       },
       {
+        name: 'Bitmap Decoder',
+        folder: 'bitmap-decoder',
+        group: 'puzzle',
+        description: 'Fill a nonogram whose clues are run-length encoding until a hidden 1-bit icon decodes into a hex dump: a daily icon with a streak, Endless boards and best times.'
+      },
+      {
+        name: 'Flip-Flop',
+        folder: 'flip-flop',
+        group: 'tabletop',
+        description: 'Play Reversi in 1s and 0s against a CPU at Easy, Normal or Hard, or a friend on one device, with popcount and hex scores, an XOR flip hint, undo and auto save.'
+      },
+      {
+        name: 'Hash Cracker',
+        folder: 'hash-cracker',
+        group: 'memory',
+        description: 'Crack a hidden key in 10 attempts in Easy, Normal or Hard from HIT and NEAR counts; the terminal prints the keys left and their entropy in bits, and streaks are saved.'
+      },
+      {
         name: 'Minesweeper Game',
         folder: 'minesweeper',
         group: 'puzzle',
         description: 'Clear Easy, Medium or Hard boards with a safe first click, right-click flags and flood reveal, against the clock and your best time per difficulty.'
+      },
+      {
+        name: 'On-Call Shift',
+        folder: 'oncall-shift',
+        group: 'arcade',
+        description: 'Keep twelve servers green through a night on call: pick the right fix before each SLA runs out, stop cascades from a failed database and score your uptime in nines.'
+      },
+      {
+        name: 'Patch Panel',
+        folder: 'patch-panel',
+        group: 'puzzle',
+        description: 'Turn patch-cord tiles until every server, NAS and access point links up to the core switch, on 5x5 to 9x9 boards with wrap mode, locks and a shared Daily.'
+      },
+      {
+        name: 'Port Knocker',
+        folder: 'port-knocker',
+        group: 'memory',
+        description: 'Watch a homelab patch panel flash a port-knocking sequence and knock it back in Forward, Reverse or Stride mode within the knock window, then take on the shared Daily.'
       },
       {
         name: 'Reaction Time Test',
@@ -443,6 +479,12 @@
         description: 'Solve a freshly generated 9x9 Sudoku with hints, wrong digits shown in red, a restart, and progress saved after every move.'
       },
       {
+        name: 'Swap Space Solitaire',
+        folder: 'swap-space-solitaire',
+        group: 'tabletop',
+        description: 'Page all 52 cards out to /dev/sda-sdd in an open solitaire of skill: two-tap moves, 4 swap slots, numbered deals to replay, a daily deal and win streaks.'
+      },
+      {
         name: 'Typing Speed Test',
         folder: 'typing-speed-test',
         group: 'reflex',
@@ -456,12 +498,15 @@
       }
     ];
 
-    // Genres in display order: puzzles first, then word, arcade, and reflex and typing games.
+    // Genres in display order: puzzles first, then word, arcade, reflex and typing, memory and
+    // logic, and board and card games.
     var GROUPS = [
       { key: 'puzzle', label: 'Puzzle', color: '#3b82f6' },
       { key: 'word', label: 'Word', color: '#10b981' },
       { key: 'arcade', label: 'Arcade', color: '#f59e0b' },
-      { key: 'reflex', label: 'Reflex and Typing', color: '#22d3ee' }
+      { key: 'reflex', label: 'Reflex and Typing', color: '#22d3ee' },
+      { key: 'memory', label: 'Memory and Logic', color: '#a855f7' },
+      { key: 'tabletop', label: 'Board and Cards', color: '#ec4899' }
     ];
 
     // The genre filter of the All chip.

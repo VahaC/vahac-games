@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>On-Call Shift — Logs from VahaC</title>
+  <meta name="description" content="Survive a night on call: incidents flare up on a rack of twelve servers, pick the right fix before the SLA timer runs out, watch cascades spread from a failed database and finish with an uptime score in nines and a postmortem. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="ocs-wrapper" id="ocs-root">
+
+  <header class="ocs-header">
+    <div class="ocs-title-group">
+      <h1 class="ocs-title">On-Call Shift</h1>
+      <p class="ocs-subtitle">22:00 to 06:00. Twelve servers, one pager, and an SLA to keep.</p>
+    </div>
+
+    <div class="ocs-controls">
+      <button id="ocs-new" class="ocs-btn" type="button" aria-label="Start a new shift">New Shift</button>
+      <button id="ocs-pause" class="ocs-btn ocs-btn-secondary" type="button">Start shift</button>
+      <label class="ocs-level">
+        <span class="ocs-level-label">Level</span>
+        <select id="ocs-level" class="ocs-select" aria-label="Level: the difficulty of the next shift">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <section class="ocs-hud" aria-label="Shift status">
+    <div class="ocs-stat">
+      <span class="ocs-stat-label">Clock</span>
+      <span id="ocs-clock" class="ocs-stat-value">22:00</span>
+    </div>
+    <div class="ocs-stat">
+      <span class="ocs-stat-label">Uptime</span>
+      <span id="ocs-uptime" class="ocs-stat-value">100%</span>
+    </div>
+    <div class="ocs-stat">
+      <span class="ocs-stat-label">Open</span>
+      <span id="ocs-open" class="ocs-stat-value">0</span>
+    </div>
+    <div class="ocs-stat">
+      <span class="ocs-stat-label">Best</span>
+      <span id="ocs-best" class="ocs-stat-value">--</span>
+    </div>
+  </section>
+
+  <div class="ocs-timeline">
+    <span class="ocs-timeline-label">22:00</span>
+    <div id="ocs-progress" class="ocs-progress" role="progressbar" aria-label="Shift progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span id="ocs-progress-fill" class="ocs-progress-fill"></span>
+    </div>
+    <span class="ocs-timeline-label">06:00</span>
+  </div>
+
+  <section class="ocs-rack-wrap" aria-label="Server rack">
+    <div id="ocs-rack" class="ocs-rack" tabindex="0" role="group" aria-label="Server rack: arrow keys move the cursor, 1 to 4 choose an action, Enter applies it, Space pauses"></div>
+    <button id="ocs-overlay" class="ocs-overlay" type="button">
+      <span id="ocs-overlay-title" class="ocs-overlay-title">Ready</span>
+      <span id="ocs-overlay-text" class="ocs-overlay-text">Tap here or press Start shift to begin (Space works once the rack has the focus).</span>
+    </button>
+  </section>
+
+  <section id="ocs-actions" class="ocs-actions" aria-label="Actions">
+    <button id="ocs-act-cleanup" class="ocs-act ocs-kind-cleanup" type="button" aria-pressed="false" aria-label="Action 1: cleanup, fixes a full disk">
+      <span class="ocs-act-key">1</span>
+      <span class="ocs-act-name">cleanup</span>
+      <span class="ocs-act-hint">disk</span>
+    </button>
+    <button id="ocs-act-restart" class="ocs-act ocs-kind-restart" type="button" aria-pressed="false" aria-label="Action 2: restart, fixes a memory leak or a lost connection">
+      <span class="ocs-act-key">2</span>
+      <span class="ocs-act-name">restart</span>
+      <span class="ocs-act-hint">leak, lost</span>
+    </button>
+    <button id="ocs-act-scale" class="ocs-act ocs-kind-scale" type="button" aria-pressed="false" aria-label="Action 3: scale, fixes a CPU at 100%">
+      <span class="ocs-act-key">3</span>
+      <span class="ocs-act-name">scale</span>
+      <span class="ocs-act-hint">cpu</span>
+    </button>
+    <button id="ocs-act-renew" class="ocs-act ocs-kind-renew" type="button" aria-pressed="false" aria-label="Action 4: renew, fixes an expiring certificate">
+      <span class="ocs-act-key">4</span>
+      <span class="ocs-act-name">renew</span>
+      <span class="ocs-act-hint">cert</span>
+    </button>
+  </section>
+
+  <p id="ocs-status" class="ocs-status" aria-live="polite">Pager is quiet.</p>
+  <p id="ocs-warning" class="ocs-warning" role="alert" hidden></p>
+
+  <section class="ocs-panel" aria-label="Pager feed">
+    <h2 class="ocs-panel-title">Pager</h2>
+    <ul id="ocs-feed" class="ocs-feed"></ul>
+  </section>
+
+  <section id="ocs-postmortem" class="ocs-panel ocs-postmortem" aria-label="Postmortem" hidden>
+    <h2 class="ocs-panel-title">Postmortem</h2>
+    <div class="ocs-pm-head">
+      <span id="ocs-pm-uptime" class="ocs-pm-uptime">100%</span>
+      <span id="ocs-pm-grade" class="ocs-pm-grade">five nines</span>
+    </div>
+    <p id="ocs-pm-note" class="ocs-pm-note"></p>
+    <p id="ocs-pm-stats" class="ocs-pm-stats"></p>
+    <ol id="ocs-pm-log" class="ocs-pm-log" aria-label="Incident timeline"></ol>
+    <div class="ocs-pm-actions">
+      <button id="ocs-pm-new" class="ocs-btn" type="button" aria-label="Start a new shift">New Shift</button>
+      <button id="ocs-pm-copy" class="ocs-btn ocs-btn-secondary" type="button" aria-label="Copy postmortem as text">Copy postmortem</button>
+    </div>
+    <textarea id="ocs-share" class="ocs-share" readonly hidden rows="6" aria-label="Postmortem text to copy"></textarea>
+  </section>
+
+  <section class="ocs-panel" aria-label="Last shifts">
+    <h2 class="ocs-panel-title">Last 5 shifts</h2>
+    <ol id="ocs-history" class="ocs-history"></ol>
+  </section>
+
+  <details class="ocs-help">
+    <summary class="ocs-help-title">How to play</summary>
+    <ul class="ocs-help-list">
+      <li>Every incident needs one action: <strong>cleanup</strong> a full disk, <strong>restart</strong> a memory leak or a lost connection, <strong>scale</strong> a CPU at 100%, <strong>renew</strong> an expiring certificate.</li>
+      <li>Tap an action, then the servers to fix (the action stays armed), or tap a server first and then its action.</li>
+      <li>When the SLA bar runs out the server goes down and counts downtime until it gets the right action. A wrong action adds 4 minutes of downtime.</li>
+      <li>A down database, cache, queue or DNS server knocks out the servers that depend on it: fix the root cause first.</li>
+      <li>Keyboard (with the rack focused): arrows move, 1 to 4 choose an action, Enter applies it, Space pauses, Escape clears.</li>
+      <li>Uptime is graded in nines: 99% is two nines, 99.9% three, 99.999% five. The shift pauses when you switch tabs.</li>
+      <li>Level sets the difficulty of your next shift: a shift under way plays on at its own level until you press New Shift.</li>
+    </ul>
+  </details>
+
+  <div id="ocs-toast" class="ocs-toast" aria-live="polite"></div>
+
+  <footer class="ocs-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

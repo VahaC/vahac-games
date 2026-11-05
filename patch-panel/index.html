@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patch Panel — Logs from VahaC</title>
+  <meta name="description" content="Patch Panel: turn the patch-cord tiles of a homelab rack until every server, NAS and access point links up to the core switch with no loops and no dangling cables. 5x5 to 9x9 boards, wrap mode, tile locks, a rotation target, best times and a shared Daily with a streak. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="ppn-wrapper">
+
+  <header class="ppn-header">
+    <div class="ppn-title-group">
+      <h1 class="ppn-title">Patch Panel</h1>
+      <p class="ppn-subtitle">Turn the patch cords until every port on the rack links up to the core switch: no loops, no dangling cables.</p>
+    </div>
+
+    <div class="ppn-header-actions">
+      <button id="ppn-new-game" class="ppn-btn" type="button" aria-label="Start a new board">New Game</button>
+      <button id="ppn-restart" class="ppn-btn ppn-btn--secondary" type="button" aria-label="Restart this board">Restart</button>
+    </div>
+  </header>
+
+  <section class="ppn-toolbar" aria-label="Board options">
+    <div class="ppn-control">
+      <label class="ppn-label" for="ppn-config">Board</label>
+      <select id="ppn-config" class="ppn-select" aria-label="Board size and wrap mode">
+        <option value="5">5x5</option>
+        <option value="7">7x7</option>
+        <option value="9">9x9</option>
+        <option value="5w">5x5 wrap (edges join)</option>
+        <option value="7w">7x7 wrap (edges join)</option>
+        <option value="9w">9x9 wrap (edges join)</option>
+      </select>
+    </div>
+
+    <div class="ppn-toolbar-actions">
+      <button id="ppn-daily-button" class="ppn-btn ppn-btn--daily" type="button" aria-label="Open the Daily board">Daily</button>
+      <button id="ppn-lock-mode" class="ppn-btn ppn-btn--secondary" type="button" aria-pressed="false" aria-label="Lock mode: taps lock tiles instead of turning them">Lock mode: off</button>
+    </div>
+  </section>
+
+  <section class="ppn-stats" aria-label="Network stats">
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Ports up</span>
+      <span id="ppn-ports" class="ppn-stat-value">0/0</span>
+    </div>
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Rotations</span>
+      <span id="ppn-moves" class="ppn-stat-value">0</span>
+    </div>
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Target</span>
+      <span id="ppn-target" class="ppn-stat-value">0</span>
+    </div>
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Time</span>
+      <span id="ppn-time" class="ppn-stat-value">0:00</span>
+    </div>
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Best</span>
+      <span id="ppn-best" class="ppn-stat-value">--</span>
+    </div>
+    <div class="ppn-stat">
+      <span class="ppn-stat-label">Streak</span>
+      <span id="ppn-streak" class="ppn-stat-value">0</span>
+    </div>
+  </section>
+
+  <main class="ppn-main">
+    <div class="ppn-rack">
+      <div class="ppn-rack-head">
+        <span id="ppn-mode" class="ppn-mode">Free play</span>
+        <span class="ppn-rack-leds" aria-hidden="true"></span>
+      </div>
+      <div class="ppn-board-wrap">
+        <div id="ppn-board" class="ppn-board" tabindex="0" role="group" aria-label="Patch panel"></div>
+      </div>
+    </div>
+    <p id="ppn-hint" class="ppn-hint" aria-live="polite"></p>
+    <p id="ppn-wrap-note" class="ppn-wrap-note ppn-hidden">Wrap board: opposite edges join. A cable leaving the right edge comes back in on the left of the same row, and the top edge joins the bottom one. Marks on the rim show each crossing: cyan where cables meet across the edge, green once that link reaches the switch, red in a loop, amber or grey where a cable gets no answer, and faint where no cable crosses (that is fine). The tile you last touched and the tile across the edge from it get a dashed outline.</p>
+  </main>
+
+  <section class="ppn-status-panel">
+    <div id="ppn-status" class="ppn-status" aria-live="polite">Booting the rack...</div>
+    <button id="ppn-next" class="ppn-btn ppn-btn--next ppn-hidden" type="button" aria-label="Start a new board, the next rung of the ladder">Next rung</button>
+    <div id="ppn-warning" class="ppn-warning ppn-hidden" role="alert"></div>
+    <div id="ppn-share" class="ppn-share ppn-hidden">
+      <button id="ppn-share-button" class="ppn-btn" type="button" aria-label="Copy the Daily result">Copy result</button>
+      <input id="ppn-share-text" class="ppn-share-text ppn-hidden" type="text" readonly aria-label="Daily result to copy">
+    </div>
+  </section>
+
+  <details class="ppn-help">
+    <summary class="ppn-help-title">How to play</summary>
+    <ul class="ppn-help-list">
+      <li>Tap or click a tile to turn it a quarter turn clockwise. Connect every server, NAS and access point to the core switch in the middle.</li>
+      <li>Cables reached from the switch light up green (link up) and carry packets out from the switch. A closed loop glows red: a broadcast storm. Amber tips mark cable ends nobody answers.</li>
+      <li>Right-click a tile, or switch on Lock mode and tap it, to lock a tile you are sure about.</li>
+      <li>Keyboard, with the board focused: arrows move the cursor, Space or Enter turn clockwise, Q turns back, L locks, N starts a new game.</li>
+      <li>Target is the number of rotations the generated solution needs. Other solutions can exist, so you may beat it.</li>
+      <li>Restart puts the same board back to its scramble. Once you have turned a tile, that run is a replay and sets no best: New Game deals a scored board.</li>
+      <li>Wrap boards join opposite edges, like a torus: a cable leaving the right edge enters the left tile of the same row, and top joins bottom the same way. Marks on the rim show each crossing, and a tile on the rim and the tile across the edge from it share a dashed outline when you touch one of them.</li>
+      <li>Each win offers the next rung of the ladder: 5x5, 7x7, 9x9, then the same with wrap.</li>
+      <li>The Daily is the same 7x7 board for everyone, one scored attempt per day, and its clock runs while it is on screen. Solve it on consecutive days to grow your streak.</li>
+    </ul>
+  </details>
+
+  <div id="ppn-toast" class="ppn-toast" aria-live="polite"></div>
+
+  <footer class="ppn-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

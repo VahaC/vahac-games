@@ -4,6 +4,170 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-05] - Seven new games
+
+Seven games join the collection, each in its own folder with the usual three plain files, its own
+namespace prefix and its own test module at 100 % line, branch and function coverage. None of them uses
+an AI service, a network call or an outside resource: the computer opponent of Flip-Flop is a plain
+JavaScript search. Four of them (Bitmap Decoder, Patch Panel, Port Knocker, Swap Space Solitaire) share
+one Daily rule, now described in README Notes. Every game was reviewed independently after it was built,
+and the review findings were fixed before release.
+
+### Index page
+
+#### Added
+- Two genres: Memory and Logic (Hash Cracker, Port Knocker) and Board and Cards (Flip-Flop, Swap Space
+  Solitaire). Patch Panel and Bitmap Decoder join Puzzle, and On-Call Shift joins Arcade. The page now
+  lists 14 games in 6 genres.
+
+#### Tests
+- `tests/hub.test.js` follows the new lists: the counts, the genre chips, the listing by genre, search and
+  the README and prefix registry checks.
+
+### Bitmap Decoder
+
+#### Added
+- New game `bitmap-decoder/` (prefix `bmd`): a nonogram whose clues are
+  run-length encoding. A solved grid decodes a hidden 1-bit icon, shown as a
+  hex dump, ASCII art, a hex stream and the icon name.
+- Daily mode: one 10x10 icon per day from a library of 55 original homelab
+  and dev icons, picked by the shared daily rule (FNV-1a + mulberry32, every
+  icon once per cycle, never the same icon two days running). One scored
+  attempt per day, written at once to `bmd-daily`, a streak with its maximum,
+  and a share line with a clipboard fallback.
+- Endless mode: 5x5, 10x10 and 15x15 boards from smoothed noise, kept only
+  when line logic alone solves them, with a library fallback. 15x15 is
+  desktop-only. A restarted puzzle is practice and sets no best time.
+- Easy rules count mistakes (three end the game); Hard rules check only the
+  finished grid. New rules apply at once to a puzzle with no moves yet,
+  otherwise from the next puzzle.
+- Tap, Fill/Mark toggle, right-click marks, drag painting on the grid only,
+  and keyboard play on the focused grid.
+- A clock that runs from the moment a puzzle is shown and pauses in a hidden
+  tab, the best time per size (`bmd-best`), and a re-render at local midnight
+  for the next Daily and the streak as of the new day.
+- Saves in `bmd-state`, `bmd-best` and `bmd-daily` that fall back field by
+  field. Saves from other tabs are taken over. A page shown again (tab switch,
+  back/forward cache, frozen tab) reads the saves back before writing, so a
+  Daily won elsewhere stays won.
+
+#### Tests
+- `tests/bitmap-decoder.test.js`, 42 tests:
+  - The line solver against brute force; every library icon solved by line
+    logic alone; Endless generation; the daily rule against an independent
+    reference; midnight arithmetic across DST.
+  - The page booted from `index.html`: saves in every damaged form, a reload
+    round trip, takeover from other tabs and from a page shown again or
+    restored from the back/forward cache, blocked and full storage, the clock
+    with mocked timers, the midnight re-render with a single timeout, rules
+    switching only on a puzzle with no moves, and the phone size choice.
+  - Source checks: prefix, ES5, embed safety, 320–414 px.
+- 100% lines, branches and functions of `bitmap-decoder/script.js`.
+
+### Flip-Flop
+
+#### Added
+- New game `flip-flop/` (prefix `ffl-`): Reversi in 1s and 0s on a neon memory-dump board, with standard rules, automatic passes and ties allowed.
+- Play against a local computer (Easy: random move weighted by flips; Normal: alpha-beta, 2 plies; Hard: iterative-deepening alpha-beta, 5 plies or to the end with 10 cells left, with move ordering, mobility and a 30,000-node cap) or two players on one device. The computer moves after a 450 ms delay, and input is ignored while it thinks.
+- Popcount and hex scores, a memory-dump panel, and an XOR hint toggle that marks legal moves with their flip count. The hover/focus preview of the flipped bits comes back by itself after the computer's reply.
+- Undo of the full turn, a New Game that asks for confirmation (its aria-label changes too), keyboard play inside the game, and touch play.
+- Saves under `ffl-state` and `ffl-stats`, both parsed field by field. Stats are re-read and merged before each result, so a second open tab no longer overwrites a win or loss.
+- The blocked or full storage warning names every key that failed and what it holds. The move log is a `role="status"` region, so screen readers hear moves, refusals and the New Game prompt.
+
+#### Tests
+- `tests/flip-flop.test.js`: 53 tests.
+  - An independent Reversi model and minimax, crafted pass, endgame and node-cap positions, and level ordering.
+  - The page booted like a browser, with saves (current, corrupt, partial, blocked, full), the multi-tab stats merge, reload round trips, key and focus filters, the XOR preview after the CPU reply, mocked timers, and source checks.
+  - 100% lines, branches and functions of `flip-flop/script.js`.
+
+### Hash Cracker
+
+#### Added
+- New game `hash-cracker/`: crack a hidden key in 10 attempts from HIT and NEAR counts, in Easy (4 different digits), Normal (4 different hex symbols) or Hard (5 hex symbols with repeats). A terminal log prints every attempt with the keys still possible and their entropy in bits. Hard counts its million keys with a budget-limited pruned search and shows n/a until few enough remain.
+- An on-screen hex keypad and the physical keys 0-9, A-F, Backspace and Enter. Refusals name their values. Giving up a key that has attempts needs a second press within 4 s and counts as a loss.
+- Saves in `hcr-state` (the game in progress) and `hcr-stats` (wins, losses, current and best streak per mode). Damaged, blocked or full storage never breaks the game.
+- A review pass fixed four small issues before release:
+  - Toasts use the full phone width instead of half of it.
+  - The keypad, mode and New Game buttons set `touch-action: manipulation`, so quick double taps no longer zoom the page on iOS.
+  - An attempt only appends its own lines to the live log instead of rebuilding it, so screen readers hear only the new feedback.
+
+#### Tests
+- `tests/hash-cracker.test.js`: 43 deterministic tests (Math.random and timers mocked everywhere), 100% line, branch and function coverage of `hash-cracker/script.js`.
+
+### On-Call Shift
+
+#### Added
+- New arcade game `oncall-shift/`: a 3-minute night on call (22:00 to 06:00 on screen) on a rack of twelve generic servers.
+  - Each incident (full disk, memory leak, CPU at 100%, expiring certificate) needs one action (cleanup, restart, scale or renew) before its SLA runs out. A breached SLA takes the server down, and a wrong action adds downtime.
+  - A down database, cache, queue or DNS server cascades to the servers that depend on it.
+- Easy, Normal and Hard levels. Normal is tuned so a player who needs about 1.5 s per fix keeps two nines. A level picked mid-shift applies from the next New Shift, and shift numbers count only shifts that ran.
+- Uptime graded in nines and a postmortem with the shift's numbers and its full timeline, copyable as text. The best uptime per level and the last 5 shifts are kept.
+- Tap an action then servers, or a server then its action. A mouse or touch click on any game control hands the keys to the rack.
+- Keyboard on the rack: 1-4, the arrows, Enter, Space and Escape. Keys outside the game, on its buttons' Enter, Space and arrows, and after the shift ends stay with the page.
+- The shift pauses on a hidden tab and comes back paused after a reload. Saves go to `ocs-state`, `ocs-best` and `ocs-history`.
+- Phone layouts from 320 px wide and a compact layout for screens up to 420 px tall (landscape phones).
+
+#### Tests
+- `tests/oncall-shift.test.js` (49 tests), with 100% line, branch and function coverage of `oncall-shift/script.js`:
+  - The pure shift model against an independent model.
+  - Balance simulations: a 1 s and a 1.5 s bot and a human-paced player on Normal, and a 2 s bot across the levels.
+  - The page booted from `index.html`: input and focus rules, pause and hidden tabs, reloads, the end of the shift, level changes, storage failures and corrupt saves.
+  - Source checks, including the 320-414 px widths and the 320 px landscape height.
+
+### Patch Panel
+
+#### Added
+- A new puzzle game: turn the patch-cord tiles of a homelab rack until every server, NAS and access point links up to the core switch, with no loops (broadcast storm) and no dangling cables.
+- Boards: 5x5, 7x7 and 9x9, plus a wrap mode. Each is a random spanning tree around the switch, scrambled and never solved at the start.
+- Controls: tap or click to turn a tile. Lock mode or a mouse/pen right-click locks a tile; an Android long press locks nothing. Keyboard controls work only while the board has the focus.
+- Live link-up, packet, storm and open-end highlighting, and a hex hint for the cursor tile.
+- Wrap boards explain themselves: the options read "5x5 wrap (edges join)", a note under the board says how the edges join, marks on the rim beside every row and column light up where a cable crosses to the opposite edge (each end in its tile's colour where the cables meet: green, red in a loop, cyan on a dark tile; amber or grey where a cable gets no answer), a rim tile and the tile across the rim from it share a dashed outline, and the hint names where the rim edges continue ("wraps W→E3"). On screens up to 359 px a wrap board keeps 5 px of padding for the marks, and every board still fits 320 px.
+- Stats and progress: a rotation target (an upper bound), the time, the best time and fewest rotations per board, and a ladder of board sizes.
+- Restart: once a tile was turned, a restarted board is an unscored replay, so a memorised board cannot set a best.
+- The Daily: a 7x7 board for everyone, seeded from the local date, following DAILY_RULE. It has one scored attempt, a clock that runs while the Daily is on screen, a streak, an unscored practice run and a share line with a clipboard fallback.
+- Saves under `ppn-state`, `ppn-best` and `ppn-daily`, parsed field by field. Blocked or full storage never stops the game.
+- Second tabs: a second tab takes over a newer Daily record instead of overwriting it, both before every write and through the storage event, and a new best is merged with the one on disk.
+
+#### Tests
+- `tests/patch-panel.test.js` with 60 tests:
+  - Pure board logic against an independent model, Daily seeding and day numbering, which of two tabs' Daily records wins, and saves field by field.
+  - The page booted from `index.html`: input, locks and long press, focus-only keys, the win, best and replay rules, the free and the Daily clock, and the wrap rim (placement, looks after every turn and once solved, the outlined tile across, the note).
+  - The Daily flow, second-tab takeovers, corrupt, blocked and full storage, and source checks with the 320-1440 px layout.
+- 100% line, branch and function coverage of `patch-panel/script.js`.
+
+### Port Knocker
+
+#### Added
+- New memory game `port-knocker/` (prefix `pkn-`): a homelab patch panel of 4, 6 or 9 ports flashes a knock sequence that grows by one port per round. The player knocks it back in Forward (FIFO), Reverse (LIFO) or Stride (every second port) mode within a 3 s knock window. The show speeds up from 600 to 250 ms, and from round 5 it starts with a knockd log line. The result is 'ssh: connection established' or 'Connection refused', and the score is the longest sequence repeated.
+- Daily mode: one seeded sequence a day for everyone (FNV-1a + mulberry32 from the local date) on 6 ports with a rotating mode and one scored attempt, recorded before its first show. A reload resumes it, and it has a streak, a Share line with a clipboard fallback and an unscored replay. A result stored by another tab stands: a stale tab takes it and never writes over it, and a new Daily builds its streak on the latest stored record.
+- Saves in `pkn-state`, `pkn-best` (per mode and panel size), `pkn-daily` and `pkn-sound` (sound off by default). Corrupt, partial, blocked or full storage never stops the game.
+- Keyboard 1-9 (numpad layout on 9 ports), Enter/Space only with the focus in the game, touch that never blocks page scrolling, hidden-tab pausing, and the Daily button's accessible name following its state.
+
+#### Tests
+- `tests/port-knocker.test.js` (44 tests): the pure logic against independent models; the page booted from the real `index.html` (rounds, modes, knock window, log line, keys and focus, touch, timers, saves, reloads, storage failures, the Daily and its multi-tab cases); and source checks (ids, prefix, ES5, embed safety, 320-414 px layout). 100 % lines, branches and functions of `port-knocker/script.js`.
+
+### Swap Space Solitaire
+
+#### Added
+- New game `swap-space-solitaire/`: an open card solitaire of the Baker's Game family with 8 cascades, 4 swap slots and 4 /dev/sd* disks.
+  - Alternating-colour building, the (free swap slots + 1) x 2^(empty cascades) run limit, and safe autoplay to the disks.
+  - Two-tap moves on phones; keys 1-8, Q W E R, F, U / Ctrl+Z and Escape on desktop.
+- Numbered deals 1-999999 from the game's own seeded shuffle, which can be typed and replayed. They match no other program's deals, and none is guaranteed solvable.
+- A daily deal scored once per day, with Share, an unscored Practice and a daily streak. A daily left open past midnight finishes as its own day and then says the next one is open.
+- Undo of up to 500 moves. Restart, Give Up and New Deal ask for a second press. A clock, page faults, won/played, streaks and best are shown.
+- Saves in `swp-state`, `swp-stats` and `swp-daily`, read field by field. Blocked or full storage shows a warning that names the keys. The clock is saved with moves, on hide and on close, never on ticks.
+- A second open tab never overwrites your progress. Another tab's newer save is taken over at once, and an older one is never allowed to undo a finished daily or lost wins.
+- Tab stops on the card table once instead of on every card.
+
+#### Tests
+- `tests/swap-space-solitaire.test.js`, 51 tests:
+  - Rules and deals checked against independent models.
+  - Saves of every kind, including corrupt, partial, blocked and full storage, and the reload round trip.
+  - Keys, focus and Tab stops; two-press confirms, the clock and the daily rules across midnight.
+  - Two tabs: a hidden tab shown again, closed, or getting storage events; taps and keys that find a newer save; behind saves; no write-back loops.
+  - Source and 320 px layout checks.
+- 100% lines, branches and functions of `swap-space-solitaire/script.js`.
+
 ## [2026-11-04] - Refactor of all games and full test coverage
 
 Every game's `script.js` was rewritten as one strict ES5 script in clear

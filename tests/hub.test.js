@@ -169,12 +169,14 @@ function watchChildren(parent) {
 }
 
 const FULL_LISTING = [
-  'puzzle: 2048 Game, Minesweeper Game, Sudoku Game',
+  'puzzle: 2048 Game, Bitmap Decoder, Minesweeper Game, Patch Panel, Sudoku Game',
   'word: Cyberpunk Wordle',
-  'arcade: Snake Game',
-  'reflex: Reaction Time Test, Typing Speed Test'
+  'arcade: On-Call Shift, Snake Game',
+  'reflex: Reaction Time Test, Typing Speed Test',
+  'memory: Hash Cracker, Port Knocker',
+  'tabletop: Flip-Flop, Swap Space Solitaire'
 ];
-const ALL_CHIPS = ['All 7*', 'Puzzle 3', 'Word 1', 'Arcade 1', 'Reflex and Typing 2'];
+const ALL_CHIPS = ['All 14*', 'Puzzle 5', 'Word 1', 'Arcade 2', 'Reflex and Typing 2', 'Memory and Logic 2', 'Board and Cards 2'];
 
 const savedProtocol = Object.getOwnPropertyDescriptor(globalThis.location, 'protocol');
 
@@ -211,14 +213,14 @@ test('hub: waits for DOMContentLoaded only while the document is still loading',
   assert.equal(listenerCount(document, 'DOMContentLoaded'), 1);
   b.ready();
   assert.deepEqual(listing(), FULL_LISTING);
-  assert.equal(b.els['hub-stats'].textContent, '7 games in 4 genres');
+  assert.equal(b.els['hub-stats'].textContent, '14 games in 6 genres');
   assert.equal(listenerCount(document, 'keydown'), 1);
   b.restore();
 
   // Once parsing is over DOMContentLoaded may already have fired: start at once.
   const late = boot({ readyState: 'interactive' });
   assert.deepEqual(listing(), FULL_LISTING);
-  assert.equal(late.els['hub-stats'].textContent, '7 games in 4 genres');
+  assert.equal(late.els['hub-stats'].textContent, '14 games in 6 genres');
   assert.equal(listenerCount(document, 'DOMContentLoaded'), 0);
   assert.equal(listenerCount(document, 'keydown'), 1);
 });
@@ -243,8 +245,8 @@ test('hub: a value already in the search box when the page starts filters the fi
   const spec = { ...SPEC, 'hub-search': { ...SPEC['hub-search'], value: '  snake ' } };
   const b = boot({ spec });
   assert.deepEqual(listing(), ['arcade: Snake Game']);
-  assert.deepEqual(status(b.els), { count: '1 of 7', empty: null });
-  assert.deepEqual(chips(), ['All 1*', 'Puzzle 0', 'Word 0', 'Arcade 1', 'Reflex and Typing 0']);
+  assert.deepEqual(status(b.els), { count: '1 of 14', empty: null });
+  assert.deepEqual(chips(), ['All 1*', 'Puzzle 0', 'Word 0', 'Arcade 1', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
 });
 
 // ── header ───────────────────────────────────────────────────────────────────
@@ -252,20 +254,20 @@ test('hub: a value already in the search box when the page starts filters the fi
 test('hub: the header counts the games and genres; the placeholder and footer use the game count', () => {
   const { els } = boot();
   const stats = els['hub-stats'];
-  assert.equal(stats.textContent, '7 games in 4 genres');
-  assert.deepEqual(stats.children.map((c) => c.tagName + ':' + c.textContent), ['STRONG:7', 'STRONG:4']);
-  assert.equal(els['hub-search'].placeholder, 'Search 7 games by name or genre  (press /)');
-  assert.equal(els['hub-footer'].textContent, 'Local repository index page · 7 games');
+  assert.equal(stats.textContent, '14 games in 6 genres');
+  assert.deepEqual(stats.children.map((c) => c.tagName + ':' + c.textContent), ['STRONG:14', 'STRONG:6']);
+  assert.equal(els['hub-search'].placeholder, 'Search 14 games by name or genre  (press /)');
+  assert.equal(els['hub-footer'].textContent, 'Local repository index page · 14 games');
 });
 
 test('hub: the counts follow the GAMES and GROUPS lists', () => {
-  const source = variant((html) => withExtraGroup(withoutGame('snake-game')(html)));
+  const source = variant((html) => withExtraGroup(withoutGame('oncall-shift')(withoutGame('snake-game')(html))));
   const { els } = boot({ source });
-  assert.equal(els['hub-stats'].textContent, '6 games in 5 genres');
-  assert.equal(els['hub-search'].placeholder, 'Search 6 games by name or genre  (press /)');
-  assert.equal(els['hub-footer'].textContent, 'Local repository index page · 6 games');
-  assert.deepEqual(chips(), ['All 6*', 'Puzzle 3', 'Word 1', 'Arcade 0', 'Reflex and Typing 2', 'Extra 0']);
-  assert.deepEqual(listing(), [FULL_LISTING[0], FULL_LISTING[1], FULL_LISTING[3]]);
+  assert.equal(els['hub-stats'].textContent, '12 games in 7 genres');
+  assert.equal(els['hub-search'].placeholder, 'Search 12 games by name or genre  (press /)');
+  assert.equal(els['hub-footer'].textContent, 'Local repository index page · 12 games');
+  assert.deepEqual(chips(), ['All 12*', 'Puzzle 5', 'Word 1', 'Arcade 0', 'Reflex and Typing 2', 'Extra 0', 'Memory and Logic 2', 'Board and Cards 2']);
+  assert.deepEqual(listing(), [FULL_LISTING[0], FULL_LISTING[1], FULL_LISTING[3], FULL_LISTING[4], FULL_LISTING[5]]);
 });
 
 // ── list and cards ───────────────────────────────────────────────────────────
@@ -274,7 +276,7 @@ test('hub: the first render lists every game by genre in GROUPS order, sorted by
   const { els } = boot();
   assert.deepEqual(listing(), FULL_LISTING);
   const sections = $$('.hub-section');
-  assert.deepEqual(sections.map((s) => s.tagName), ['SECTION', 'SECTION', 'SECTION', 'SECTION']);
+  assert.deepEqual(sections.map((s) => s.tagName), GROUPS.map(() => 'SECTION'));
   sections.forEach((section, i) => {
     const group = GROUPS[i];
     const [heading, grid] = section.children;
@@ -300,7 +302,7 @@ test('hub: cards are sorted by name within a genre, ignoring case, whatever the 
   // would sort last by code point and stay put without any sorting.
   const source = variant((html) => html.replace("name: 'Sudoku Game'", "name: 'arrow Sudoku'"));
   boot({ source });
-  assert.deepEqual(listing()[0], 'puzzle: 2048 Game, arrow Sudoku, Minesweeper Game');
+  assert.deepEqual(listing()[0], 'puzzle: 2048 Game, arrow Sudoku, Bitmap Decoder, Minesweeper Game, Patch Panel');
 });
 
 test('hub: each card links its game, carries its genre colour and shows its description', () => {
@@ -328,7 +330,9 @@ test('hub: card links end in folder/ over http and https', () => {
     setProtocol(protocol);
     boot();
     assert.deepEqual($$('.hub-card-link').map((a) => a.href), [
-      '2048-game/', 'minesweeper/', 'sudoku/', 'wordle-game/', 'snake-game/', 'reaction-time/', 'typing-speed-test/'
+      '2048-game/', 'bitmap-decoder/', 'minesweeper/', 'patch-panel/', 'sudoku/', 'wordle-game/', 'oncall-shift/',
+      'snake-game/', 'reaction-time/', 'typing-speed-test/', 'hash-cracker/', 'port-knocker/', 'flip-flop/',
+      'swap-space-solitaire/'
     ], protocol);
     resetStubs();
   }
@@ -338,8 +342,10 @@ test('hub: card links open folder/index.html when the page is opened from disk (
   setProtocol('file:');
   const { els } = boot();
   assert.deepEqual($$('.hub-card-link').map((a) => a.href), [
-    '2048-game/index.html', 'minesweeper/index.html', 'sudoku/index.html', 'wordle-game/index.html',
-    'snake-game/index.html', 'reaction-time/index.html', 'typing-speed-test/index.html'
+    '2048-game/index.html', 'bitmap-decoder/index.html', 'minesweeper/index.html', 'patch-panel/index.html',
+    'sudoku/index.html', 'wordle-game/index.html', 'oncall-shift/index.html', 'snake-game/index.html',
+    'reaction-time/index.html', 'typing-speed-test/index.html', 'hash-cracker/index.html',
+    'port-knocker/index.html', 'flip-flop/index.html', 'swap-space-solitaire/index.html'
   ]);
   chipButton('Arcade').click();
   search(els, 'snake');
@@ -376,16 +382,16 @@ test('hub: search ignores case and matches names, descriptions and genre labels'
   const { els } = boot();
   search(els, 'REFLEX');
   assert.deepEqual(listing(), ['reflex: Reaction Time Test, Typing Speed Test']);
-  assert.deepEqual(status(els), { count: '2 of 7', empty: null });
+  assert.deepEqual(status(els), { count: '2 of 14', empty: null });
 
   search(els, 'Snake');
   assert.deepEqual(listing(), ['arcade: Snake Game']);
-  assert.deepEqual(chips(), ['All 1*', 'Puzzle 0', 'Word 0', 'Arcade 1', 'Reflex and Typing 0']);
+  assert.deepEqual(chips(), ['All 1*', 'Puzzle 0', 'Word 0', 'Arcade 1', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
 
   search(els, 'undo');
-  assert.deepEqual(shownNames(), ['2048 Game'], 'a word only in the description');
+  assert.deepEqual(shownNames(), ['2048 Game', 'Flip-Flop'], 'a word only in the descriptions');
   search(els, 'arcade');
-  assert.deepEqual(shownNames(), ['Snake Game'], 'a word only in the genre label');
+  assert.deepEqual(shownNames(), ['On-Call Shift', 'Snake Game'], 'a word only in the genre label');
   search(els, 'mine swe');
   assert.deepEqual(shownNames(), ['Minesweeper Game'], 'parts of words match');
   search(els, '(.*)');
@@ -395,9 +401,9 @@ test('hub: search ignores case and matches names, descriptions and genre labels'
 test('hub: every word of a search must match; extra whitespace is ignored', () => {
   const { els } = boot();
   search(els, '  puzzle   board ');
-  assert.deepEqual(listing(), ['puzzle: 2048 Game, Minesweeper Game']);
-  assert.deepEqual(status(els), { count: '2 of 7', empty: null });
-  assert.deepEqual(chips(), ['All 2*', 'Puzzle 2', 'Word 0', 'Arcade 0', 'Reflex and Typing 0']);
+  assert.deepEqual(listing(), ['puzzle: 2048 Game, Bitmap Decoder, Minesweeper Game, Patch Panel']);
+  assert.deepEqual(status(els), { count: '4 of 14', empty: null });
+  assert.deepEqual(chips(), ['All 4*', 'Puzzle 4', 'Word 0', 'Arcade 0', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
   search(els, 'puzzle board hard');
   assert.deepEqual(shownNames(), ['Minesweeper Game']);
   search(els, ' \t ');
@@ -410,8 +416,8 @@ test('hub: a search without a match shows the empty message; clearing the box br
   search(els, 'zzz');
   assert.deepEqual(listing(), []);
   assert.equal(els['hub-list'].children.length, 0);
-  assert.deepEqual(status(els), { count: '0 of 7', empty: 'No game matches “zzz”.' });
-  assert.deepEqual(chips(), ['All 0*', 'Puzzle 0', 'Word 0', 'Arcade 0', 'Reflex and Typing 0']);
+  assert.deepEqual(status(els), { count: '0 of 14', empty: 'No game matches “zzz”.' });
+  assert.deepEqual(chips(), ['All 0*', 'Puzzle 0', 'Word 0', 'Arcade 0', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
   search(els, ' zzz  ');
   assert.equal(status(els).empty, 'No game matches “zzz”.', 'the message shows the trimmed query');
   search(els, '');
@@ -516,12 +522,12 @@ test('hub: Escape in the search box clears the query and keeps the chosen genre'
   chipButton('Puzzle').click();
   els['hub-search'].focus();
   search(els, 'zzz');
-  assert.deepEqual(status(els), { count: '0 of 7', empty: 'No game matches “zzz” in this genre.' });
+  assert.deepEqual(status(els), { count: '0 of 14', empty: 'No game matches “zzz” in this genre.' });
   pressKey('Escape');
   assert.equal(els['hub-search'].value, '');
   assert.deepEqual(listing(), [FULL_LISTING[0]]);
-  assert.deepEqual(status(els), { count: '3 of 7', empty: null });
-  assert.deepEqual(chips(), ['All 7', 'Puzzle 3*', 'Word 1', 'Arcade 1', 'Reflex and Typing 2']);
+  assert.deepEqual(status(els), { count: '5 of 14', empty: null });
+  assert.deepEqual(chips(), ['All 14', 'Puzzle 5*', 'Word 1', 'Arcade 2', 'Reflex and Typing 2', 'Memory and Logic 2', 'Board and Cards 2']);
   assertSame(document.activeElement, els['hub-search']);
 });
 
@@ -621,8 +627,8 @@ test('hub: a genre chip shows only its genre; clicking it again or All returns t
   const { els } = boot();
   chipButton('Puzzle').click();
   assert.deepEqual(listing(), [FULL_LISTING[0]]);
-  assert.deepEqual(chips(), ['All 7', 'Puzzle 3*', 'Word 1', 'Arcade 1', 'Reflex and Typing 2']);
-  assert.deepEqual(status(els), { count: '3 of 7', empty: null });
+  assert.deepEqual(chips(), ['All 14', 'Puzzle 5*', 'Word 1', 'Arcade 2', 'Reflex and Typing 2', 'Memory and Logic 2', 'Board and Cards 2']);
+  assert.deepEqual(status(els), { count: '5 of 14', empty: null });
 
   chipButton('Puzzle').click();
   assert.deepEqual(listing(), FULL_LISTING);
@@ -633,8 +639,8 @@ test('hub: a genre chip shows only its genre; clicking it again or All returns t
   assert.deepEqual(listing(), [FULL_LISTING[1]]);
   chipButton('Reflex and Typing').click();
   assert.deepEqual(listing(), [FULL_LISTING[3]]);
-  assert.deepEqual(chips(), ['All 7', 'Puzzle 3', 'Word 1', 'Arcade 1', 'Reflex and Typing 2*']);
-  assert.equal(status(els).count, '2 of 7');
+  assert.deepEqual(chips(), ['All 14', 'Puzzle 5', 'Word 1', 'Arcade 2', 'Reflex and Typing 2*', 'Memory and Logic 2', 'Board and Cards 2']);
+  assert.equal(status(els).count, '2 of 14');
 
   chipButton('All').click();
   assert.deepEqual(listing(), FULL_LISTING);
@@ -678,7 +684,7 @@ test('hub: activating a chip from the keyboard keeps the same button in place an
   search(els, 'snake');
   assert.deepEqual(changes, [], 'a search leaves the chip row as it is');
   assert.ok(sameNodes($$('.hub-chip'), before), 'a search updates the counts in place');
-  assert.deepEqual(chips(), ['All 1', 'Puzzle 0', 'Word 0*', 'Arcade 1', 'Reflex and Typing 0']);
+  assert.deepEqual(chips(), ['All 1', 'Puzzle 0', 'Word 0*', 'Arcade 1', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
 
   // The watch does see a chip put back where it was, and the row being cleared.
   row.appendChild(row.lastChild);
@@ -692,22 +698,22 @@ test('hub: a genre without a match for the search says so; the chip counts point
   search(els, 'snake');
   chipButton('Puzzle').click();
   assert.deepEqual(listing(), []);
-  assert.deepEqual(status(els), { count: '0 of 7', empty: 'No game matches “snake” in this genre.' });
-  assert.deepEqual(chips(), ['All 1', 'Puzzle 0*', 'Word 0', 'Arcade 1', 'Reflex and Typing 0']);
+  assert.deepEqual(status(els), { count: '0 of 14', empty: 'No game matches “snake” in this genre.' });
+  assert.deepEqual(chips(), ['All 1', 'Puzzle 0*', 'Word 0', 'Arcade 1', 'Reflex and Typing 0', 'Memory and Logic 0', 'Board and Cards 0']);
   chipButton('Arcade').click();
   assert.deepEqual(listing(), ['arcade: Snake Game']);
-  assert.deepEqual(status(els), { count: '1 of 7', empty: null });
+  assert.deepEqual(status(els), { count: '1 of 14', empty: null });
 });
 
 test('hub: a genre without games gets a 0 chip, and choosing it shows the empty message', () => {
   // The wording without a query is pinned as it is; a dedicated text is a
   // proposal for Vasyl.
   const { els } = boot({ source: variant(withExtraGroup) });
-  assert.deepEqual(chips(), ALL_CHIPS.concat('Extra 0'));
+  assert.deepEqual(chips(), ALL_CHIPS.slice(0, 5).concat('Extra 0', ALL_CHIPS.slice(5)));
   assert.deepEqual(listing(), FULL_LISTING, 'no section for an empty genre');
   chipButton('Extra').click();
   assert.deepEqual(listing(), []);
-  assert.deepEqual(status(els), { count: '0 of 7', empty: 'No game matches “” in this genre.' });
+  assert.deepEqual(status(els), { count: '0 of 14', empty: 'No game matches “” in this genre.' });
 });
 
 // ── data checks ──────────────────────────────────────────────────────────────

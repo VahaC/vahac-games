@@ -1,0 +1,727 @@
+/* Port Knocker — style.css
+   Namespace: pkn- (port knocker)
+   All selectors use the pkn- prefix to avoid conflicts with host page styles. */
+
+.pkn-wrapper {
+  --pkn-bg-primary: #0a0f1e;
+  --pkn-bg-secondary: #111827;
+  --pkn-bg-card: #1a2236;
+  --pkn-bg-input: #0d1424;
+  --pkn-bg-terminal: #05080f;
+  --pkn-border: #2a3a5c;
+  --pkn-border-focus: #3b82f6;
+  --pkn-text-primary: #e2e8f0;
+  --pkn-text-secondary: #94a3b8;
+  --pkn-text-muted: #64748b;
+  --pkn-accent-blue: #3b82f6;
+  --pkn-accent-cyan: #22d3ee;
+  --pkn-accent-green: #10b981;
+  --pkn-accent-amber: #f59e0b;
+  --pkn-accent-red: #ef4444;
+  --pkn-jack: #04070d;
+  --pkn-jack-edge: #3b4b6e;
+  --pkn-pin: #d4a017;
+  --pkn-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --pkn-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --pkn-radius: 8px;
+
+  font-family: var(--pkn-font-sans);
+  color: var(--pkn-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 45%),
+    linear-gradient(180deg, #0a0f1e 0%, #111827 100%);
+}
+
+.pkn-wrapper *,
+.pkn-wrapper *::before,
+.pkn-wrapper *::after {
+  box-sizing: border-box;
+}
+
+.pkn-hidden {
+  display: none;
+}
+
+/* ── Header and settings ────────────────────────────────────────────────── */
+
+.pkn-header {
+  margin-bottom: 20px;
+}
+
+.pkn-title {
+  margin: 0;
+  font-family: var(--pkn-font-mono);
+  font-size: 2rem;
+  color: var(--pkn-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.pkn-subtitle {
+  margin: 6px 0 0;
+  color: var(--pkn-text-secondary);
+}
+
+.pkn-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.pkn-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.pkn-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pkn-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pkn-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  background: var(--pkn-bg-input);
+  border: 1px solid var(--pkn-border);
+  border-radius: 6px;
+  color: var(--pkn-text-primary);
+  font-family: var(--pkn-font-mono);
+  font-size: 0.95rem;
+}
+
+.pkn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 100%;
+}
+
+.pkn-btn {
+  min-height: 44px;
+  padding: 0.65rem 1.25rem;
+  background: var(--pkn-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.pkn-btn:hover {
+  background: #2563eb;
+}
+
+.pkn-btn:active {
+  transform: scale(0.97);
+}
+
+.pkn-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.pkn-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--pkn-border);
+  color: var(--pkn-text-secondary);
+}
+
+.pkn-btn--secondary:hover {
+  background: var(--pkn-bg-secondary);
+  color: var(--pkn-text-primary);
+}
+
+.pkn-btn--daily {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--pkn-accent-amber);
+  color: var(--pkn-accent-amber);
+}
+
+.pkn-btn--daily:hover {
+  background: rgba(245, 158, 11, 0.28);
+}
+
+.pkn-btn:focus-visible,
+.pkn-select:focus-visible,
+.pkn-stage:focus-visible,
+.pkn-share-text:focus-visible {
+  outline: 2px solid var(--pkn-accent-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Stats ──────────────────────────────────────────────────────────────── */
+
+.pkn-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.pkn-stat {
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--pkn-bg-card);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--pkn-radius);
+}
+
+.pkn-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--pkn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pkn-stat-value {
+  font-family: var(--pkn-font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--pkn-accent-cyan);
+}
+
+/* ── Stage: console, faceplate, meter ───────────────────────────────────── */
+
+.pkn-stage {
+  padding: 16px;
+  background: rgba(17, 24, 39, 0.92);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 14px;
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.06);
+}
+
+.pkn-console {
+  min-height: 5.4em;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: var(--pkn-bg-terminal);
+  border: 1px solid #1e2a44;
+  border-radius: var(--pkn-radius);
+  font-family: var(--pkn-font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pkn-command {
+  color: var(--pkn-text-secondary);
+}
+
+.pkn-log {
+  min-height: 1.6em;
+  color: var(--pkn-accent-amber);
+  visibility: hidden;
+}
+
+.pkn-log-on {
+  visibility: visible;
+}
+
+.pkn-output {
+  color: var(--pkn-text-secondary);
+}
+
+.pkn-out-ok {
+  color: var(--pkn-accent-green);
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.45);
+  animation: pkn-type 0.7s steps(30, end) both;
+}
+
+.pkn-out-err {
+  color: var(--pkn-accent-red);
+  animation: pkn-type 0.7s steps(30, end) both;
+}
+
+.pkn-out-warn {
+  color: var(--pkn-accent-amber);
+}
+
+.pkn-faceplate {
+  padding: 14px;
+  background:
+    radial-gradient(circle at 10px 10px, #3b4b6e 2px, transparent 3px),
+    radial-gradient(circle at calc(100% - 10px) 10px, #3b4b6e 2px, transparent 3px),
+    linear-gradient(180deg, #161f33, #0c1322);
+  border: 1px solid var(--pkn-border);
+  border-radius: 10px;
+}
+
+.pkn-faceplate-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 12px 10px;
+  font-family: var(--pkn-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--pkn-text-muted);
+}
+
+.pkn-faceplate-name {
+  color: var(--pkn-accent-cyan);
+}
+
+.pkn-faceplate-speed {
+  color: var(--pkn-accent-green);
+}
+
+.pkn-panel {
+  display: grid;
+  grid-template-columns: repeat(var(--pkn-cols, 2), minmax(0, 1fr));
+  gap: 10px;
+  max-width: calc(var(--pkn-cols, 2) * 150px);
+  margin: 0 auto;
+  touch-action: manipulation;
+}
+
+.pkn-panel-down {
+  animation: pkn-shake 0.35s ease;
+}
+
+.pkn-port {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 104px;
+  padding: 12px 4px 8px;
+  background: linear-gradient(180deg, #1a2236, #0d1424);
+  border: 1px solid var(--pkn-border);
+  border-radius: 10px;
+  color: var(--pkn-text-primary);
+  font-family: var(--pkn-font-mono);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.08s;
+}
+
+.pkn-port:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.pkn-port:active {
+  transform: scale(0.97);
+}
+
+.pkn-port span {
+  pointer-events: none;
+}
+
+.pkn-led {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1f2937;
+  box-shadow: inset 0 0 2px #000;
+}
+
+.pkn-jack {
+  position: relative;
+  width: 44px;
+  height: 28px;
+  margin-bottom: 12px;
+  background: var(--pkn-jack);
+  border: 2px solid var(--pkn-jack-edge);
+  border-radius: 3px;
+}
+
+/* The latch slot under the opening, the RJ45 outline. */
+.pkn-jack::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: -12px;
+  height: 10px;
+  background: var(--pkn-jack);
+  border: 2px solid var(--pkn-jack-edge);
+  border-top: 0;
+  border-radius: 0 0 2px 2px;
+}
+
+.pkn-pins {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  right: 5px;
+  height: 7px;
+  background: repeating-linear-gradient(90deg, var(--pkn-pin) 0 2px, transparent 2px 4px);
+  opacity: 0.85;
+}
+
+.pkn-port-num {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pkn-port-svc {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  color: var(--pkn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pkn-key {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.65rem;
+  color: var(--pkn-text-muted);
+}
+
+.pkn-port-lit {
+  border-color: var(--pkn-accent-cyan);
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.55), inset 0 0 14px rgba(34, 211, 238, 0.22);
+}
+
+.pkn-port-lit .pkn-led,
+.pkn-panel-up .pkn-led {
+  background: var(--pkn-accent-green);
+  box-shadow: 0 0 10px var(--pkn-accent-green);
+}
+
+.pkn-port-lit .pkn-jack {
+  border-color: var(--pkn-accent-cyan);
+}
+
+.pkn-port-hit {
+  border-color: var(--pkn-accent-amber);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+}
+
+.pkn-port-hit .pkn-led {
+  background: var(--pkn-accent-amber);
+  box-shadow: 0 0 10px var(--pkn-accent-amber);
+}
+
+.pkn-port-bad {
+  border-color: var(--pkn-accent-red);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
+}
+
+.pkn-port-bad .pkn-led {
+  background: var(--pkn-accent-red);
+}
+
+.pkn-port-want {
+  border-color: var(--pkn-accent-green);
+  border-style: dashed;
+}
+
+.pkn-panel-up .pkn-led {
+  animation: pkn-blink 0.3s steps(2, start) 4;
+}
+
+.pkn-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.pkn-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 12px;
+}
+
+.pkn-dot {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--pkn-border);
+  border-radius: 3px;
+  background: var(--pkn-bg-input);
+}
+
+.pkn-dot-on {
+  background: var(--pkn-accent-cyan);
+  border-color: var(--pkn-accent-cyan);
+  box-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+}
+
+.pkn-window {
+  height: 6px;
+  overflow: hidden;
+  background: var(--pkn-bg-input);
+  border-radius: 3px;
+}
+
+.pkn-window-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pkn-accent-red), var(--pkn-accent-amber), var(--pkn-accent-cyan));
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.pkn-window-run {
+  animation: pkn-drain var(--pkn-window-ms, 3000ms) linear var(--pkn-window-delay, 0ms) forwards;
+}
+
+.pkn-hint {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--pkn-text-secondary);
+}
+
+/* ── Start, status, result ──────────────────────────────────────────────── */
+
+.pkn-start-row {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 8px;
+}
+
+.pkn-btn--start {
+  min-width: 220px;
+  min-height: 52px;
+  font-size: 1rem;
+  font-family: var(--pkn-font-mono);
+  background: var(--pkn-accent-green);
+}
+
+.pkn-btn--start:hover {
+  background: #059669;
+}
+
+.pkn-status {
+  margin: 8px 0;
+  padding: 12px 14px;
+  min-height: 3.2em;
+  text-align: center;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  border-radius: var(--pkn-radius);
+  color: var(--pkn-accent-cyan);
+  overflow-wrap: anywhere;
+}
+
+.pkn-note {
+  margin: 8px 0;
+  padding: 10px 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--pkn-radius);
+  color: var(--pkn-accent-amber);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.pkn-result {
+  margin: 12px 0;
+  padding: 16px;
+  background: var(--pkn-bg-card);
+  border: 1px solid var(--pkn-accent-amber);
+  border-radius: 12px;
+}
+
+.pkn-result-title {
+  margin: 0 0 6px;
+  font-family: var(--pkn-font-mono);
+  font-size: 1.1rem;
+  color: var(--pkn-accent-amber);
+  overflow-wrap: anywhere;
+}
+
+.pkn-result-text {
+  margin: 0 0 12px;
+  color: var(--pkn-text-secondary);
+}
+
+.pkn-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pkn-share-text {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--pkn-bg-input);
+  border: 1px solid var(--pkn-border);
+  border-radius: 6px;
+  color: var(--pkn-text-primary);
+  font-family: var(--pkn-font-mono);
+  font-size: 0.85rem;
+}
+
+.pkn-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--pkn-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+
+.pkn-toast.pkn-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.pkn-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--pkn-text-muted);
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes pkn-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes pkn-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+@keyframes pkn-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes pkn-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pkn-out-ok,
+  .pkn-out-err,
+  .pkn-panel-down,
+  .pkn-panel-up .pkn-led {
+    animation: none;
+  }
+}
+
+/* ── Phones ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .pkn-wrapper {
+    padding: 16px 12px;
+  }
+
+  .pkn-title {
+    font-size: 1.6rem;
+  }
+
+  .pkn-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pkn-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pkn-btn {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .pkn-btn--start {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pkn-stage {
+    padding: 12px;
+  }
+
+  .pkn-console {
+    font-size: 0.78rem;
+  }
+
+  .pkn-faceplate {
+    padding: 10px;
+  }
+
+  .pkn-panel {
+    gap: 8px;
+  }
+
+  .pkn-port {
+    min-height: 92px;
+  }
+
+  .pkn-jack {
+    width: 38px;
+    height: 24px;
+  }
+
+  .pkn-jack::after {
+    left: 9px;
+    right: 9px;
+  }
+
+  .pkn-port-num {
+    font-size: 0.9rem;
+  }
+}

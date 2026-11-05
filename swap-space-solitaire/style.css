@@ -1,0 +1,601 @@
+/* Swap Space Solitaire — style.css
+   Namespace: swp- (swap space solitaire)
+   All selectors use the swp- prefix to avoid conflicts with host page styles.
+   The table is a grid of 8 equal columns (minmax(0, 1fr)), so the cards
+   shrink with the page; a card is 5:7 and each covered card shows a strip of
+   (1.4 + --swp-fan) x its width, enough for its rank and suit corner. */
+
+.swp-wrapper {
+  --swp-bg-primary: #0a0f1e;
+  --swp-bg-secondary: #111827;
+  --swp-bg-card: #1a2236;
+  --swp-bg-input: #0d1424;
+  --swp-border: #2a3a5c;
+  --swp-border-focus: #3b82f6;
+  --swp-text-primary: #e2e8f0;
+  --swp-text-secondary: #94a3b8;
+  --swp-text-muted: #64748b;
+  --swp-accent-blue: #3b82f6;
+  --swp-accent-cyan: #22d3ee;
+  --swp-accent-green: #10b981;
+  --swp-accent-amber: #f59e0b;
+  --swp-accent-red: #ef4444;
+  --swp-suit-red: #fb7185;
+  --swp-suit-black: #e2e8f0;
+  --swp-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --swp-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --swp-radius: 8px;
+  --swp-gap: 6px;
+  --swp-fan: -100%;
+  --swp-fan-long: -110%;
+  --swp-corner: 1rem;
+  --swp-pip: 2.2rem;
+
+  font-family: var(--swp-font-sans);
+  color: var(--swp-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--swp-bg-primary) 0%, var(--swp-bg-secondary) 100%);
+  border-radius: 12px;
+}
+
+.swp-wrapper *,
+.swp-wrapper *::before,
+.swp-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and tabs ─────────────────────────────────────────────────────── */
+
+.swp-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+
+.swp-title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--swp-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.swp-subtitle {
+  margin: 6px 0 0;
+  color: var(--swp-text-secondary);
+  font-size: 0.95rem;
+}
+
+.swp-tabs {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--swp-border);
+  border-radius: 10px;
+  background: var(--swp-bg-input);
+}
+
+.swp-tab {
+  padding: 0.45rem 1.1rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--swp-text-secondary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swp-tab:hover {
+  color: var(--swp-text-primary);
+}
+
+.swp-tab-active {
+  background: var(--swp-accent-blue);
+  color: #fff;
+}
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+
+.swp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.swp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.swp-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--swp-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.swp-btn:hover {
+  background: #2563eb;
+}
+
+.swp-btn:active {
+  transform: scale(0.97);
+}
+
+.swp-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--swp-border);
+  color: var(--swp-text-secondary);
+}
+
+.swp-btn--secondary:hover {
+  background: var(--swp-bg-secondary);
+  color: var(--swp-text-primary);
+}
+
+.swp-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.swp-btn:focus-visible,
+.swp-tab:focus-visible,
+.swp-input:focus-visible,
+.swp-share-field:focus-visible {
+  outline: 2px solid var(--swp-accent-cyan);
+  outline-offset: 2px;
+}
+
+.swp-deal-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swp-label {
+  color: var(--swp-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.swp-input,
+.swp-share-field {
+  padding: 0.55rem 0.7rem;
+  background: var(--swp-bg-input);
+  border: 1px solid var(--swp-border);
+  border-radius: 6px;
+  color: var(--swp-text-primary);
+  font-family: var(--swp-font-mono);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.swp-input {
+  width: 7.5rem;
+}
+
+.swp-input:focus,
+.swp-share-field:focus {
+  border-color: var(--swp-border-focus);
+}
+
+.swp-input::placeholder {
+  color: var(--swp-text-muted);
+}
+
+/* ── Stats ───────────────────────────────────────────────────────────────── */
+
+.swp-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.swp-stat {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.swp-stat-label {
+  display: block;
+  color: var(--swp-text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.swp-stat-value {
+  display: block;
+  color: var(--swp-accent-cyan);
+  font-family: var(--swp-font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.swp-deal-label {
+  margin: 0 0 8px;
+  color: var(--swp-text-secondary);
+  font-family: var(--swp-font-mono);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.swp-warning {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--swp-accent-amber);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+/* ── The table ───────────────────────────────────────────────────────────── */
+
+.swp-table {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.95), rgba(10, 15, 30, 0.98));
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.08), inset 0 0 25px rgba(34, 211, 238, 0.04);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.swp-table:focus-visible {
+  outline: 2px solid var(--swp-accent-cyan);
+  outline-offset: 3px;
+}
+
+.swp-row {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--swp-gap);
+}
+
+.swp-top {
+  margin-bottom: 14px;
+}
+
+/* Every cascade stretches to the tallest one, so the free area under a short
+   cascade is still its tap target. */
+.swp-cascades {
+  align-items: stretch;
+}
+
+.swp-cascade {
+  min-width: 0;
+  padding-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Cards and slots are buttons, and a browser centres a button's content
+   vertically even with display: block. A column flex box keeps the rank and
+   suit corner at the top, inside the strip a covered card still shows. */
+.swp-slot,
+.swp-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  margin: 0;
+  padding: 3px 4px;
+  overflow: hidden;
+  border: 1px solid var(--swp-border);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1f2a42, var(--swp-bg-card));
+  color: var(--swp-text-primary);
+  font-family: var(--swp-font-mono);
+  font-size: var(--swp-corner);
+  font-weight: 700;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.swp-cascade > .swp-card + .swp-card {
+  margin-top: var(--swp-fan);
+}
+
+.swp-cascade.swp-long > .swp-card + .swp-card {
+  margin-top: var(--swp-fan-long);
+}
+
+.swp-card-corner {
+  display: block;
+  white-space: nowrap;
+  letter-spacing: -0.03em;
+}
+
+.swp-card-pip {
+  position: absolute;
+  right: 8%;
+  bottom: 6%;
+  font-size: var(--swp-pip);
+  line-height: 1;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.swp-red {
+  color: var(--swp-suit-red);
+}
+
+.swp-black {
+  color: var(--swp-suit-black);
+}
+
+.swp-card:hover,
+.swp-slot:hover {
+  border-color: var(--swp-accent-cyan);
+}
+
+.swp-card:focus-visible,
+.swp-slot:focus-visible {
+  outline: 2px solid var(--swp-accent-cyan);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+.swp-selected {
+  border-color: var(--swp-accent-cyan);
+  background: linear-gradient(180deg, #123247, #0e2235);
+  box-shadow: 0 0 0 1px var(--swp-accent-cyan), 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.swp-slot.swp-target,
+.swp-cascade.swp-target > :last-child {
+  border-color: var(--swp-accent-green);
+  box-shadow: 0 0 0 1px var(--swp-accent-green), 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.swp-empty {
+  border-style: dashed;
+  background: rgba(13, 20, 36, 0.6);
+  color: var(--swp-text-muted);
+}
+
+.swp-disk.swp-empty {
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.swp-swap.swp-empty {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.swp-slot-label {
+  display: block;
+  color: var(--swp-text-muted);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.swp-slot-value {
+  display: block;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.swp-empty .swp-slot-value {
+  margin-top: 18%;
+  font-size: 1.4em;
+  text-align: center;
+  opacity: 0.45;
+}
+
+.swp-won {
+  animation: swp-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes swp-glow {
+  from {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+  }
+  to {
+    box-shadow: 0 0 42px rgba(16, 185, 129, 0.55);
+  }
+}
+
+/* ── Status, help, toast ─────────────────────────────────────────────────── */
+
+.swp-status {
+  max-width: 680px;
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  color: var(--swp-accent-cyan);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.swp-share-field {
+  display: block;
+  width: 100%;
+  max-width: 680px;
+  margin: 8px auto 0;
+}
+
+.swp-help {
+  max-width: 680px;
+  margin: 14px auto 0;
+  color: var(--swp-text-secondary);
+  font-size: 0.85rem;
+}
+
+.swp-help summary {
+  cursor: pointer;
+  color: var(--swp-text-primary);
+  font-weight: 600;
+}
+
+.swp-help ul {
+  margin: 8px 0 0;
+  padding-left: 1.2rem;
+}
+
+.swp-help code {
+  font-family: var(--swp-font-mono);
+  color: var(--swp-accent-cyan);
+}
+
+.swp-hidden {
+  display: none;
+}
+
+.swp-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--swp-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+
+.swp-toast.swp-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.swp-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--swp-text-muted);
+  font-size: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swp-won {
+    animation: none;
+  }
+
+  .swp-slot,
+  .swp-card,
+  .swp-toast {
+    transition: none;
+  }
+}
+
+/* ── Smaller screens ─────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .swp-wrapper {
+    padding: 16px 12px;
+    --swp-gap: 4px;
+    --swp-fan-long: -105%;
+    --swp-corner: 0.85rem;
+    --swp-pip: 1.5rem;
+  }
+
+  .swp-table {
+    padding: 6px;
+  }
+
+  .swp-title {
+    font-size: 1.6rem;
+  }
+
+  .swp-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .swp-wrapper {
+    padding: 12px 8px;
+    --swp-gap: 3px;
+    --swp-fan: -92%;
+    --swp-fan-long: -100%;
+    --swp-corner: 0.7rem;
+    --swp-pip: 1.05rem;
+  }
+
+  .swp-table {
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .swp-slot,
+  .swp-card {
+    padding: 2px;
+    border-radius: 4px;
+  }
+
+  .swp-slot-label {
+    font-size: 0.5rem;
+  }
+
+  .swp-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .swp-tab {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .swp-title {
+    font-size: 1.4rem;
+  }
+
+  .swp-stat {
+    padding: 6px 8px;
+  }
+}
