@@ -2,7 +2,10 @@
    Namespace: bmd- (bitmap decoder)
    All selectors use the bmd- prefix to avoid conflicts with host page styles.
    The cell size of each board size and the clue number box are variables on
-   the wrapper, set again for narrow screens at the end. */
+   the wrapper, set again for narrow screens at the end.  The boards from
+   20x20 up are offered only on screens wide enough for them (768, 1024 and
+   1280 px, see BMD_SCREEN_LIMITS in script.js); 25x25 and 30x30 widen the
+   wrapper to 1280 px. */
 
 .bmd-wrapper {
   --bmd-bg-primary: #0a0f1e;
@@ -25,6 +28,9 @@
   --bmd-cell-5: 44px;
   --bmd-cell-10: 30px;
   --bmd-cell-15: 24px;
+  --bmd-cell-20: 26px;
+  --bmd-cell-25: 26px;
+  --bmd-cell-30: 26px;
   --bmd-num: 14px;
   --bmd-num-gap: 3px;
   --bmd-num-font: 0.78rem;
@@ -38,6 +44,11 @@
   margin: 0 auto;
   padding: 2rem 1rem;
   box-sizing: border-box;
+}
+
+.bmd-wrapper:has(.bmd-board--s25),
+.bmd-wrapper:has(.bmd-board--s30) {
+  max-width: 1280px;
 }
 
 .bmd-wrapper *,
@@ -274,6 +285,18 @@
 
 .bmd-board--s15 {
   --bmd-cell: var(--bmd-cell-15);
+}
+
+.bmd-board--s20 {
+  --bmd-cell: var(--bmd-cell-20);
+}
+
+.bmd-board--s25 {
+  --bmd-cell: var(--bmd-cell-25);
+}
+
+.bmd-board--s30 {
+  --bmd-cell: var(--bmd-cell-30);
 }
 
 .bmd-corner {

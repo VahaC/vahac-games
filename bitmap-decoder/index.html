@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bitmap Decoder — Logs from VahaC</title>
-  <meta name="description" content="Bitmap Decoder: a nonogram picture-logic puzzle whose clues are run-length encoding. Fill the grid until every row and column matches and a hidden 1-bit pixel icon decodes into a hex dump and ASCII art. A daily icon with a streak, Endless boards from 5x5 to 15x15, Easy and Hard rules, a timer and best times. Fully client-side and offline compatible.">
+  <meta name="description" content="Bitmap Decoder: a nonogram picture-logic puzzle whose clues are run-length encoding. Fill the grid until every row and column matches and a hidden 1-bit pixel icon decodes into a hex dump and ASCII art. A daily icon with a streak, Endless boards from 5x5 to 30x30, Easy, Relaxed (no mistake limit) and Hard rules, a timer and best times. Fully client-side and offline compatible.">
   <link rel="stylesheet" href="style.css">
   <style>body { margin: 0; background: #0a0f1e; }</style>
 </head>
@@ -32,13 +32,17 @@
         <option value="5">5x5</option>
         <option value="10" selected>10x10</option>
         <option id="bmd-size-15" value="15">15x15</option>
+        <option id="bmd-size-20" value="20">20x20</option>
+        <option id="bmd-size-25" value="25">25x25</option>
+        <option id="bmd-size-30" value="30">30x30</option>
       </select>
     </div>
 
     <div class="bmd-field">
       <label class="bmd-label" for="bmd-rules">Rules</label>
       <select id="bmd-rules" class="bmd-select" aria-label="Rules for the next puzzle, and for this one while it has no moves">
-        <option value="easy">Easy: 3 mistakes</option>
+        <option id="bmd-rules-easy" value="easy">Easy: 3 mistakes</option>
+        <option value="relaxed">Relaxed: no limit</option>
         <option value="hard">Hard: no checks</option>
       </select>
     </div>

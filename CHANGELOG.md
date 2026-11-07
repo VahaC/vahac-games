@@ -4,6 +4,49 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-07] - Bitmap Decoder: bigger boards and mistake limits
+
+Bitmap Decoder's Endless mode gets three bigger boards for wide screens, up to 30x30 on a 1280 px screen.
+Easy allows more mistakes on bigger boards, and new Relaxed rules turn the mistake limit off.
+The suite now has 1197 tests in 25 modules.
+
+### Bitmap Decoder
+
+#### Added
+- Endless boards of 20x20, 25x25 and 30x30, made and checked like the others (noise kept only when line logic
+  alone solves it, a library icon centred on the board as the fallback). Each one has its own best time.
+- Each big size is offered only on a screen wide enough for it: 20x20 from 768 px, 25x25 from 1024 px and
+  30x30 from 1280 px (15x15 keeps "over 600 px"). A disabled option says which screen it needs, for example
+  "30x30 (screens 1280 px and wider)". The limits are one table, `BMD_SCREEN_LIMITS`.
+- 25x25 and 30x30 widen the page from 860 to 1280 px (`.bmd-wrapper:has(...)`); the big boards use 26 px cells.
+- Relaxed rules ("Relaxed: no limit"): every move is checked as on Easy and a wrong one counts as a mistake and
+  shows the truth, but no number of mistakes ends the game. The Mistakes box shows the count alone ("14"), the
+  share line says "Relaxed 14 mistakes", and a Relaxed win sets no best time (each wrong tap reveals a cell, so
+  guessing could beat an honest time). A Relaxed Daily still keeps the streak.
+- An Endless puzzle being played can drop its limit at once: choosing Relaxed mid-game keeps its mistakes and
+  clock. Every other change of rules still waits for a puzzle with no moves, so a scored Daily keeps its limit.
+
+#### Changed
+- Easy's mistake limit depends on the board size (`BMD_MISTAKE_LIMITS`): 3 on 5x5 and 10x10 (so the Daily is
+  unchanged), 5 on 15x15, 6 on 20x20, 8 on 25x25 and 10 on 30x30. The Easy option names the limit of the board
+  on show, for example "Easy: 10 mistakes".
+- A saved board bigger than the screen offers is still shown and playable; New Game then makes the largest
+  size the screen offers (before: only 15x15 on a phone, which now follows the same rule).
+- Endless boards are never mirrored. Every other board used to copy its left half onto the right (about 60 %
+  of the 30x30 boards came out symmetric), so only half of it needed solving. Line logic still solves the
+  plain noise in under 2 tries on average at every size (about 2 ms for a 30x30 board).
+
+#### Tests
+- `tests/bitmap-decoder.test.js`, 46 tests (was 42): the mistake limit of every size and Relaxed moves, wins
+  and saves with no cap; on the page the Easy label per size, a 30x30 puzzle switched to Relaxed after two
+  mistakes and won with no best time, a 15x15 lost on its fifth mistake, a Daily that keeps its limit, and a
+  Relaxed Daily that keeps the streak and its mistakes on Restart; generation and smoothing at every size up to 30x30 with no mirrored board from 10x10 up, the
+  30x30 library fallback, a 30-bit hex dump and ASCII art, best times of all six sizes, the screen widths that
+  offer each size and the option notes, a 30x30 board played and decoded, a saved 30x30 board on a 1024 px
+  screen, and the layout check that a 20x20, 25x25 or 30x30 board fits beside the widest clue of 120 generated
+  boards on every screen from the one that offers it up to 1280 px.
+- 100% lines, branches and functions of `bitmap-decoder/script.js`.
+
 ## [2026-11-06] - Eight new games
 
 Eight games join the collection: Bad Sector, Byte Catcher, Defrag, Lost in /var, Pod Packer, Rack Reset,

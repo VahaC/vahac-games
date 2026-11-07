@@ -8,18 +8,20 @@
 // as a hex dump, ASCII art and the icon's name.
 //
 // Modes: Daily (one 10x10 icon of the day from the built-in library, one
-// scored attempt per day, a streak) and Endless (a 5x5, 10x10 or 15x15
-// bitmap made from noise).  Every puzzle can be solved by line logic alone,
+// scored attempt per day, a streak) and Endless (a 5x5 to 30x30 bitmap made
+// from noise; 15x15 and up only on screens wide enough for them, see
+// BMD_SCREEN_LIMITS).  Every puzzle can be solved by line logic alone,
 // so it has exactly one solution.  Rules: Easy checks each move (a wrong cell
-// counts as a mistake, three end the game), Hard checks nothing until the
-// grid matches every clue.
+// counts as a mistake, and the size's limit of them ends the game, see
+// BMD_MISTAKE_LIMITS), Relaxed checks each move with no limit (and sets no
+// best time), Hard checks nothing until the grid matches every clue.
 //
 // Storage (localStorage, each read and write guarded):
 //   bmd-state  { v, mode, size, rules, tool, endless }  the settings and the
 //              Endless puzzle in progress (id, name, size, rules, solution,
 //              fills, marks, mistakes, elapsed ms, status, practice: true
 //              once it was restarted, so it sets no best time).
-//   bmd-best   { "5": ms, "10": ms, "15": ms }  the best time per size.
+//   bmd-best   { "5": ms, "10": ms, ... "30": ms }  the best time per size.
 //   bmd-daily  { v, day, icon, rules, fills, marks, mistakes, elapsed,
 //              status, streak, lastWon, maxStreak }  today's attempt, written
 //              the moment it begins, and the streak.
@@ -38,12 +40,16 @@
   // ── Constants ─────────────────────────────────────────────────────────────
 
   var BMD_NAME = 'Bitmap Decoder';
-  var BMD_SIZES = [5, 10, 15];
+  var BMD_SIZES = [5, 10, 15, 20, 25, 30];
   var BMD_DAILY_SIZE = 10;
   var BMD_EMPTY = 0;
   var BMD_FILL = 1;
   var BMD_MARK = 2;
-  var BMD_MAX_MISTAKES = 3;
+  // The mistakes Easy allows per board size: the last one ends the game.
+  var BMD_MISTAKE_LIMITS = { 5: 3, 10: 3, 15: 5, 20: 6, 25: 8, 30: 10 };
+  // The rules by value: Easy and Relaxed check each move, Hard does not.
+  var BMD_RULES = ['easy', 'relaxed', 'hard'];
+  var BMD_RULE_LABELS = { easy: 'Easy', relaxed: 'Relaxed', hard: 'Hard' };
   var BMD_STATE_KEY = 'bmd-state';
   var BMD_BEST_KEY = 'bmd-best';
   var BMD_DAILY_KEY = 'bmd-daily';
@@ -58,10 +64,18 @@
   var BMD_MIDNIGHT_SLACK_MS = 1000;
   var BMD_TOAST_MS = 2200;
   var BMD_FILL_RATE = 0.55;
-  var BMD_MIRROR_RATE = 0.5;
   var BMD_MIN_DENSITY = 0.3;
   var BMD_MAX_DENSITY = 0.75;
-  var BMD_COMPACT_QUERY = '(max-width: 600px)';
+  // The big Endless sizes and the screens too narrow for them (the query),
+  // smallest first: a size is offered only on a screen the query does not
+  // match, so a screen too narrow for one is too narrow for every later one.
+  // note says why the option is disabled.
+  var BMD_SCREEN_LIMITS = [
+    { size: 15, query: '(max-width: 600px)', note: 'screens over 600 px' },
+    { size: 20, query: '(max-width: 767px)', note: 'screens 768 px and wider' },
+    { size: 25, query: '(max-width: 1023px)', note: 'screens 1024 px and wider' },
+    { size: 30, query: '(max-width: 1279px)', note: 'screens 1280 px and wider' }
+  ];
   var BMD_MAX_TEXT = 64;
   // Cell classes and words by state (EMPTY, FILL, MARK).
   var BMD_CELL_CLASS = ['', ' bmd-cell--fill', ' bmd-cell--mark'];
@@ -152,7 +166,7 @@
   var bmdRecord = { streak: 0, lastWon: null, maxStreak: 0, attempt: null };
 
   // Best times in ms per size, null for none.
-  var bmdBest = { 5: null, 10: null, 15: null };
+  var bmdBest = { 5: null, 10: null, 15: null, 20: null, 25: null, 30: null };
 
   // Generation tuning (a test seam: tests lower attempts to reach the fallback).
   var bmdTuning = { attempts: 200 };
@@ -172,7 +186,8 @@
     toastTimeout: null,
     midnightTimeout: null,
     warned: false,
-    compact: false
+    // The largest Endless size this screen offers (see BMD_SCREEN_LIMITS).
+    maxSize: 30
   };
 
   // ── Small helpers (no DOM) ────────────────────────────────────────────────
@@ -461,10 +476,10 @@
     return grid;
   }
 
-  // Noise: about 55 % of the cells filled, the left half mirrored onto the
-  // right half every other board, then smoothed once (a cell with 5 or more
-  // filled cells in its 3x3 block fills, one with 3 or fewer empties; cells
-  // outside the grid count as empty).
+  // Noise: about 55 % of the cells filled, then smoothed once (a cell with 5
+  // or more filled cells in its 3x3 block fills, one with 3 or fewer empties;
+  // cells outside the grid count as empty).  Never mirrored: a symmetric
+  // board would leave only half of it to solve.
   function bmdNoiseGrid(size, rnd) {
     var grid = bmdGridOf(size, 0);
     var row;
@@ -472,13 +487,6 @@
     for (row = 0; row < size; row++) {
       for (col = 0; col < size; col++) {
         grid[row][col] = rnd() < BMD_FILL_RATE ? 1 : 0;
-      }
-    }
-    if (rnd() < BMD_MIRROR_RATE) {
-      for (row = 0; row < size; row++) {
-        for (col = 0; col < size / 2; col++) {
-          grid[row][size - 1 - col] = grid[row][col];
-        }
       }
     }
     return grid.map(function (line, r) {
@@ -517,8 +525,8 @@
   // An Endless solution: noise grids drawn from rnd until one is fair, at
   // most maxAttempts of them.  Returns { solution, attempts, icon }: icon is
   // null for noise; after maxAttempts misses it is the library icon the
-  // solution falls back to (a random one centred on 10x10 and 15x15, the mini
-  // heart on 5x5).
+  // solution falls back to (a random one centred on 10x10 and larger, the
+  // mini heart on 5x5).
   function bmdGenerate(size, rnd, maxAttempts) {
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       var grid = bmdNoiseGrid(size, rnd);
@@ -643,15 +651,15 @@
   }
 
   // The plain-text result line of a finished game, e.g.
-  // 'Bitmap Decoder #5 10x10 1:42 Easy 1 mistake' (a restarted Endless
-  // puzzle ends in 'practice').
+  // 'Bitmap Decoder #5 10x10 1:42 Easy 1 mistake' (Relaxed counts its
+  // mistakes too; a restarted Endless puzzle ends in 'practice').
   function bmdShareText(game) {
     var parts = [game.kind === 'daily' ? BMD_NAME + ' #' + game.day : BMD_NAME + ' Endless', game.size + 'x' + game.size];
     if (game.status === 'lost') {
       parts.push('failed');
     }
     parts.push(bmdFormatTime(game.elapsed));
-    parts.push(game.rules === 'easy' ? 'Easy ' + bmdPlural(game.mistakes, 'mistake') : 'Hard');
+    parts.push(bmdLabelRules(game.rules) + (bmdChecks(game.rules) ? ' ' + bmdPlural(game.mistakes, 'mistake') : ''));
     if (game.practice) {
       parts.push('practice');
     }
@@ -723,15 +731,27 @@
     return { from: start, to: BMD_EMPTY };
   }
 
+  // Whether rules check each move against the solution (Easy and Relaxed).
+  function bmdChecks(rules) {
+    return rules !== 'hard';
+  }
+
+  // The mistakes that end a game: the size's limit on Easy, 0 (none) on
+  // Relaxed and Hard.
+  function bmdMistakeLimit(game) {
+    return game.rules === 'easy' ? BMD_MISTAKE_LIMITS[game.size] : 0;
+  }
+
   // 'won', 'lost' or 'playing' from the cells and mistakes.
   function bmdStatusOf(game) {
-    if (game.rules === 'easy' && game.mistakes >= BMD_MAX_MISTAKES) {
+    var limit = bmdMistakeLimit(game);
+    if (limit && game.mistakes >= limit) {
       return 'lost';
     }
     return bmdIsSolved(game.cells, game.rowClues, game.colClues) ? 'won' : 'playing';
   }
 
-  // Sets one cell.  Easy rules check a fill or a mark against the solution:
+  // Sets one cell.  Easy and Relaxed check a fill or a mark against the solution:
   // a wrong one counts a mistake and the cell shows the truth instead (a
   // wrong fill becomes a mark, a wrong mark a fill).  Returns 'same' (game
   // over or nothing to change), 'set', 'mistake', 'won' or 'lost'.
@@ -740,7 +760,7 @@
       return 'same';
     }
     var result = 'set';
-    if (game.rules === 'easy' && to !== BMD_EMPTY && (to === BMD_FILL) !== (game.solution[row][col] === 1)) {
+    if (bmdChecks(game.rules) && to !== BMD_EMPTY && (to === BMD_FILL) !== (game.solution[row][col] === 1)) {
       game.mistakes++;
       game.cells[row][col] = to === BMD_FILL ? BMD_MARK : BMD_FILL;
       result = 'mistake';
@@ -811,14 +831,14 @@
         return value ? BMD_FILL : marks[row][col] ? BMD_MARK : BMD_EMPTY;
       });
     });
-    game.mistakes = game.rules === 'easy' ? bmdCount(raw.mistakes, BMD_MAX_MISTAKES) : 0;
+    game.mistakes = bmdChecks(game.rules) ? bmdCount(raw.mistakes, bmdMistakeLimit(game) || undefined) : 0;
     game.elapsed = bmdCount(raw.elapsed);
     game.status = bmdStatusOf(game);
     return game;
   }
 
   function bmdRules(value) {
-    return value === 'hard' ? 'hard' : 'easy';
+    return BMD_RULES.indexOf(value) !== -1 ? value : 'easy';
   }
 
   // The Endless game of a bmd-state save, or null when it has no playable
@@ -873,7 +893,7 @@
     return record;
   }
 
-  // bmd-best text as { 5, 10, 15 } of ms or null.
+  // bmd-best text as { 5, 10, ... 30 } of ms or null.
   function bmdParseBest(text) {
     var data = bmdParseJson(text) || {};
     var best = {};
@@ -1021,14 +1041,14 @@
 
   // Reads the three saves.  endless is the Endless puzzle kept when
   // bmd-state holds none (null at start-up).  The size for New Game is the
-  // size of that puzzle (a damaged save may name another one), but 10x10
-  // instead of 15x15 on a phone.
+  // size of that puzzle (a damaged save may name another one), but no larger
+  // than the screen offers (10x10 instead of 15x15 on a phone).
   function bmdLoad(endless) {
     var saved = bmdParseState(bmdStorageGet(BMD_STATE_KEY));
     var game = saved.endless || endless;
     var size = game ? game.size : saved.size;
     bmdState.mode = saved.mode;
-    bmdState.size = bmdRuntime.compact && size === 15 ? 10 : size;
+    bmdState.size = Math.min(size, bmdRuntime.maxSize);
     bmdState.rules = saved.rules;
     bmdState.tool = saved.tool;
     bmdGames.endless = game;
@@ -1195,7 +1215,7 @@
       bmdShowToast('Board cleared for practice: the clock starts over, and a restarted puzzle sets no best time.');
     } else {
       bmdShowToast('Board cleared: Daily #' + game.day + ' keeps its clock (' + bmdFormatTime(game.elapsed) +
-        ')' + (game.rules === 'easy' ? ' and mistakes (' + game.mistakes + '/' + BMD_MAX_MISTAKES + ')' : '') + '.');
+        ')' + (bmdChecks(game.rules) ? ' and mistakes (' + bmdMistakeCount(game) + ')' : '') + '.');
     }
     bmdRender();
     bmdClockSync();
@@ -1210,7 +1230,9 @@
 
   // The rules for the next puzzle.  The puzzle on show takes them at once
   // while it has no move yet (a fresh Daily attempt too); one already played
-  // keeps its rules, so a scored attempt never changes them halfway.
+  // keeps its rules, so a scored attempt never changes them halfway.  The
+  // one exception lifts the limit: an Endless puzzle being played turns
+  // Relaxed at once (keeping its mistakes), since Relaxed sets no best time.
   function bmdHandleRulesChange() {
     bmdState.rules = bmdRules(bmdRuntime.els.rules.value);
     var game = bmdActive();
@@ -1220,6 +1242,12 @@
     } else if (!bmdHasMoves(game)) {
       game.rules = bmdState.rules;
       bmdShowToast(label + ' rules apply to this puzzle now: it has no moves yet.');
+      bmdRender();
+      bmdSaveAll();
+    } else if (game.kind === 'endless' && game.status === 'playing' && bmdState.rules === 'relaxed') {
+      game.rules = 'relaxed';
+      bmdShowToast('No mistake limit on this puzzle now: it goes on with ' + bmdPlural(game.mistakes, 'mistake') +
+        ' and sets no best time.');
       bmdRender();
       bmdSaveAll();
     } else {
@@ -1243,11 +1271,12 @@
       if (daily) {
         bmdRecord.streak = 0;
       }
-      bmdShowToast('Decode failed: ' + BMD_MAX_MISTAKES + '/' + BMD_MAX_MISTAKES + ' mistakes. It was ' + game.name + '.');
+      bmdShowToast('Decode failed: ' + bmdMistakeCount(game) + ' mistakes. It was ' + game.name + '.');
       return;
     }
     var best = bmdBest[game.size];
-    var record = !game.practice && (best === null || game.elapsed < best);
+    var relaxed = game.rules === 'relaxed';
+    var record = !game.practice && !relaxed && (best === null || game.elapsed < best);
     var size = game.size + 'x' + game.size;
     var note = '.';
     if (record) {
@@ -1256,6 +1285,8 @@
       note = ': a new best for ' + size + '!';
     } else if (game.practice) {
       note = ' (practice: no best time).';
+    } else if (relaxed) {
+      note = ' (no mistake limit: no best time).';
     }
     if (daily) {
       bmdRecord.streak = (bmdRecord.lastWon === game.day - 1 ? bmdRecord.streak : 0) + 1;
@@ -1271,7 +1302,7 @@
     game.flash = result === 'mistake' || result === 'lost' ? at.row + ',' + at.col : null;
     if (result === 'mistake') {
       bmdRuntime.stroke = null;
-      bmdShowToast('Mistake ' + game.mistakes + '/' + BMD_MAX_MISTAKES + ': row ' + (at.row + 1) + ', column ' +
+      bmdShowToast('Mistake ' + bmdMistakeCount(game) + ': row ' + (at.row + 1) + ', column ' +
         (at.col + 1) + (game.cells[at.row][at.col] === BMD_MARK ? ' is not' : ' is') + ' part of the bitmap.');
     } else if (result === 'won' || result === 'lost') {
       bmdRuntime.stroke = null;
@@ -1354,7 +1385,13 @@
   // ── Rendering ─────────────────────────────────────────────────────────────
 
   function bmdLabelRules(rules) {
-    return rules === 'easy' ? 'Easy' : 'Hard';
+    return BMD_RULE_LABELS[rules];
+  }
+
+  // The mistakes so far, out of the limit when there is one: '2/5' or '2'.
+  function bmdMistakeCount(game) {
+    var limit = bmdMistakeLimit(game);
+    return game.mistakes + (limit ? '/' + limit : '');
   }
 
   function bmdClueSpans(box, clue) {
@@ -1475,7 +1512,7 @@
     var els = bmdRuntime.els;
     var best = bmdBest[game.size];
     els.time.textContent = bmdFormatTime(bmdElapsedOf(game));
-    els.mistakes.textContent = game.rules === 'easy' ? game.mistakes + '/' + BMD_MAX_MISTAKES : 'off';
+    els.mistakes.textContent = bmdChecks(game.rules) ? bmdMistakeCount(game) : 'off';
     els.best.textContent = best === null ? '--' : bmdFormatTime(best);
     els.streak.textContent = String(bmdStreakAsOf(bmdRecord, bmdToday())) + ' (max ' + bmdRecord.maxStreak + ')';
   }
@@ -1490,8 +1527,12 @@
     // change and starts a 10x10 board.
     els.size.value = String(daily ? BMD_DAILY_SIZE : game.size);
     els.size.disabled = daily;
-    els.size15.disabled = bmdRuntime.compact;
+    BMD_SCREEN_LIMITS.forEach(function (limit) {
+      els.sizeOptions[limit.size].disabled = limit.size > bmdRuntime.maxSize;
+    });
     els.rules.value = bmdState.rules;
+    // Easy's limit for the board on show (the next Endless one has its size).
+    els.rulesEasy.textContent = 'Easy: ' + BMD_MISTAKE_LIMITS[game.size] + ' mistakes';
     els.toolFill.setAttribute('aria-pressed', String(bmdState.tool === 'fill'));
     els.toolMark.setAttribute('aria-pressed', String(bmdState.tool === 'mark'));
     els.newGame.textContent = daily ? 'New Daily' : 'New Game';
@@ -1513,9 +1554,9 @@
       text = 'Decoding: ' + done.rows + '/' + size + ' rows and ' + done.cols + '/' + size + ' columns match their RLE.';
     } else if (game.status === 'won') {
       text = 'Decoded ' + game.name + ' in ' + bmdFormatTime(game.elapsed) +
-        (game.rules === 'easy' ? ' with ' + bmdPlural(game.mistakes, 'mistake') : '') + '.';
+        (bmdChecks(game.rules) ? ' with ' + bmdPlural(game.mistakes, 'mistake') : '') + '.';
     } else {
-      text = 'Decode failed after ' + BMD_MAX_MISTAKES + ' mistakes. The bitmap was ' + game.name + '.';
+      text = 'Decode failed after ' + game.mistakes + ' mistakes. The bitmap was ' + game.name + '.';
     }
     var today = bmdToday();
     if (game.kind === 'daily' && game.day < today) {
@@ -1704,6 +1745,17 @@
     return typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
   }
 
+  // The largest Endless size the screen offers: the size before the first
+  // one whose screen is too narrow, else the largest.
+  function bmdScreenMaxSize() {
+    for (var i = 0; i < BMD_SCREEN_LIMITS.length; i++) {
+      if (bmdMatches(BMD_SCREEN_LIMITS[i].query)) {
+        return BMD_SIZES[BMD_SIZES.indexOf(BMD_SCREEN_LIMITS[i].size) - 1];
+      }
+    }
+    return BMD_SIZES[BMD_SIZES.length - 1];
+  }
+
   function bmdBindEvents() {
     var els = bmdRuntime.els;
     els.tabDaily.addEventListener('click', function () {
@@ -1744,8 +1796,8 @@
       tabDaily: 'bmd-tab-daily',
       tabEndless: 'bmd-tab-endless',
       size: 'bmd-size',
-      size15: 'bmd-size-15',
       rules: 'bmd-rules',
+      rulesEasy: 'bmd-rules-easy',
       newGame: 'bmd-new-game',
       restart: 'bmd-restart',
       toolFill: 'bmd-tool-fill',
@@ -1775,6 +1827,11 @@
     Object.keys(ids).forEach(function (name) {
       els[name] = document.getElementById(ids[name]);
     });
+    // The options of the big sizes by size (bmd-size-15 ... bmd-size-30).
+    els.sizeOptions = {};
+    BMD_SCREEN_LIMITS.forEach(function (limit) {
+      els.sizeOptions[limit.size] = document.getElementById('bmd-size-' + limit.size);
+    });
     return els;
   }
 
@@ -1785,10 +1842,12 @@
       return;
     }
     bmdRuntime.els = bmdFindElements();
-    bmdRuntime.compact = bmdMatches(BMD_COMPACT_QUERY);
-    if (bmdRuntime.compact) {
-      bmdRuntime.els.size15.textContent = '15x15 (screens over 600 px)';
-    }
+    bmdRuntime.maxSize = bmdScreenMaxSize();
+    BMD_SCREEN_LIMITS.forEach(function (limit) {
+      if (limit.size > bmdRuntime.maxSize) {
+        bmdRuntime.els.sizeOptions[limit.size].textContent = limit.size + 'x' + limit.size + ' (' + limit.note + ')';
+      }
+    });
     bmdLoad(null);
     bmdBindEvents();
     bmdShowMode(bmdState.mode);
@@ -1804,6 +1863,8 @@
       bmdTuning: bmdTuning,
       bmdIcons: BMD_ICONS,
       bmdMiniIcon: BMD_MINI_ICON,
+      bmdScreenLimits: BMD_SCREEN_LIMITS,
+      bmdMistakeLimits: BMD_MISTAKE_LIMITS,
       bmdInit: bmdInit,
       bmdCluesOf: bmdCluesOf,
       bmdSolveLine: bmdSolveLine,

@@ -118,6 +118,8 @@ const dailySolution = (day) => decodeHex(dailyIcon(day).hex);
 const cellsOf = (grid, value = 1) => grid.flatMap((row, r) => row.flatMap((v, c) => (v === value ? [[r, c]] : [])));
 const rowsText = (grid, value = 1) => grid.map((row) => row.map((v) => (v === value ? '1' : '0')).join(''));
 const zeros = (n) => Array.from({ length: n }, () => '0'.repeat(n));
+// bmd-best with no best time for any size.
+const NO_BEST = { 5: null, 10: null, 15: null, 20: null, 25: null, 30: null };
 
 // ── Pages ───────────────────────────────────────────────────────────────────
 
@@ -142,6 +144,14 @@ function writeStorage(storage) {
 
 function compactScreen(t) {
   t.mock.method(window, 'matchMedia', (query) => ({ matches: query === '(max-width: 600px)', media: query }));
+}
+
+// A screen width px wide: every (max-width: N px) query with N >= width matches.
+function screenOf(t, width) {
+  t.mock.method(window, 'matchMedia', (query) => {
+    const m = /^\(max-width: (\d+)px\)$/.exec(query);
+    return { matches: Boolean(m) && width <= Number(m[1]), media: query };
+  });
 }
 
 const read = (key) => JSON.parse(localStorage.getItem(key));
@@ -202,6 +212,7 @@ function pageView(b) {
 function openPage(t, options = {}) {
   enableClock(t, options.now === undefined ? DAY5 : options.now);
   if (options.compact) compactScreen(t);
+  if (options.width) screenOf(t, options.width);
   writeStorage(options.storage);
   return pageView(bootLikeBrowser(SCRIPT, htmlPageSpec(HTML), { readyState: options.readyState }));
 }
@@ -345,6 +356,45 @@ test('bitmap: from 320 px up a 10x10 and a 5x5 board fit beside their widest clu
   assert.equal(declsAt(rules, '.bmd-toast', 320)['max-width'], 'calc(100vw - 2rem)');
 });
 
+test('bitmap: from the narrowest screen that offers it up to 1280 px, a 20x20, 25x25 or 30x30 board fits beside its widest clue', () => {
+  const rules = cssRules(CSS);
+  // The narrowest screen of each big size: one px past the query that turns it off.
+  const minScreen = {};
+  for (const limit of BMD.bmdScreenLimits) minScreen[limit.size] = Number(/^\(max-width: (\d+)px\)$/.exec(limit.query)[1]) + 1;
+  assert.deepEqual(minScreen, { 15: 601, 20: 768, 25: 1024, 30: 1280 });
+  for (const size of [20, 25, 30]) {
+    // The widest row clue of 120 generated boards (and of the library icons it falls back to).
+    let widest = [];
+    for (let seed = 1; seed <= 120; seed++) {
+      const grid = BMD.bmdGenerate(size, seeded(seed * 7 + size), 200).solution;
+      for (const line of grid.concat(columns(grid))) if (refClues(line).length > widest.length) widest = refClues(line);
+    }
+    assert.ok(widest.length >= 6 && widest.length <= size / 2, size + ': ' + widest.join(' '));
+    for (let vw = minScreen[size]; vw <= 1280; vw += 16) {
+      const wrapper = declsAt(rules, '.bmd-wrapper', vw);
+      const wide = declsAt(rules, '.bmd-wrapper:has(.bmd-board--s' + size + ')', vw)['max-width'];
+      const panel = declsAt(rules, '.bmd-panel', vw);
+      const pad = px(wrapper.padding.split(/\s+/)[1]);
+      const available = Math.min(vw, px(wide || wrapper['max-width'])) - 2 * pad - 2 * px(panel.padding) - 2;
+      const font = px(wrapper['--bmd-num-font']);
+      const num = px(wrapper['--bmd-num']);
+      // A mono digit is at most 0.62 em wide: a two-digit run may be wider than the box.
+      const numbers = widest.reduce((sum, run) => sum + Math.max(num, String(run).length * 0.62 * font), 0);
+      const clue = numbers + (widest.length - 1) * px(wrapper['--bmd-num-gap']) + px(wrapper['--bmd-clue-pad']);
+      // A slack of 3 more numbers for a board wider than any of the 120.
+      const width = clue + 3 * (num + px(wrapper['--bmd-num-gap'])) + size * px(wrapper['--bmd-cell-' + size]) + 4;
+      assert.ok(width <= available, vw + 'px: a ' + size + 'x' + size + ' board of ' + Math.round(width) + 'px in ' + available + 'px');
+    }
+    assert.equal(declsAt(rules, '.bmd-board--s' + size, 1280)['--bmd-cell'], 'var(--bmd-cell-' + size + ')');
+    // A column clue box holds two digits.
+    assert.ok(px(declsAt(rules, '.bmd-wrapper', 1280)['--bmd-cell-' + size]) >= 24);
+  }
+  // Only 25x25 and 30x30 widen the page, to 1280 px; the narrower boards keep the 860 px column.
+  assert.equal(declsAt(rules, '.bmd-wrapper', 1280)['max-width'], '860px');
+  for (const size of [5, 10, 15, 20]) assert.equal(declsAt(rules, '.bmd-wrapper:has(.bmd-board--s' + size + ')', 1280)['max-width'], undefined);
+  for (const size of [25, 30]) assert.equal(declsAt(rules, '.bmd-wrapper:has(.bmd-board--s' + size + ')', 1280)['max-width'], '1280px');
+});
+
 // ── Clues and the line solver ───────────────────────────────────────────────
 
 test('bitmap: bmdCluesOf is the run-length encoding of every 10-cell line; marks and empties both end a run', () => {
@@ -444,35 +494,35 @@ test('bitmap: bmdDecodeIcon refuses malformed hex; bmdFitIcon centres an icon on
 
 // ── Generation ──────────────────────────────────────────────────────────────
 
-test('bitmap: Endless boards are noise smoothed by the 3x3 majority rule, mirrored on every other board', () => {
+test('bitmap: Endless boards are noise smoothed by the 3x3 majority rule, never mirrored', () => {
   // An independent noise grid: the same draws, the same rules.
   function refNoise(size, rnd) {
     const g = Array.from({ length: size }, () => Array.from({ length: size }, () => (rnd() < 0.55 ? 1 : 0)));
-    const mirrored = rnd() < 0.5;
-    if (mirrored) g.forEach((row) => { for (let c = 0; c < size / 2; c++) row[size - 1 - c] = row[c]; });
-    const out = g.map((row, r) => row.map((v, c) => {
+    return g.map((row, r) => row.map((v, c) => {
       let n = 0;
       for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) n += (g[r + dr] || [])[c + dc] || 0;
       return n >= 5 ? 1 : n <= 3 ? 0 : v;
     }));
-    return { out, mirrored };
   }
-  let mirroredCount = 0;
+  const symmetric = (grid) => grid.every((row) => row.join('') === row.slice().reverse().join(''));
   for (let seed = 1; seed <= 40; seed++) {
-    for (const size of [5, 10, 15]) {
-      const ref = refNoise(size, seeded(seed * 31 + size));
-      assert.deepEqual(BMD.bmdNoiseGrid(size, seeded(seed * 31 + size)), ref.out, seed + '/' + size);
-      if (ref.mirrored) {
-        mirroredCount++;
-        ref.out.forEach((row) => assert.deepEqual(row, row.slice().reverse()));
-      }
+    for (const size of [5, 10, 15, 20, 25, 30]) {
+      assert.deepEqual(BMD.bmdNoiseGrid(size, seeded(seed * 31 + size)), refNoise(size, seeded(seed * 31 + size)), seed + '/' + size);
     }
   }
-  assert.ok(mirroredCount > 20 && mirroredCount < 100, mirroredCount + ' mirrored boards');
+  // Only half of a mirrored board would need solving: from 10x10 up no
+  // generated board comes out symmetric (on 5x5 one now and then is, by chance).
+  for (const size of [10, 15, 20, 25, 30]) {
+    for (let seed = 1; seed <= 60; seed++) {
+      const made = BMD.bmdGenerate(size, seeded(seed * 97 + size), 200);
+      assert.equal(made.icon, null, size + '/' + seed + ' is noise');
+      assert.equal(symmetric(made.solution), false, size + '/' + seed + ' is not mirrored');
+    }
+  }
 });
 
 test('bitmap: bmdGenerate returns fair, line-solvable boards of every size, reproducible from the PRNG, with a library fallback', () => {
-  for (const size of [5, 10, 15]) {
+  for (const size of [5, 10, 15, 20, 25, 30]) {
     for (let seed = 1; seed <= 25; seed++) {
       const made = BMD.bmdGenerate(size, seeded(seed), 200);
       assert.equal(made.icon, null);
@@ -498,6 +548,12 @@ test('bitmap: bmdGenerate returns fair, line-solvable boards of every size, repr
   const fifteen = BMD.bmdGenerate(15, () => 0, 0);
   assert.equal(fifteen.icon, ICONS[0]);
   assert.deepEqual(fifteen.solution, BMD.bmdFitIcon(ICONS[0], 15));
+  // On 30x30 the 10x10 icon sits in the middle, and line logic still solves it.
+  const thirty = BMD.bmdGenerate(30, () => 0, 0);
+  assert.deepEqual(thirty.solution, BMD.bmdFitIcon(ICONS[0], 30));
+  assert.deepEqual(thirty.solution[10], [...Array(10).fill(0), ...decodeHex(ICONS[0].hex)[0], ...Array(10).fill(0)]);
+  assert.equal(BMD.bmdIsFair(thirty.solution), false, 'too sparse for noise');
+  assert.equal(BMD.bmdSolveGrid(thirty.solution.map(refClues), columns(thirty.solution).map(refClues)).solved, true);
   const five = BMD.bmdGenerate(5, () => 0, 0);
   assert.equal(five.icon, BMD.bmdMiniIcon);
   assert.deepEqual(five.solution, decodeHex(BMD.bmdMiniIcon.hex));
@@ -595,6 +651,12 @@ test('bitmap: time, streak, countdown, share line, hex dump and ASCII art', () =
   const five = BMD.bmdHexDump(decodeHex(BMD.bmdMiniIcon.hex)).split('\n');
   assert.deepEqual(five.slice(0, 2), ['ROW  HEX   BITS', '00   0x0A  01010']);
   assert.equal(BMD.bmdHexDump(BMD.bmdFitIcon(ICONS[0], 15)).split('\n')[0], 'ROW  HEX     BITS');
+  // 30 bits a row: eight hex digits.
+  const wide = BMD.bmdHexDump(BMD.bmdFitIcon(ICONS[0], 30)).split('\n');
+  assert.equal(wide[0], 'ROW  HEX         BITS');
+  assert.equal(wide[11], '10   0x000FFC00  ' + '0'.repeat(10) + '1'.repeat(10) + '0'.repeat(10));
+  assert.equal(wide.length, 31);
+  assert.equal(BMD.bmdAsciiArt(BMD.bmdFitIcon(ICONS[0], 30)).split('\n')[10], '.'.repeat(10) + '#'.repeat(10) + '.'.repeat(10));
 });
 
 // ── Game rules ──────────────────────────────────────────────────────────────
@@ -648,6 +710,37 @@ test('bitmap: Easy rules turn a wrong move into the truth and count it; the thir
   const diagonal = BMD.bmdMakeGame({ kind: 'endless', id: 'd', name: 'D', rules: 'hard', solution: [[1, 0], [0, 1]] });
   BMD.bmdApplyCell(diagonal, 0, 1, 1);
   assert.equal(BMD.bmdApplyCell(diagonal, 1, 0, 1), 'won');
+});
+
+test('bitmap: Easy allows more mistakes on bigger boards (3 up to 10x10, 10 on 30x30); Relaxed checks every move with no limit', () => {
+  assert.deepEqual(BMD.bmdMistakeLimits, { 5: 3, 10: 3, 15: 5, 20: 6, 25: 8, 30: 10 });
+  const solution = BMD.bmdFitIcon(ICONS[0], 30);
+  const wrong = cellsOf(solution, 0);
+  const easy = BMD.bmdMakeGame({ kind: 'endless', id: 'x', name: 'Rack', rules: 'easy', solution });
+  for (let i = 0; i < 9; i++) assert.equal(BMD.bmdApplyCell(easy, ...wrong[i], 1), 'mistake', 'mistake ' + (i + 1));
+  assert.equal(easy.status, 'playing');
+  assert.equal(BMD.bmdApplyCell(easy, ...wrong[9], 1), 'lost', 'the tenth');
+
+  const relaxed = BMD.bmdMakeGame({ kind: 'endless', id: 'x', name: 'Rack', rules: 'relaxed', solution });
+  for (let i = 0; i < 40; i++) assert.equal(BMD.bmdApplyCell(relaxed, ...wrong[i], i % 2 ? 2 : 1), i % 2 ? 'set' : 'mistake');
+  assert.equal(relaxed.mistakes, 20, 'a wrong fill counts, a right mark does not');
+  assert.equal(relaxed.cells[wrong[0][0]][wrong[0][1]], 2, 'a wrong fill shows the truth');
+  assert.equal(BMD.bmdApplyCell(relaxed, 10, 10, 2), 'mistake', 'a wrong mark too');
+  assert.equal(relaxed.status, 'playing');
+  const filled = cellsOf(solution).filter(([r, c]) => relaxed.cells[r][c] !== 1);
+  filled.slice(0, -1).forEach(([r, c]) => assert.equal(BMD.bmdApplyCell(relaxed, r, c, 1), 'set'));
+  assert.equal(BMD.bmdApplyCell(relaxed, ...filled[filled.length - 1], 1), 'won');
+  assert.equal(relaxed.mistakes, 21);
+  assert.equal(BMD.bmdShareText({ ...relaxed, elapsed: 102000 }), 'Bitmap Decoder Endless 30x30 1:42 Relaxed 21 mistakes');
+
+  // Saves: Relaxed keeps any count, Easy is capped at its size's limit (and lost there); unknown rules are Easy.
+  const save = (rules, mistakes) => JSON.stringify({ endless: { size: 30, rules, solution: rowsText(solution), fills: zeros(30), marks: zeros(30), mistakes } });
+  const keep = BMD.bmdParseState(save('relaxed', 42)).endless;
+  assert.deepEqual([keep.rules, keep.mistakes, keep.status], ['relaxed', 42, 'playing']);
+  const capped = BMD.bmdParseState(save('easy', 42)).endless;
+  assert.deepEqual([capped.rules, capped.mistakes, capped.status], ['easy', 10, 'lost']);
+  assert.equal(BMD.bmdParseState(JSON.stringify({ rules: 'relaxed' })).rules, 'relaxed');
+  assert.equal(BMD.bmdParseState(JSON.stringify({ rules: 'medium' })).rules, 'easy');
 });
 
 // ── Saves (pure) ────────────────────────────────────────────────────────────
@@ -724,9 +817,9 @@ test('bitmap: bmdParseDaily keeps the streak field by field and restores the att
   assert.equal(BMD.bmdParseDaily(JSON.stringify(dailySave({ icon: 'no-such-icon' }))).attempt.name, dailyIcon(5).name);
   assert.equal(BMD.bmdParseDaily(JSON.stringify(dailySave({ day: 1e9, icon: 1 }))).attempt.size, 10);
 
-  assert.deepEqual(BMD.bmdParseBest(null), { 5: null, 10: null, 15: null });
-  assert.deepEqual(BMD.bmdParseBest('{"5":1234.9,"10":-1,"15":"77"}'), { 5: 1234, 10: null, 15: null });
-  assert.deepEqual(BMD.bmdParseBest('{"10":1e999}'), { 5: null, 10: null, 15: null });
+  assert.deepEqual(BMD.bmdParseBest(null), NO_BEST);
+  assert.deepEqual(BMD.bmdParseBest('{"5":1234.9,"10":-1,"15":"77","30":5000}'), { ...NO_BEST, 5: 1234, 30: 5000 });
+  assert.deepEqual(BMD.bmdParseBest('{"10":1e999}'), NO_BEST);
 });
 
 // ── The page ────────────────────────────────────────────────────────────────
@@ -1017,7 +1110,7 @@ test('bitmap: solving the daily decodes it: hex dump, ASCII art, name, best time
   assert.equal(page.els['bmd-restart'].disabled, true);
   for (let r = 0; r < 10; r++) assert.ok(page.clueRow(r).className.includes('bmd-clue--done'), 'row clue ' + r);
   for (let c = 0; c < 10; c++) assert.ok(page.clueCol(c).className.includes('bmd-clue--done'), 'col clue ' + c);
-  assert.deepEqual(read(BEST_KEY), { 5: null, 10: 61000, 15: null });
+  assert.deepEqual(read(BEST_KEY), { ...NO_BEST, 10: 61000 });
   const saved = read(DAILY_KEY);
   assert.deepEqual([saved.status, saved.elapsed, saved.streak, saved.lastWon, saved.maxStreak], ['won', 61000, 4, 5, 4]);
   // The clock has stopped; New Daily on the same day explains when the next one comes.
@@ -1058,7 +1151,7 @@ test('bitmap: the streak continues from yesterday, restarts after a gap, shows 0
   const faster = won({ streak: 2, lastWon: 3, maxStreak: 2 }, { 5: 7000, 10: 40000 });
   assert.deepEqual([faster.saved.streak, faster.saved.maxStreak], [1, 2]);
   assert.equal(faster.toast, 'Decoded ' + name + ' in 0:30: a new best for 10x10!');
-  assert.deepEqual(faster.best, { 5: 7000, 10: 30000, 15: null });
+  assert.deepEqual(faster.best, { ...NO_BEST, 5: 7000, 10: 30000 });
   assert.equal(faster.shown, '0:30');
   resetStubs();
   const missed = openPage(t, { storage: { [DAILY_KEY]: { streak: 6, lastWon: 3, maxStreak: 6 } } });
@@ -1264,6 +1357,83 @@ test('bitmap: new rules switch a puzzle with no moves at once, else from the nex
   fire(first.els['bmd-rules'], 'change');
   assert.equal(first.text('bmd-puzzle'), 'Daily #5 · 10x10 · Hard · icon hidden until decoded');
   assert.deepEqual([read(DAILY_KEY).rules, read(STATE_KEY).rules], ['hard', 'hard']);
+});
+
+test('bitmap: Relaxed counts mistakes with no limit and sets no best time; a played Endless puzzle can drop its limit, a Daily cannot', (t) => {
+  t.mock.method(Math, 'random', () => 0.4);
+  const page = openPage(t, { width: 1280, storage: { [STATE_KEY]: { mode: 'endless', size: 10 } } });
+  const setRules = (value) => {
+    page.els['bmd-rules'].value = value;
+    fire(page.els['bmd-rules'], 'change');
+  };
+  const rulesHtml = HTML.slice(HTML.indexOf('<select id="bmd-rules"'), HTML.indexOf('</select>', HTML.indexOf('<select id="bmd-rules"')));
+  assert.deepEqual([...rulesHtml.matchAll(/<option[^>]* value="(\w+)">([^<]+)</g)].map((m) => m[1] + ': ' + m[2]),
+    ['easy: Easy: 3 mistakes', 'relaxed: Relaxed: no limit', 'hard: Hard: no checks']);
+  const easyLabel = () => page.els['bmd-rules-easy'].textContent;
+  assert.equal(easyLabel(), 'Easy: 3 mistakes');
+  // The Easy option names the limit of the board on show.
+  page.els['bmd-size'].value = '30';
+  fire(page.els['bmd-size'], 'change');
+  assert.equal(easyLabel(), 'Easy: 10 mistakes');
+  assert.equal(page.text('bmd-mistakes'), '0/10');
+  const solution = page.endlessSolution();
+  const wrong = cellsOf(solution, 0);
+  page.tap(...wrong[0]);
+  page.tap(...wrong[1]);
+  assert.equal(page.text('bmd-mistakes'), '2/10');
+  assert.match(page.toast(), /^Mistake 2\/10: row \d+, column \d+ is not part of the bitmap\.$/);
+  // Two mistakes in, the limit comes off at once.
+  setRules('relaxed');
+  assert.equal(page.toast(), 'No mistake limit on this puzzle now: it goes on with 2 mistakes and sets no best time.');
+  assert.equal(page.text('bmd-mistakes'), '2');
+  assert.match(page.text('bmd-puzzle'), /^Endless · 30x30 · Relaxed · /);
+  assert.deepEqual([read(STATE_KEY).rules, read(STATE_KEY).endless.rules, read(STATE_KEY).endless.mistakes], ['relaxed', 'relaxed', 2]);
+  for (let i = 2; i < 14; i++) page.tap(...wrong[i]);
+  assert.equal(page.text('bmd-mistakes'), '14');
+  assert.match(page.toast(), /^Mistake 14: row \d+, column \d+ is not part of the bitmap\.$/);
+  assert.equal(page.grid.className, 'bmd-grid');
+  page.solve(solution);
+  assert.equal(page.grid.className, 'bmd-grid bmd-grid--won');
+  assert.match(page.text('bmd-status'), /^Decoded Bitmap [0-9A-F]{8} in 0:00 with 14 mistakes\.$/);
+  assert.match(page.toast(), /\(no mistake limit: no best time\)\.$/);
+  assert.equal((read(BEST_KEY) || {})[30], undefined, 'no best time written');
+  assert.equal(page.text('bmd-best-time'), '--');
+  // A finished puzzle keeps its rules.
+  setRules('easy');
+  assert.equal(page.toast(), 'Easy rules apply from the next puzzle; this one stays Relaxed (it has moves).');
+
+  // A lost puzzle stays lost: 15x15 allows 5 mistakes.
+  page.els['bmd-size'].value = '15';
+  fire(page.els['bmd-size'], 'change');
+  const fifteen = page.endlessSolution();
+  cellsOf(fifteen, 0).slice(0, 5).forEach(([r, c]) => page.tap(r, c));
+  assert.equal(page.grid.className, 'bmd-grid bmd-grid--lost');
+  assert.match(page.toast(), /^Decode failed: 5\/5 mistakes\. It was Bitmap [0-9A-F]{8}\.$/);
+  assert.match(page.text('bmd-status'), /^Decode failed after 5 mistakes\. The bitmap was Bitmap [0-9A-F]{8}\.$/);
+  setRules('relaxed');
+  assert.equal(page.toast(), 'Relaxed rules apply from the next puzzle; this one stays Easy (it has moves).');
+
+  // A scored Daily keeps its limit once it has a move.
+  page.els['bmd-tab-daily'].click();
+  setRules('easy');
+  page.tap(...cellsOf(dailySolution(5), 0)[0]);
+  setRules('relaxed');
+  assert.equal(page.toast(), 'Relaxed rules apply from the next puzzle; this one stays Easy (it has moves).');
+  assert.equal(page.text('bmd-mistakes'), '1/3');
+  assert.equal(read(DAILY_KEY).rules, 'easy');
+
+  // A Daily started on Relaxed counts its mistakes and keeps them on Restart.
+  resetStubs();
+  const daily = openPage(t, { storage: { [STATE_KEY]: { rules: 'relaxed' } } });
+  assert.equal(daily.text('bmd-puzzle'), 'Daily #5 · 10x10 · Relaxed · icon hidden until decoded');
+  daily.tap(...cellsOf(dailySolution(5), 0)[0]);
+  assert.equal(daily.text('bmd-mistakes'), '1');
+  daily.els['bmd-restart'].click();
+  assert.equal(daily.toast(), 'Board cleared: Daily #5 keeps its clock (0:00) and mistakes (1).');
+  daily.solve(dailySolution(5));
+  assert.equal(daily.grid.className, 'bmd-grid bmd-grid--won');
+  assert.equal(read(DAILY_KEY).streak, 1, 'a Relaxed Daily keeps the streak');
+  assert.equal((read(BEST_KEY) || {})[10], undefined, 'but sets no best time');
 });
 
 test('bitmap: keys on the focused grid move the cursor, fill and mark; shortcuts, repeats and other keys stay with the browser', (t) => {
@@ -1745,4 +1915,55 @@ test('bitmap: phones keep 15x15 out of the size choice but still finish a saved 
   assert.equal(old.size(), 15);
   assert.equal(old.els['bmd-size-15'].disabled, false);
   assert.equal(old.els['bmd-size-15'].textContent, '15x15');
+});
+
+test('bitmap: 20x20 needs a 768 px screen, 25x25 1024 px and 30x30 1280 px; a narrower one still finishes a saved big board', (t) => {
+  const option = (page, size) => page.els['bmd-size-' + size];
+  const offered = (page) => [15, 20, 25, 30].filter((size) => !option(page, size).disabled);
+  for (const [width, sizes] of [[1280, [15, 20, 25, 30]], [1279, [15, 20, 25]], [1024, [15, 20, 25]], [1023, [15, 20]], [768, [15, 20]], [767, [15]], [601, [15]], [600, []]]) {
+    resetStubs();
+    const page = openPage(t, { width, storage: { [STATE_KEY]: { mode: 'endless', size: 5 } } });
+    assert.deepEqual(offered(page), sizes, width + ' px');
+  }
+  // The disabled options say why.
+  const tablet = openPage(t, { width: 1024 });
+  assert.equal(option(tablet, 25).textContent, '25x25');
+  assert.equal(option(tablet, 30).textContent, '30x30 (screens 1280 px and wider)');
+  resetStubs();
+  const narrow = openPage(t, { width: 700 });
+  assert.deepEqual([20, 25, 30].map((size) => option(narrow, size).textContent),
+    ['20x20 (screens 768 px and wider)', '25x25 (screens 1024 px and wider)', '30x30 (screens 1280 px and wider)']);
+
+  // A 1280 px screen plays 30x30: 900 cells, eight hex digits a row once decoded, a best time of its own.
+  resetStubs();
+  t.mock.method(Math, 'random', () => 0.3);
+  const desk = openPage(t, { width: 1280, storage: { [STATE_KEY]: { mode: 'endless', size: 10 } } });
+  desk.els['bmd-size'].value = '30';
+  fire(desk.els['bmd-size'], 'change');
+  assert.equal(desk.size(), 30);
+  assert.equal(desk.els['bmd-board'].className, 'bmd-board bmd-board--s30');
+  assert.equal(desk.grid.style.gridTemplateColumns, 'repeat(30, var(--bmd-cell))');
+  assert.equal(read(STATE_KEY).endless.size, 30);
+  const solution = desk.endlessSolution();
+  assert.equal(solution.length, 30);
+  desk.solve(solution);
+  assert.equal(desk.grid.className, 'bmd-grid bmd-grid--won');
+  assert.match(desk.text('bmd-hex').split('\n')[1], /^00 {3}0x[0-9A-F]{8} {2}[01]{30}$/);
+  assert.equal(read(BEST_KEY)[30], read(STATE_KEY).endless.elapsed);
+
+  // A saved 30x30 puzzle on a 1024 px screen: still on show and playable, New Game makes 25x25.
+  const saved = read(STATE_KEY);
+  saved.endless.fills = zeros(30);
+  saved.endless.status = 'playing';
+  resetStubs();
+  writeStorage({ [STATE_KEY]: saved });
+  const smaller = openPage(t, { width: 1024 });
+  assert.equal(smaller.size(), 30);
+  assert.equal(smaller.els['bmd-size'].value, '30');
+  assert.equal(option(smaller, 30).disabled, true);
+  smaller.solve(solution);
+  assert.equal(smaller.grid.className, 'bmd-grid bmd-grid--won');
+  smaller.els['bmd-new-game'].click();
+  assert.equal(smaller.size(), 25, 'the largest size the screen offers');
+  assert.equal(read(STATE_KEY).size, 25);
 });
