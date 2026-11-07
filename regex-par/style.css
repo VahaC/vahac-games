@@ -1,0 +1,703 @@
+/* Regex Par — style.css
+   Namespace: rxp- (regex par)
+   All selectors use the rxp- prefix to avoid conflicts with host page styles.
+   Phones: the scorecard keeps 9 columns of at least 28 px from 320 px wide,
+   the Catch and Leave lists stack, and long log lines, patterns and messages
+   wrap anywhere instead of widening the page.  The pattern box uses a 16 px
+   font so iOS does not zoom in when it takes the focus. */
+
+.rxp-wrapper {
+  --rxp-bg-primary: #0a0f1e;
+  --rxp-bg-secondary: #111827;
+  --rxp-bg-card: #1a2236;
+  --rxp-bg-input: #0d1424;
+  --rxp-border: #2a3a5c;
+  --rxp-border-focus: #3b82f6;
+  --rxp-text-primary: #e2e8f0;
+  --rxp-text-secondary: #94a3b8;
+  --rxp-text-muted: #64748b;
+  --rxp-accent-blue: #3b82f6;
+  --rxp-accent-cyan: #22d3ee;
+  --rxp-accent-green: #10b981;
+  --rxp-accent-amber: #f59e0b;
+  --rxp-accent-red: #ef4444;
+  --rxp-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --rxp-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rxp-radius: 8px;
+
+  font-family: var(--rxp-font-sans);
+  color: var(--rxp-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--rxp-bg-primary) 0%, var(--rxp-bg-secondary) 100%);
+}
+
+.rxp-wrapper *,
+.rxp-wrapper *::before,
+.rxp-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and buttons ──────────────────────────────────────────────────── */
+
+.rxp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.rxp-title-group {
+  min-width: 0;
+}
+
+.rxp-title {
+  margin: 0;
+  font-family: var(--rxp-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--rxp-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+.rxp-subtitle {
+  margin: 6px 0 0;
+  max-width: 560px;
+  color: var(--rxp-text-secondary);
+  font-size: 0.92rem;
+}
+
+.rxp-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rxp-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--rxp-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.rxp-btn:hover {
+  background: #2563eb;
+}
+
+.rxp-btn:active {
+  transform: scale(0.97);
+}
+
+.rxp-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+.rxp-btn:focus-visible,
+.rxp-chip:focus-visible,
+.rxp-card-cell:focus-visible,
+.rxp-help-title:focus-visible {
+  outline: 2px solid var(--rxp-accent-cyan);
+  outline-offset: 2px;
+}
+
+.rxp-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--rxp-border);
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-btn--secondary:hover {
+  background: var(--rxp-bg-secondary);
+  color: var(--rxp-text-primary);
+}
+
+/* ── Scorecard ───────────────────────────────────────────────────────────── */
+
+.rxp-scorecard {
+  margin-bottom: 16px;
+}
+
+.rxp-card {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  gap: 4px;
+}
+
+/* A button centres its content by itself only on one line: the hole number
+   and its score sit in a column, centred both ways. */
+.rxp-card-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 42px;
+  padding: 3px 0;
+  border: 1px solid var(--rxp-border);
+  border-radius: 6px;
+  background: var(--rxp-bg-input);
+  color: var(--rxp-text-secondary);
+  font-family: var(--rxp-font-mono);
+  line-height: 1.15;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  touch-action: manipulation;
+}
+
+.rxp-card-num {
+  font-size: 0.66rem;
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-card-score {
+  max-width: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.rxp-card-cell--under {
+  border-color: rgba(16, 185, 129, 0.6);
+  color: var(--rxp-accent-green);
+}
+
+.rxp-card-cell--par {
+  border-color: rgba(34, 211, 238, 0.6);
+  color: var(--rxp-accent-cyan);
+}
+
+.rxp-card-cell--over {
+  border-color: rgba(245, 158, 11, 0.6);
+  color: var(--rxp-accent-amber);
+}
+
+.rxp-card-cell--current {
+  background: #13203a;
+  box-shadow: inset 0 0 0 2px var(--rxp-accent-blue);
+}
+
+.rxp-course-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-top: 8px;
+  font-family: var(--rxp-font-mono);
+  font-size: 0.8rem;
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-course,
+.rxp-best-course {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ── The hole ────────────────────────────────────────────────────────────── */
+
+.rxp-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rxp-hole,
+.rxp-tee,
+.rxp-list-box {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: var(--rxp-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+}
+
+.rxp-hole-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--rxp-font-mono);
+  font-size: 0.8rem;
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-hole-number {
+  min-width: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rxp-par {
+  flex: none;
+  color: var(--rxp-accent-cyan);
+  font-weight: 700;
+}
+
+.rxp-hole-title {
+  margin: 4px 0 0;
+  font-size: 1.3rem;
+  color: var(--rxp-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.rxp-hole-meta {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-hole-source {
+  font-family: var(--rxp-font-mono);
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-hole-task {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  color: var(--rxp-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* ── The pattern box ─────────────────────────────────────────────────────── */
+
+.rxp-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rxp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rxp-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rxp-slash {
+  flex: none;
+  font-family: var(--rxp-font-mono);
+  font-size: 1.3rem;
+  color: var(--rxp-text-muted);
+}
+
+.rxp-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  background: var(--rxp-bg-input);
+  border: 1px solid var(--rxp-border);
+  border-radius: 6px;
+  color: var(--rxp-accent-cyan);
+  font-family: var(--rxp-font-mono);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.rxp-input:focus {
+  border-color: var(--rxp-border-focus);
+}
+
+.rxp-input::placeholder {
+  color: var(--rxp-text-muted);
+}
+
+/* The chips and the short count sit just above the pattern box, so both
+   stay in sight above a phone keyboard. */
+.rxp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.rxp-chip {
+  min-width: 42px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--rxp-border);
+  border-radius: 6px;
+  background: var(--rxp-bg-secondary);
+  color: var(--rxp-text-primary);
+  font-family: var(--rxp-font-mono);
+  font-size: 0.95rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rxp-chip:active {
+  background: var(--rxp-bg-card);
+}
+
+.rxp-live {
+  min-height: 1.5em;
+  margin: 0 0 4px;
+  font-family: var(--rxp-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--rxp-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.rxp-live--solved {
+  color: var(--rxp-accent-green);
+}
+
+.rxp-live--error {
+  color: #fca5a5;
+}
+
+.rxp-stroke-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-top: 10px;
+  font-family: var(--rxp-font-mono);
+  font-size: 0.85rem;
+}
+
+.rxp-strokes {
+  color: var(--rxp-text-primary);
+  font-weight: 700;
+}
+
+.rxp-score {
+  color: var(--rxp-accent-cyan);
+}
+
+.rxp-best-hole {
+  min-width: 0;
+  color: var(--rxp-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.rxp-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rxp-status {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--rxp-radius);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  color: var(--rxp-accent-cyan);
+  font-family: var(--rxp-font-mono);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.rxp-status--error {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.rxp-status--solved {
+  border-color: rgba(16, 185, 129, 0.55);
+  color: var(--rxp-accent-green);
+  animation: rxp-flash 0.6s ease-out;
+}
+
+.rxp-sandbox {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--rxp-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.rxp-sandbox--worker {
+  color: #6ee7b7;
+}
+
+.rxp-sandbox--main {
+  color: var(--rxp-accent-amber);
+}
+
+.rxp-sandbox--starting {
+  color: var(--rxp-text-secondary);
+}
+
+/* ── Catch and Leave ─────────────────────────────────────────────────────── */
+
+.rxp-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rxp-list-box--match {
+  border-top: 3px solid rgba(16, 185, 129, 0.6);
+}
+
+.rxp-list-box--skip {
+  border-top: 3px solid rgba(239, 68, 68, 0.6);
+}
+
+.rxp-list-title {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--rxp-text-primary);
+}
+
+.rxp-count {
+  font-family: var(--rxp-font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--rxp-text-secondary);
+}
+
+.rxp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A check still out: the last colours stay, dimmed. */
+.rxp-list--pending .rxp-line {
+  opacity: 0.55;
+}
+
+/* A log line wraps anywhere (they are long and have few spaces) and keeps
+   its runs of spaces; the mark hangs in the left padding. */
+.rxp-line {
+  display: block;
+  margin-top: 4px;
+  padding: 4px 6px 4px 1.7em;
+  border-radius: 4px;
+  background: rgba(10, 15, 30, 0.6);
+  font-family: var(--rxp-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--rxp-text-secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rxp-line-mark {
+  display: inline-block;
+  width: 1.3em;
+  margin-left: -1.3em;
+  color: var(--rxp-text-muted);
+}
+
+.rxp-line-text {
+  color: inherit;
+}
+
+.rxp-hit {
+  border-radius: 2px;
+  background: rgba(34, 211, 238, 0.22);
+  color: var(--rxp-text-primary);
+}
+
+/* A match of no characters still shows where it is. */
+.rxp-hit--empty {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background: var(--rxp-accent-cyan);
+}
+
+.rxp-line--ok {
+  background: rgba(16, 185, 129, 0.1);
+  color: #a7f3d0;
+}
+
+.rxp-line--ok .rxp-line-mark {
+  color: var(--rxp-accent-green);
+}
+
+.rxp-line--bad {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+}
+
+.rxp-line--bad .rxp-line-mark {
+  color: var(--rxp-accent-red);
+}
+
+/* ── Warning, help, toast, footer ────────────────────────────────────────── */
+
+.rxp-warning {
+  display: block;
+  margin-top: 12px;
+  color: var(--rxp-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.rxp-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--rxp-border);
+  border-radius: var(--rxp-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--rxp-text-secondary);
+  font-size: 0.85rem;
+}
+
+.rxp-help-title {
+  cursor: pointer;
+  color: var(--rxp-text-primary);
+  font-weight: 600;
+}
+
+.rxp-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+/* width: max-content with a max-width: centred with left 50%, a toast would
+   otherwise shrink to half the screen on a phone. */
+.rxp-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: #065f46;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+/* Refusals and misses in red, notes in blue; each keeps 4.5:1 or more. */
+.rxp-toast--error {
+  background: #991b1b;
+}
+
+.rxp-toast--info {
+  background: #1e40af;
+}
+
+.rxp-toast.rxp-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.rxp-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--rxp-text-muted);
+  font-size: 0.8rem;
+}
+
+.rxp-hidden {
+  display: none;
+}
+
+@keyframes rxp-flash {
+  from { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.7); }
+  to { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rxp-btn,
+  .rxp-input,
+  .rxp-toast {
+    transition: none;
+  }
+
+  .rxp-status--solved {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .rxp-wrapper {
+    padding: 20px 12px;
+  }
+
+  .rxp-title {
+    font-size: 1.6rem;
+  }
+
+  .rxp-card {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  .rxp-lists {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rxp-hole,
+  .rxp-tee,
+  .rxp-list-box {
+    padding: 12px;
+  }
+
+  .rxp-nav .rxp-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 399px) {
+  .rxp-header-actions {
+    width: 100%;
+  }
+
+  .rxp-header-actions .rxp-btn {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 359px) {
+  .rxp-wrapper {
+    padding: 16px 8px;
+  }
+
+  .rxp-card {
+    gap: 3px;
+  }
+
+  .rxp-hole,
+  .rxp-tee,
+  .rxp-list-box {
+    padding: 10px 8px;
+  }
+
+  .rxp-chip {
+    min-width: 38px;
+    padding: 0 8px;
+  }
+}

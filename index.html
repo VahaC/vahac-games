@@ -419,10 +419,28 @@
         description: 'Slide and merge tiles on a 4x4 board with arrow keys or swipes until you reach 2048, with undo of up to 10 moves, a best score and auto save.'
       },
       {
+        name: 'Bad Sector',
+        folder: 'bad-sector',
+        group: 'arcade',
+        description: 'Bounce the read head off the carriage and break the sectors of an unrolled disk platter: bad sectors take several hits, read-only ones never break, with bonuses and a Daily disk.'
+      },
+      {
         name: 'Bitmap Decoder',
         folder: 'bitmap-decoder',
         group: 'puzzle',
         description: 'Fill a nonogram whose clues are run-length encoding until a hidden 1-bit icon decodes into a hex dump: a daily icon with a streak, Endless boards and best times.'
+      },
+      {
+        name: 'Byte Catcher',
+        folder: 'byte-catcher',
+        group: 'reflex',
+        description: 'Encode the packets queued on a router interface before their TTL runs out: bytes to bits, prefix lengths to subnet masks and rwx to octal and back; three drops take the link down.'
+      },
+      {
+        name: 'Defrag',
+        folder: 'defrag',
+        group: 'memory',
+        description: 'Move file fragments between disk tracks until every file lies in one unbroken run, with fixed system blocks, files of different sizes, a solver hint, numbered levels and a Daily.'
       },
       {
         name: 'Flip-Flop',
@@ -435,6 +453,12 @@
         folder: 'hash-cracker',
         group: 'memory',
         description: 'Crack a hidden key in 10 attempts in Easy, Normal or Hard from HIT and NEAR counts; the terminal prints the keys left and their entropy in bits, and streaks are saved.'
+      },
+      {
+        name: 'Lost in /var',
+        folder: 'lost-in-var',
+        group: 'sim',
+        description: 'Log in to a fake shell on a broken server and find the cause with real commands (ls, cd, cat, grep, tail, ps, df, kill), in a tutorial and two incidents, with chips for phones.'
       },
       {
         name: 'Minesweeper Game',
@@ -455,16 +479,34 @@
         description: 'Turn patch-cord tiles until every server, NAS and access point links up to the core switch, on 5x5 to 9x9 boards with wrap mode, locks and a shared Daily.'
       },
       {
+        name: 'Pod Packer',
+        folder: 'pod-packer',
+        group: 'memory',
+        description: 'Schedule pods onto cluster nodes with CPU and RAM bars under anti-affinity, a GPU taint and a draining node, on the fewest nodes with as few evictions and moves as you can.'
+      },
+      {
         name: 'Port Knocker',
         folder: 'port-knocker',
         group: 'memory',
         description: 'Watch a homelab patch panel flash a port-knocking sequence and knock it back in Forward, Reverse or Stride mode within the knock window, then take on the shared Daily.'
       },
       {
+        name: 'Rack Reset',
+        folder: 'rack-reset',
+        group: 'puzzle',
+        description: 'Clear the alarm LEDs on a rack front panel in as few presses as possible: each rack model flips LEDs under its own hex toggle mask, and a GF(2) solver sets the par.'
+      },
+      {
         name: 'Reaction Time Test',
         folder: 'reaction-time',
         group: 'reflex',
         description: 'Wait for the neon signal, then click, tap or press Space: four delay windows, false-start detection, and your current, best and average times over 10 rounds.'
+      },
+      {
+        name: 'Regex Par',
+        folder: 'regex-par',
+        group: 'word',
+        description: 'Write the shortest regular expression that catches every line on one list and none on the other, on 18 holes made from real nginx, cron, dmesg, docker and git lines, against par.'
       },
       {
         name: 'Snake Game',
@@ -491,6 +533,12 @@
         description: 'Type a random Easy, Medium or Hard sentence against a 60-second clock with live WPM and accuracy, and keep your best WPM.'
       },
       {
+        name: 'Uptime Idle',
+        folder: 'uptime-idle',
+        group: 'sim',
+        description: 'Grow an old laptop under the desk into a homelab rack: buy services and hardware while the power bill and incidents eat the income, with offline progress and migrations.'
+      },
+      {
         name: 'Cyberpunk Wordle',
         folder: 'wordle-game',
         group: 'word',
@@ -499,14 +547,15 @@
     ];
 
     // Genres in display order: puzzles first, then word, arcade, reflex and typing, memory and
-    // logic, and board and card games.
+    // logic, board and card games, and simulations.
     var GROUPS = [
       { key: 'puzzle', label: 'Puzzle', color: '#3b82f6' },
       { key: 'word', label: 'Word', color: '#10b981' },
       { key: 'arcade', label: 'Arcade', color: '#f59e0b' },
       { key: 'reflex', label: 'Reflex and Typing', color: '#22d3ee' },
       { key: 'memory', label: 'Memory and Logic', color: '#a855f7' },
-      { key: 'tabletop', label: 'Board and Cards', color: '#ec4899' }
+      { key: 'tabletop', label: 'Board and Cards', color: '#ec4899' },
+      { key: 'sim', label: 'Simulation', color: '#84cc16' }
     ];
 
     // The genre filter of the All chip.

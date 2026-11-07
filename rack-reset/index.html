@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rack Reset — Logs from VahaC</title>
+  <meta name="description" content="Rack Reset: clear the alarm LEDs on a rack's front panel in as few presses as possible. Each rack model flips the LEDs under its own toggle mask in hex, every row reads as a hex register, and a built-in GF(2) solver sets an honest par and gives hints. 3x3 to 6x6 racks, undo, best per model and size. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="rkr-wrapper">
+
+  <header class="rkr-header">
+    <div class="rkr-title-group">
+      <h1 class="rkr-title">Rack Reset</h1>
+      <p class="rkr-subtitle">The rack is full of alarms. Each press flips an LED and its neighbours under the model's toggle mask: clear every row register to 0x0 in as few presses as you can.</p>
+    </div>
+
+    <div class="rkr-header-actions">
+      <button id="rkr-new-game" class="rkr-btn" type="button" aria-label="Deal a new rack">New Game</button>
+      <button id="rkr-restart" class="rkr-btn rkr-btn--secondary" type="button" aria-label="Restart this rack from its first state">Restart</button>
+    </div>
+  </header>
+
+  <section class="rkr-toolbar" aria-label="Rack options">
+    <div class="rkr-controls">
+      <div class="rkr-control">
+        <label class="rkr-label" for="rkr-model">Rack model</label>
+        <select id="rkr-model" class="rkr-select" aria-label="Rack model and its toggle mask">
+          <option value="272">RK-272 cross</option>
+          <option value="525">RK-525 X-link</option>
+          <option value="070">RK-070 row bus</option>
+          <option value="575">RK-575 H-frame</option>
+          <option value="632">RK-632 hook</option>
+          <option value="777">RK-777 block</option>
+        </select>
+      </div>
+      <div class="rkr-control">
+        <label class="rkr-label" for="rkr-size">Size</label>
+        <select id="rkr-size" class="rkr-select" aria-label="Rack size">
+          <option value="3">3x3</option>
+          <option value="4">4x4</option>
+          <option value="5" selected>5x5</option>
+          <option value="6">6x6</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="rkr-toolbar-actions">
+      <button id="rkr-undo" class="rkr-btn rkr-btn--secondary" type="button" aria-label="Undo the last press">Undo</button>
+      <button id="rkr-hint-button" class="rkr-btn rkr-btn--hint" type="button" aria-label="Show one LED of a fewest-press reset; the rack is then not scored">Hint</button>
+    </div>
+  </section>
+
+  <section class="rkr-stats" aria-label="Rack stats">
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Mask</span>
+      <span id="rkr-mask-hex" class="rkr-stat-value">0x272</span>
+    </div>
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Lit</span>
+      <span id="rkr-lit" class="rkr-stat-value">0/0</span>
+    </div>
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Presses</span>
+      <span id="rkr-moves" class="rkr-stat-value">0</span>
+    </div>
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Par</span>
+      <span id="rkr-par" class="rkr-stat-value">0</span>
+    </div>
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Best</span>
+      <span id="rkr-best" class="rkr-stat-value">--</span>
+    </div>
+    <div class="rkr-stat">
+      <span class="rkr-stat-label">Cleared</span>
+      <span id="rkr-cleared" class="rkr-stat-value">0</span>
+    </div>
+  </section>
+
+  <main class="rkr-main">
+    <div class="rkr-panel">
+      <div class="rkr-panel-head">
+        <span id="rkr-mode" class="rkr-mode">RK-272 cross</span>
+        <span id="rkr-mask-grid" class="rkr-mask-grid" aria-hidden="true"></span>
+      </div>
+      <div class="rkr-board-wrap">
+        <div id="rkr-board" class="rkr-board" tabindex="0" role="group" aria-label="Rack alarm panel"></div>
+      </div>
+    </div>
+    <p id="rkr-hint" class="rkr-hint" aria-live="polite"></p>
+    <p id="rkr-solver" class="rkr-solver"></p>
+  </main>
+
+  <section class="rkr-status-panel">
+    <div id="rkr-status" class="rkr-status" aria-live="polite">Powering up the rack...</div>
+    <div id="rkr-warning" class="rkr-warning rkr-hidden" role="alert"></div>
+  </section>
+
+  <details class="rkr-help">
+    <summary class="rkr-help-title">How to play</summary>
+    <ul class="rkr-help-list">
+      <li>Tap or click an LED to press it. A press flips that LED and the neighbours its rack model's toggle mask covers: lit alarms go out, clear ones light up.</li>
+      <li>The mask is a 3x3 stencil in three hex digits, one per row from the top (4 left, 2 centre, 1 right): 0x272 is a cross, 0x525 a diagonal X, 0x070 a row of three, 0x575 an H, 0x632 a hook and 0x777 the full block. The small grid above the rack shows it.</li>
+      <li>Each row of LEDs is also a register in hex, the left LED its highest bit. The rack is reset when every register reads 0.</li>
+      <li>Par is the true minimum, worked out by a GF(2) solver built into the page: Gaussian elimination plus a check of every solution its null space allows. Pressing an LED twice cancels out, so the order of presses never matters.</li>
+      <li>Undo takes back the last press, Restart goes back to the rack's first state, and Hint shows one LED of a fewest-press reset from where you are. A rack where you used a hint, or that you restart after resetting it, is not scored.</li>
+      <li>New Game, N or a new model or size deal a new rack at once when the rack in play has no presses or is reset. With presses on it, a new model or size waits for New Game, and New Game or N has to be pressed a second time within 4 s, so one slip never throws a rack away. A dealt rack always needs at least 3 presses on 3x3 and 4 on larger racks.</li>
+      <li>Best is your fewest presses over par for each model and size ("par" when you matched it), and Cleared counts your scored resets.</li>
+      <li>Keyboard, with the rack focused: arrows move the cursor, Space or Enter press, H hint, U undo, R restart, N new game.</li>
+    </ul>
+  </details>
+
+  <div id="rkr-toast" class="rkr-toast" aria-live="polite"></div>
+
+  <footer class="rkr-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

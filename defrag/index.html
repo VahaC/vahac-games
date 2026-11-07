@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Defrag — Logs from VahaC</title>
+  <meta name="description" content="Defrag: move file fragments between disk tracks until every file lies in one unbroken run and the fragmentation reads 0%. Files of different sizes, fixed system blocks, a solver hint and a dead-end warning, numbered levels and a shared Daily with a streak. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="dfg-wrapper" id="dfg-game">
+
+  <header class="dfg-header">
+    <div class="dfg-title-group">
+      <h1 class="dfg-title">Defrag</h1>
+      <p class="dfg-subtitle">Move file fragments between the tracks of a disk until every file lies in one unbroken run and the fragmentation reads 0%.</p>
+    </div>
+
+    <div class="dfg-header-actions">
+      <button id="dfg-daily-button" class="dfg-btn dfg-btn--daily" type="button" aria-label="Open the Daily disk">Daily</button>
+    </div>
+  </header>
+
+  <section class="dfg-levelbar" aria-label="Levels">
+    <button id="dfg-prev" class="dfg-btn dfg-btn--secondary" type="button" aria-label="Previous level">Prev</button>
+    <span id="dfg-mode" class="dfg-mode">Level 1</span>
+    <button id="dfg-next" class="dfg-btn dfg-btn--secondary" type="button" aria-label="Next level">Next</button>
+  </section>
+
+  <section class="dfg-stats" aria-label="Disk stats">
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Fragmented</span>
+      <span id="dfg-frag" class="dfg-stat-value">0%</span>
+    </div>
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Moves</span>
+      <span id="dfg-moves" class="dfg-stat-value">0</span>
+    </div>
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Par</span>
+      <span id="dfg-par" class="dfg-stat-value">--</span>
+    </div>
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Best</span>
+      <span id="dfg-best" class="dfg-stat-value">--</span>
+    </div>
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Hints</span>
+      <span id="dfg-hints" class="dfg-stat-value">0</span>
+    </div>
+    <div class="dfg-stat">
+      <span class="dfg-stat-label">Streak</span>
+      <span id="dfg-streak" class="dfg-stat-value">0</span>
+    </div>
+  </section>
+
+  <main class="dfg-main">
+    <div class="dfg-console">
+      <div class="dfg-console-head">
+        <span class="dfg-prompt">$ defrag /dev/sda</span>
+        <span id="dfg-frag-line" class="dfg-frag-line">fragmentation 0% → 0%</span>
+      </div>
+      <div class="dfg-meter" aria-hidden="true"><div id="dfg-meter-fill" class="dfg-meter-fill"></div></div>
+      <div id="dfg-disk" class="dfg-disk" tabindex="0" role="group" aria-label="Disk tracks"></div>
+    </div>
+  </main>
+
+  <section class="dfg-actions" aria-label="Disk actions">
+    <button id="dfg-undo" class="dfg-btn dfg-btn--secondary" type="button" aria-label="Undo the last move">Undo</button>
+    <button id="dfg-hint" class="dfg-btn dfg-btn--secondary" type="button" aria-label="Show the next move of a solution">Hint</button>
+    <button id="dfg-restart" class="dfg-btn dfg-btn--secondary" type="button" aria-label="Restart this disk from its first state">Restart</button>
+  </section>
+
+  <section class="dfg-status-panel">
+    <div id="dfg-status" class="dfg-status" aria-live="polite">Mounting the disk...</div>
+    <div id="dfg-note" class="dfg-note dfg-hidden" aria-live="polite"></div>
+    <div id="dfg-warning" class="dfg-warning dfg-hidden" role="alert"></div>
+    <div id="dfg-share" class="dfg-share dfg-hidden">
+      <button id="dfg-share-button" class="dfg-btn" type="button" aria-label="Copy the Daily result">Copy result</button>
+      <input id="dfg-share-text" class="dfg-share-text dfg-hidden" type="text" readonly aria-label="Daily result to copy">
+    </div>
+  </section>
+
+  <details class="dfg-help">
+    <summary class="dfg-help-title">How to play</summary>
+    <ul class="dfg-help-list">
+      <li>Every column is a track of the disk, filled from the bottom. Tap a track to pick up its top fragment (every block of the same file on top), then tap another track to write it there.</li>
+      <li>A fragment goes onto an empty track or onto the same file, only when the whole fragment fits: a fragment never splits.</li>
+      <li>The disk is defragmented when every file lies in one unbroken run. The fragmentation shows how many fragments are left to merge.</li>
+      <li>Files have different sizes. A system file (boot, swap) has a fixed block at the bottom of its own track: that block never moves, and the track takes no other file.</li>
+      <li>Par is the shortest route the solver found when the disk was made: an upper bound, so you may match it or beat it.</li>
+      <li>Hint shows the next move of a route; asking again on the same disk is not counted again. When no route is left, a dead-end warning says how many moves to undo.</li>
+      <li>Keyboard, with the focus in the game: 1-9 pick tracks, U undo, H hint, R restart, N next level, Escape puts a picked fragment back. Restart, Prev, Next and N ask for a second press within 3 s when the moves on the disk would be lost.</li>
+      <li>The next level opens once the one before is defragmented. The Daily is the same disk for everyone, one scored attempt per day: the result names your moves, undos and hints. Defragment it on consecutive days to grow your streak.</li>
+    </ul>
+  </details>
+
+  <div id="dfg-toast" class="dfg-toast" aria-live="polite"></div>
+
+  <footer class="dfg-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

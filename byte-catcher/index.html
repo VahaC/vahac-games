@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Byte Catcher — Logs from VahaC</title>
+  <meta name="description" content="Byte Catcher: packets queue up on a router interface, each with a value to encode and a TTL. Turn decimal and hex into bits, prefix lengths into subnet masks and back, rwx permissions into octal and back, before the TTL runs out. Three drops and the link goes down. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="byc-wrapper" id="byc-root">
+
+  <header class="byc-header">
+    <h1 class="byc-title">Byte Catcher</h1>
+    <p class="byc-subtitle">Packets queue up on eth0, each with a value to encode and a TTL. Encode them before the TTL runs out: three drops and the link goes down.</p>
+  </header>
+
+  <section class="byc-toolbar" aria-label="Run options">
+    <div class="byc-control">
+      <label class="byc-label" for="byc-mode">Mode</label>
+      <select id="byc-mode" class="byc-select" aria-label="Mode">
+        <option value="bin">Warm-up: DEC and HEX to bits</option>
+        <option value="cidr">CIDR: prefix length and mask</option>
+        <option value="chmod">chmod: rwx and octal</option>
+      </select>
+    </div>
+    <div class="byc-toolbar-actions">
+      <button id="byc-pause" class="byc-btn" type="button" aria-label="Start the run">Start</button>
+      <button id="byc-new" class="byc-btn byc-btn--secondary" type="button" aria-label="Start a new run">New run</button>
+    </div>
+  </section>
+
+  <section class="byc-stats" aria-label="Run stats">
+    <div class="byc-stat">
+      <span class="byc-stat-label">Score</span>
+      <span id="byc-score" class="byc-stat-value">0</span>
+    </div>
+    <div class="byc-stat">
+      <span class="byc-stat-label">Combo</span>
+      <span id="byc-combo" class="byc-stat-value">0</span>
+    </div>
+    <div class="byc-stat">
+      <span class="byc-stat-label">Forwarded</span>
+      <span id="byc-forwarded" class="byc-stat-value">0</span>
+    </div>
+    <div class="byc-stat">
+      <span class="byc-stat-label">Drops</span>
+      <span id="byc-drops" class="byc-stat-value">0/3</span>
+    </div>
+    <div class="byc-stat">
+      <span class="byc-stat-label">Uptime</span>
+      <span id="byc-uptime" class="byc-stat-value">0:00</span>
+    </div>
+    <div class="byc-stat">
+      <span class="byc-stat-label">Best</span>
+      <span id="byc-best" class="byc-stat-value">0</span>
+    </div>
+  </section>
+
+  <div id="byc-console" class="byc-console" tabindex="0" role="group" aria-label="Router console: keys work while the focus is here">
+    <div class="byc-iface-row">
+      <span id="byc-link" class="byc-link byc-link--idle" aria-hidden="true"></span>
+      <span id="byc-iface" class="byc-iface">eth0 ingress · 0/5 queued</span>
+    </div>
+    <div id="byc-queue" class="byc-queue" role="group" aria-label="Ingress queue"></div>
+    <p id="byc-prompt" class="byc-prompt">Booting the router...</p>
+    <div id="byc-entry" class="byc-entry">0000 0000</div>
+    <div id="byc-bits" class="byc-pad byc-pad--bits" role="group" aria-label="Bit toggles, 128 to 1"></div>
+    <div id="byc-grid" class="byc-pad byc-pad--grid byc-hidden" role="group" aria-label="Permission grid: owner, group and other by read, write and execute"></div>
+    <div id="byc-octets" class="byc-pad byc-pad--octets byc-hidden" role="group" aria-label="Mask octet pad"></div>
+    <div id="byc-digits" class="byc-pad byc-pad--digits byc-hidden" role="group" aria-label="Digit pad"></div>
+    <div class="byc-actions">
+      <button id="byc-back" class="byc-btn byc-btn--secondary byc-btn--action" type="button" aria-label="Clear the toggles">Clear</button>
+      <button id="byc-send" class="byc-btn byc-btn--action byc-hidden" type="button" aria-label="Send the entry">Send</button>
+    </div>
+    <p id="byc-status" class="byc-status" aria-live="polite">Booting the router...</p>
+  </div>
+
+  <section class="byc-status-panel">
+    <div id="byc-warning" class="byc-warning byc-hidden" role="alert"></div>
+  </section>
+
+  <details class="byc-help">
+    <summary class="byc-help-title">How to play</summary>
+    <ul class="byc-help-list">
+      <li>Packets arrive in the ingress queue of eth0, up to five at a time. Each carries a value and a TTL that counts down. Encode the selected packet (the most urgent one, or tap another) to forward it. The line at the foot of the console says what happened: a forward, a drop, a CRC error and what the wrong entry means.</li>
+      <li>A packet whose TTL runs out is dropped, and so is one that arrives while all five slots are taken (a tail drop). After three drops the link goes down and the run ends. TTLs get shorter and packets come faster: quickly over the first four minutes, then slowly up to ten minutes, where the pace stays.</li>
+      <li>Warm-up: set the 8 bits (128 to 1) to a decimal or hex value. CIDR: pick the four octets of the subnet mask for a prefix such as /26, or type the prefix length of a mask such as 255.255.255.192. chmod: set the 3x3 rwx grid for a mode such as 750, or type the octal mode of rwxr-x---.</li>
+      <li>Toggles forward a packet as soon as they match it: any DEC or HEX byte in the queue, or any octal mode on the rwx grid, the oldest first. A typed entry goes to the selected packet and is sent when it is complete (two digits of a prefix, three of a mode, four octets) or with Send; a wrong one is a CRC error and resets the combo.</li>
+      <li>A forwarded packet scores 10 plus its seconds of TTL left, times the combo: x2 after five clean forwards in a row, up to x4. A drop or a CRC error starts the combo over.</li>
+      <li>Keys, while the focus is on the console or its keys: 1-8 or A S D F J K L ; toggle the bits; 1-9 toggle the rwx grid (owner r w x, then group, then other) or pick a mask octet; digits type; Enter sends; Backspace deletes or clears; Up and Down pick another packet during a run; P pauses (also on Start and New run).</li>
+      <li>The run pauses when the tab is hidden and comes back paused after a reload. New run during a run asks for a second press; the score it had still counts for Best.</li>
+      <li>For a whole subnet plan or a full permission set, the Subnet Calculator and the chmod Calculator in the vahac.com tools do the arithmetic for you.</li>
+    </ul>
+  </details>
+
+  <div id="byc-toast" class="byc-toast" aria-live="polite"></div>
+
+  <footer class="byc-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

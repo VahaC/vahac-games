@@ -1,0 +1,672 @@
+/* Rack Reset — style.css
+   Namespace: rkr- (rack reset)
+   All selectors use the rkr- prefix to avoid conflicts with host page styles.
+   Sizes: each rack size has its own --rkr-led per screen width, and the row
+   registers take a fixed --rkr-reg column, so a 6x6 rack with its registers
+   fits a 320 px phone with 36 px LEDs; .rkr-board-wrap scrolls sideways
+   (never the page) if a host column is narrower than the screen. */
+
+.rkr-wrapper {
+  --rkr-bg-primary: #0a0f1e;
+  --rkr-bg-secondary: #111827;
+  --rkr-bg-card: #1a2236;
+  --rkr-bg-input: #0d1424;
+  --rkr-border: #2a3a5c;
+  --rkr-border-focus: #3b82f6;
+  --rkr-text-primary: #e2e8f0;
+  --rkr-text-secondary: #94a3b8;
+  --rkr-text-muted: #64748b;
+  --rkr-accent-blue: #3b82f6;
+  --rkr-accent-cyan: #22d3ee;
+  --rkr-accent-green: #10b981;
+  --rkr-accent-amber: #f59e0b;
+  --rkr-accent-red: #ef4444;
+  --rkr-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --rkr-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rkr-radius: 8px;
+  --rkr-led-off: #13261f;
+
+  font-family: var(--rkr-font-sans);
+  color: var(--rkr-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(239, 68, 68, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--rkr-bg-primary) 0%, var(--rkr-bg-secondary) 100%);
+}
+
+.rkr-wrapper *,
+.rkr-wrapper *::before,
+.rkr-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────────── */
+
+.rkr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.rkr-title-group {
+  min-width: 0;
+}
+
+.rkr-title {
+  margin: 0;
+  font-family: var(--rkr-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--rkr-accent-red);
+  text-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+}
+
+.rkr-subtitle {
+  margin: 6px 0 0;
+  max-width: 540px;
+  color: var(--rkr-text-secondary);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.rkr-header-actions,
+.rkr-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rkr-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--rkr-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.rkr-btn:hover {
+  background: #2563eb;
+}
+
+.rkr-btn:active {
+  transform: scale(0.97);
+}
+
+.rkr-btn:focus-visible,
+.rkr-select:focus-visible,
+.rkr-help-title:focus-visible {
+  outline: 2px solid var(--rkr-accent-cyan);
+  outline-offset: 2px;
+}
+
+.rkr-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--rkr-border);
+  color: var(--rkr-text-secondary);
+}
+
+.rkr-btn--secondary:hover {
+  background: var(--rkr-bg-secondary);
+  color: var(--rkr-text-primary);
+}
+
+.rkr-btn--hint {
+  background: transparent;
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: var(--rkr-accent-amber);
+}
+
+.rkr-btn--hint:hover {
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.rkr-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rkr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rkr-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rkr-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rkr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rkr-select {
+  min-width: 150px;
+  max-width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: var(--rkr-bg-input);
+  border: 1px solid var(--rkr-border);
+  border-radius: 6px;
+  color: var(--rkr-text-primary);
+  font-family: var(--rkr-font-mono);
+  font-size: 0.9rem;
+  touch-action: manipulation;
+}
+
+.rkr-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.rkr-stat {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--rkr-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.rkr-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rkr-text-secondary);
+}
+
+/* Values wrap instead of being cut off or widening the card. */
+.rkr-stat-value {
+  display: block;
+  font-family: var(--rkr-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--rkr-accent-cyan);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ── The panel ───────────────────────────────────────────────────────────── */
+
+.rkr-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rkr-panel {
+  position: relative;
+  max-width: 100%;
+  padding: 12px 20px 16px;
+  border: 1px solid #2b2333;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.03) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, #181c2c, #0c1120);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(148, 163, 184, 0.08);
+}
+
+.rkr-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-family: var(--rkr-font-mono);
+  font-size: 0.75rem;
+  color: var(--rkr-text-secondary);
+}
+
+/* The model line wraps on a narrow phone instead of widening the page. */
+.rkr-mode {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The mask preview: the 3x3 stencil, the pressed LED in the middle. */
+.rkr-mask-grid {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, 8px);
+  gap: 2px;
+}
+
+.rkr-mask-cell {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #1e293b;
+}
+
+.rkr-mask-cell--on {
+  background: var(--rkr-accent-amber);
+}
+
+.rkr-mask-cell--self {
+  box-shadow: 0 0 0 1px var(--rkr-accent-cyan);
+}
+
+/* A scroll container clips at its edges, so everything the board draws
+   (the reset glow, the focus ring) stays inside the board's own box. */
+.rkr-board-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* The LEDs and, after each row, its register: an ordinary grid flow, one
+   cell per item, so nothing is positioned on its own. */
+.rkr-board {
+  --rkr-led: 56px;
+  --rkr-reg: 56px;
+  display: grid;
+  gap: 6px;
+  align-items: center;
+  width: max-content;
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  border-radius: 8px;
+  background: #070a14;
+  box-shadow: inset 0 0 22px rgba(239, 68, 68, 0.05);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rkr-board--n3 {
+  --rkr-led: 72px;
+}
+
+.rkr-board--n4 {
+  --rkr-led: 64px;
+}
+
+.rkr-board--n5 {
+  --rkr-led: 56px;
+}
+
+.rkr-board--n6 {
+  --rkr-led: 50px;
+}
+
+.rkr-board:focus {
+  outline: none;
+}
+
+.rkr-board:focus-visible {
+  outline: 2px solid var(--rkr-accent-cyan);
+  outline-offset: -2px;
+}
+
+.rkr-board--solved {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.35), inset 0 0 30px rgba(16, 185, 129, 0.2);
+}
+
+/* One LED: a square bezel (the tap target) holding a round lamp. */
+.rkr-led {
+  position: relative;
+  width: var(--rkr-led);
+  height: var(--rkr-led);
+  border: 1px solid #222c40;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #121a2b, #0b111e);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.rkr-led::after {
+  content: '';
+  position: absolute;
+  top: 22%;
+  left: 22%;
+  width: 56%;
+  height: 56%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #24493b, var(--rkr-led-off) 70%);
+  box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.18);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.rkr-led--on::after {
+  background: radial-gradient(circle at 35% 35%, #fecaca, var(--rkr-accent-red) 55%, #991b1b 100%);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.75), 0 0 2px #fca5a5;
+}
+
+.rkr-board--solved .rkr-led::after {
+  background: radial-gradient(circle at 35% 35%, #bbf7d0, var(--rkr-accent-green) 60%, #065f46 100%);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+.rkr-board--keys .rkr-led--cursor {
+  border-color: var(--rkr-accent-cyan);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.6);
+}
+
+.rkr-led--hint {
+  border-color: var(--rkr-accent-amber);
+  animation: rkr-hint-pulse 1s ease-in-out infinite;
+}
+
+/* A row register: the row's LEDs in hex, amber while any is lit. */
+.rkr-reg {
+  width: var(--rkr-reg);
+  font-family: var(--rkr-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  color: var(--rkr-accent-amber);
+  overflow-wrap: anywhere;
+}
+
+.rkr-reg--zero {
+  color: var(--rkr-accent-green);
+}
+
+.rkr-hint {
+  min-height: 1.6em;
+  margin: 10px 0 0;
+  font-family: var(--rkr-font-mono);
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--rkr-accent-amber);
+  overflow-wrap: anywhere;
+}
+
+.rkr-solver {
+  margin: 4px 0 0;
+  font-family: var(--rkr-font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--rkr-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* ── Status, help, toast ─────────────────────────────────────────────────── */
+
+.rkr-status-panel {
+  margin-top: 14px;
+}
+
+.rkr-status {
+  padding: 10px 14px;
+  border: 1px solid var(--rkr-border);
+  border-radius: var(--rkr-radius);
+  background: var(--rkr-bg-card);
+  font-family: var(--rkr-font-mono);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.rkr-warning {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: var(--rkr-radius);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--rkr-accent-amber);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.rkr-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--rkr-border);
+  border-radius: var(--rkr-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--rkr-text-secondary);
+  font-size: 0.85rem;
+}
+
+.rkr-help-title {
+  cursor: pointer;
+  color: var(--rkr-text-primary);
+  font-weight: 600;
+}
+
+.rkr-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  overflow-wrap: anywhere;
+}
+
+.rkr-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  /* As wide as the message, up to the screen less 16px a side: with an auto
+     width a box at left: 50% would only get the right half of the screen. */
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  /* Dark text on the green and amber: at least 4.5:1 for small text. */
+  background: var(--rkr-accent-green);
+  color: #052e1f;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.rkr-toast--warn {
+  background: var(--rkr-accent-amber);
+  color: #1f1300;
+}
+
+.rkr-toast.rkr-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.rkr-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--rkr-text-secondary);
+  font-size: 0.8rem;
+}
+
+.rkr-hidden {
+  display: none;
+}
+
+@keyframes rkr-hint-pulse {
+  50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.55); }
+}
+
+@media (hover: hover) {
+  .rkr-led:hover {
+    border-color: #3a4a6b;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rkr-led,
+  .rkr-led::after,
+  .rkr-btn,
+  .rkr-toast {
+    transition: none;
+  }
+
+  .rkr-led--hint {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .rkr-wrapper {
+    padding: 20px 12px;
+  }
+
+  .rkr-title {
+    font-size: 1.6rem;
+  }
+
+  .rkr-toolbar {
+    align-items: stretch;
+  }
+
+  /* The model select takes two parts of the row, the size select one. */
+  .rkr-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .rkr-select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .rkr-toolbar-actions {
+    width: 100%;
+  }
+
+  .rkr-toolbar-actions .rkr-btn {
+    flex: 1 1 0;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .rkr-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rkr-panel {
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .rkr-board {
+    gap: 4px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 479px) {
+  .rkr-board {
+    --rkr-reg: 44px;
+  }
+
+  .rkr-board--n3 {
+    --rkr-led: 70px;
+  }
+
+  .rkr-board--n4 {
+    --rkr-led: 58px;
+  }
+
+  .rkr-board--n5 {
+    --rkr-led: 50px;
+  }
+
+  .rkr-board--n6 {
+    --rkr-led: 44px;
+  }
+
+  .rkr-led {
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 399px) {
+  .rkr-board--n3 {
+    --rkr-led: 66px;
+  }
+
+  .rkr-board--n4 {
+    --rkr-led: 54px;
+  }
+
+  .rkr-board--n5 {
+    --rkr-led: 46px;
+  }
+
+  .rkr-board--n6 {
+    --rkr-led: 40px;
+  }
+
+  .rkr-header-actions {
+    width: 100%;
+  }
+
+  .rkr-header-actions .rkr-btn {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 359px) {
+  .rkr-wrapper {
+    padding: 16px 8px;
+  }
+
+  .rkr-board {
+    --rkr-reg: 40px;
+    padding: 6px;
+  }
+
+  .rkr-board--n3 {
+    --rkr-led: 62px;
+  }
+
+  .rkr-board--n4 {
+    --rkr-led: 52px;
+  }
+
+  .rkr-board--n5 {
+    --rkr-led: 42px;
+  }
+
+  .rkr-board--n6 {
+    --rkr-led: 36px;
+  }
+
+  .rkr-stat {
+    padding: 6px 7px;
+  }
+
+  .rkr-stat-value {
+    font-size: 0.92rem;
+  }
+
+  .rkr-reg {
+    font-size: 12px;
+  }
+}

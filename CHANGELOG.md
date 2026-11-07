@@ -4,6 +4,180 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-06] - Eight new games
+
+Eight games join the collection: Bad Sector, Byte Catcher, Defrag, Lost in /var, Pod Packer, Rack Reset,
+Regex Par and Uptime Idle. Each one sits in its own folder with the usual three plain files, its own namespace
+prefix and its own test module at 100 % line, branch and function coverage. None of them uses an AI service, a
+network call or an outside resource. Bad Sector and Defrag have a Daily under the shared rule in README Notes.
+No game links to a tool page yet: where one mentions a vahac.com tool, it names it in plain text. Every game
+was reviewed independently after it was built, and the review findings were fixed before release. The suite
+now has 1193 tests in 25 modules and passes on Node 24 and Node 20.17.
+
+### Index page
+
+#### Added
+- A new genre, Simulation (Lost in /var, Uptime Idle). Rack Reset joins Puzzle, Regex Par joins Word, Bad
+  Sector joins Arcade, Byte Catcher joins Reflex and Typing, and Defrag and Pod Packer join Memory and Logic.
+  The page now lists 22 games in 7 genres.
+
+#### Tests
+- `tests/hub.test.js` follows the new lists: the counts, the genre chips, the listing by genre, the card
+  links, search, and the README and prefix registry checks. The counts test also leaves out Bad Sector, so
+  Arcade stays the genre left without games.
+
+### Bad Sector
+
+#### Added
+- New arcade game `bad-sector/` (prefix `bds`): a brick breaker on an unrolled hard-disk platter. The read head bounces off the carriage and breaks plain sectors (1 hit), bad sectors (2-3 hits, labelled with their LBA) and never breaks read-only ones. A broken sector flashes its LBA address, and a track with no sector left is "Surface scan complete".
+- Tracks generated as fragmented disks with more rows, more bad and read-only sectors and faster heads as the track number rises; sectors walled in by read-only ones are left out.
+- A fixed-step physics model (120 steps a second, sub-steps of half the head's radius, a speed cap, at most 100 ms of catch-up a frame), drawn on a canvas that scales to the column and to the height of a landscape phone.
+- Bonuses: RAID1 (a mirrored second head, started from the head's own spot when the mirrored spot is inside a sector or a walled-in pocket), ECC (a wide carriage for 12 s) and SLOW-SEEK (the heads at 60 % for 10 s). SMART lives: the third lost head fails the drive.
+- Controls: mouse, a finger dragging the carriage from anywhere with no dead zone after a wall, taps, and keys only with the platter focused (Left/Right or A/D, Space, P). Pause on the button, P and a hidden tab.
+- A game set aside (the other view, a reload) keeps its heads in flight, their speed, the carriage and the falling bonuses, and comes back paused where it was. New disk and Practice drop a scored free scan only on a second press within 4 s.
+- The Daily disk under the shared Daily rule: one scored attempt written to `bds-daily` as it begins, a streak, an unscored Practice, a share line with a clipboard fallback, and a render at local midnight for the new day's button and streak.
+- Saves in `bds-state`, `bds-best` and `bds-daily`, parsed field by field. Blocked or full storage never stops the game. A second tab takes over a newer Daily record and merges bests.
+
+#### Tests
+- `tests/bad-sector.test.js` with 53 tests:
+  - Pure logic against independent models: pruning, track generation, bounces, no tunnelling at the speed cap, hits, bonuses and the RAID1 mirror spot, lost heads, clearing, flashes.
+  - The Daily rule with the pinned disk of 2026-11-06, the streak, the share line, the second-tab rule, and saves field by field with heads in flight.
+  - The page booted from `index.html`: input and focus filters, touch drags into walls, pause and hidden tabs, heads in flight kept through view switches and reloads, confirmations, the Daily flow, midnight, second tabs, corrupt, blocked and full storage, and source and layout checks including canvas text size and landscape phones.
+- 100 % line, branch and function coverage of `bad-sector/script.js`.
+
+### Byte Catcher
+
+#### Added
+- New reflex game `byte-catcher/`: a router console where packets queue up on eth0, each with a value to encode and a TTL that counts down. Three drops (TTL expired or a full queue) take the link down.
+- Modes: Warm-up (DEC and HEX to the 8 bit toggles), CIDR (prefix length to the four mask octets on an octet pad, a dotted mask to its prefix length on a digit pad) and chmod (an octal mode on a 3x3 rwx grid, an rwx string to its octal digits).
+- Toggles forward the oldest queued packet they match (any byte in Warm-up, any octal mode on the grid); a typed entry goes to the selected packet, sends itself when complete or with Send, and a wrong one is a CRC error that names what was sent and what it means.
+- The status line is the last line of the console, so drops, CRC errors and refusals stay in view on a phone; the console with its tallest pad fits a 320 x 568 screen with 44 px slots and keys.
+- Points: 10 plus the seconds of TTL left, times a combo of x2 after five clean forwards, up to x4. Best score and most forwarded are kept per mode in `byc-best`; the run is saved in `byc-state`.
+- The pace rises quickly over four minutes and slowly up to ten, with per-mode floors based on the taps a packet needs (Warm-up and chmod: arrivals every 1.4 s, CIDR every 1.1 s at the floor).
+- Keys only while the focus is on the console or its keys; Enter on the help summary, the mode select and other buttons stays with them, P also works on Start and New run, and Up/Down move the selection only during a run (otherwise the page scrolls).
+- Pauses on a hidden tab, comes back paused after a reload, writes only when the run changed, and takes over a run another tab saved instead of writing over it.
+
+#### Tests
+- `tests/byte-catcher.test.js` (52 tests), with 100% line, branch and function coverage of `byte-catcher/script.js`.
+- Converters against independent models for every byte, prefix length and mode; the toggle matching brute-forced over every byte.
+- The pace and the first-minute arrivals pinned as literal numbers; bots that pay think time plus a cost per tap go down within a pinned band in every mode, with mode means within 25% of each other.
+- The save format pinned byte for byte; damaged, partial, blocked and full storage; a second tab; reload round trip.
+- Page tests through the real listeners: key filters (help summary, toolbar buttons, pad keys, arrows), held keys, hidden tab, no writes for inputs that change nothing, toasts keep their full time.
+- Source checks: ids, prefix, ES5 IIFE, embed safety, CSS rule for every class, WCAG contrast of the pad key hints, and the 320-414 px layout with the console height including the status line.
+
+### Defrag
+
+#### Added
+- A new puzzle game: move file fragments between the tracks of a disk until every file lies in one unbroken run and the fragmentation reads 0%. Tap a track to pick up its top fragment, tap another to write it there: onto an empty track or the same file, only when the whole fragment fits.
+- Disks of 6 to 9 tracks of 4 or 5 blocks with 4 to 8 files. From level 3 files have different sizes; from level 5 system files (boot.sys, swap.sys) have a fixed block at the bottom of their own track that never moves, and that track takes no other file. On phones a disk of more than five tracks stands on two shelves.
+- Boards made by legal reverse moves from the defragmented disk, kept only when the solver (iterative deepening with a node cap, memoised on canonical states) proves the level's minimum moves. Par is the shortest route found, shown as an upper bound.
+- Hint (H) from the solver, counted once per disk state, and a dead-end warning after every move that says how many moves to undo. Undo, Restart, Prev and Next; Restart and leaving a level with moves made take a second press within 3 s.
+- Numbered levels 1-999 seeded from the level number, the next one opening once the one before is defragmented, with the fewest moves per level.
+- The Daily: one disk for everyone, seeded from the local date, following DAILY_RULE, with one scored attempt, a streak, an unscored practice run and a share line that names the moves, undos and hints, with a clipboard fallback.
+- Keys only while the focus is in the game: 1-9, U, H, R, N and Escape. A mouse click on a game button moves the focus to the disk, so Space scrolls the page instead of clicking the button again.
+- Saves under `dfg-state`, `dfg-progress` and `dfg-daily`, parsed field by field. Blocked or full storage never stops the game and the warning names the keys.
+- Second tabs: a newer Daily record, or a game of the same level that is further along, is taken over before every write and through the storage event; a best is merged with the one on disk.
+
+#### Tests
+- `tests/defrag.test.js` with 61 tests:
+  - Pure logic against an independent model and brute force: moves, reverse moves, fragmentation, the solver against breadth-first search, and the minimum moves of levels 1-24 and five Dailies checked by searches of the test's own.
+  - The Daily seed, the pinned disk of 2026-11-06, day numbering, the streak, the share line, which of two tabs' records wins, and saves field by field.
+  - The page booted from `index.html`: taps, refusals, focus-only keys, button focus after a click, hints, dead ends, wins, the second-press rules, the Daily flow, second tabs for the Daily and the level game, corrupt, blocked and full storage.
+  - Source checks: ids, the dfg- prefix, ES5 syntax, embed safety, CSS rules for every class, the 320-1440 px layout and text contrast.
+- 100% line, branch and function coverage of `defrag/script.js`.
+
+### Lost in /var
+
+#### Added
+- A new simulation game `lost-in-var/` (prefix `liv-`): log in to a fake shell on a broken server and find the cause with real commands.
+- Three cases as plain data in `script.js`, so more can be added without code changes. First shift is a tutorial whose eight steps teach ls, cat, cd, tail, grep, df, ps and kill. No space left: checkout fails because an export running with --loop filled /. Address in use: release 42 cannot bind :8080 while the release 41 server still holds it.
+- A pure shell: ls -l -a -h, cd, pwd, cat, grep -i -n -v -r, tail -n, ps and ps aux (ax, -ef, -e), df -h, and kill with -9, -TERM, -s, -n and -l, plus help and clear. It handles quotes, * and ? wildcards, and pipes into grep and tail (each command of a pipeline runs in a subshell, as in bash). Errors are worded like bash and name the path, process id or signal. There is no rm.
+- An incident closes when its evidence (the log lines that name the cause) was on screen and the cause is stopped, in any order, so a guess from ps aux never closes it.
+- Points: 100, minus 3 per command over par, 10 per hint and 25 per wrong process killed, at least 10. A hint stays seen, and charged, after Restart case. The best score per case is kept.
+- Keys only in the command field: Enter, Up/Down history, and Tab completion only when the field is not empty. Phones get command chips, name chips from the last output and ↑, ↓, Tab and Run keys. A mouse or keyboard click on a chip gives the focus back to the field; a tap does not.
+- Saves under `liv-state` and `liv-progress`, parsed field by field. Blocked or full storage never stops the game and the warning names the key. A second tab's sessions are taken over, with a note in every changed case's terminal, and scores are merged.
+
+#### Tests
+- `tests/lost-in-var.test.js` with 62 tests:
+  - Pure shell logic against independent models, and every command, flag and error message.
+  - A bounded search showing that the shortest incident win needs 3 commands, and that the hinted path closes within par.
+  - Saves pinned byte for byte, and the page booted from `index.html`: taps alone, chip focus, keys, hints and Restart, reloads, storage failures and second tabs.
+  - Source checks: prefix, ES5, embed safety, the 320-1440 px layout and text contrast.
+- 100% line, branch and function coverage of `lost-in-var/script.js`; passes on Node 20.17 too.
+
+### Pod Packer
+
+#### Added
+- New game `pod-packer/` (prefix `pdp`, genre Memory and Logic): you are the scheduler of a small cluster. Tap a pending pod, then a node, or a pod already running on that node, to run it there. With nothing picked, a tap on a running pod evicts it. A refusal names the values, for example "Insufficient memory: pod cache-1 needs 1.5 GiB, node-3 has 0.0 GiB free."
+- Rules from level 2 on: anti-affinity (replicas of one app never share a node), a gpu taint with tolerations and a node selector (level 3), and a draining node whose pods must move (level 4). They combine from level 5. An eviction from the draining node is final and is not on the undo history.
+- Score: nodes used against the exact minimum (a bounded branch-and-bound search, or a par if it runs out of steps), evictions and moves against their minimums, and the best moves and evictions per level.
+- 50 fixed levels built constructively from FNV-1a("pdp:level-N") through mulberry32, each one solvable within its target under every rule it turns on. A level list replays any level reached.
+- Compact vertical layout: CPU and RAM bars for every node fit 320 px; two node columns from 720 px; 44 px pod tap targets on touch screens; blocked nodes marked by a red frame instead of being dimmed.
+- Keys only while the focus is on the cluster: arrows, 1-6, E, U, N and Escape. Ctrl/Alt/Meta combinations, held keys (except the arrows), the game's own buttons and the host page are left alone.
+- Saves under `pdp-state` and `pdp-progress`, parsed field by field. A warning names the key when storage is blocked or full and goes away once a write of that key works again. Another tab's newer game is taken over before any tap, key, Undo, Restart, Next level or level-list change, and progress records from different tabs are merged.
+
+#### Tests
+- `tests/pod-packer.test.js`: 47 tests, 100% line, branch and function coverage of `pod-packer/script.js`; passes on Node 24 and Node 20.17.
+- Independent rule checker and brute force for the node target on small levels. A separate subset search with symmetry breaking checks the target on all 50 real levels and checks the search from a loose bound on 540 levels of 10-12 pods, including variants where fewer nodes than the generator used are enough.
+- Page tests through the real index.html: a tap on a running pod while another pod is picked, keys left to the game's own buttons and summary, the focus moved to the board when a level is rebuilt, an Undo that never gets stuck after an eviction from the draining node, Restart / Next level / level list / arrows taking over a second tab's game, and the storage warning clearing after a full store frees up.
+- Source checks: prefix, ES5 IIFE, embed safety, CSS rules for every class the game sets, the 320-1440 px layout, coarse-pointer 44 px pods, and 4.5:1 contrast for small texts with no opacity on node cards.
+
+### Rack Reset
+
+#### Added
+- New game `rack-reset/` (prefix `rkr`): clear the alarm LEDs on a rack's front panel in as few presses as possible. A press flips the LED and the neighbours under the rack model's toggle mask, and every row is shown as a hex register.
+- Six rack models with their own 3x3 toggle masks in hex (0x272 cross, 0x525 X-link, 0x070 row bus, 0x575 H-frame, 0x632 hook, 0x777 block) on 3x3 to 6x6 racks, with the mask drawn as a stencil above the rack.
+- Racks made by random presses from all-off, so every rack can be cleared. An empty rack, or one that needs fewer than 3 presses (3x3) or 4 presses (4x4 and up), is drawn again within 20 tries, with a fallback that always reaches that floor.
+- Par and hints from a GF(2) solver: Gaussian elimination that handles singular matrices, plus the minimum over the null space. Only model and size pairs with at most 2^12 candidates are offered (the largest is 512).
+- Taps and clicks, and with the rack focused: arrows, Space/Enter, H hint, U undo, R restart, N new game. Ctrl/Alt/Meta combinations and host-page fields are left alone. The physical-key fallback applies only to non-Latin layouts. A click on a button hands the keys back to the rack.
+- Undo (the last 500 presses, kept across a reload), Restart as an unscored replay after a reset, and Hint, which leaves the rack unscored.
+- With presses on the rack, a new model or size only chooses the next rack, and New Game or N needs a second press within 4 s. The prompt names the rack that would be thrown away.
+- Saves in `rkr-state` (the rack in play) and `rkr-best` (fewest presses over par and racks cleared per model and size) that fall back field by field. A newer game from another tab is taken over before a press, an Undo, a Hint, a Restart or a new rack, and bests from two tabs are merged.
+- A storage warning that names the keys and the error, says what a reload will show (the last save when storage is full, a new rack when it is blocked) and how to fix it. Toasts use the full phone width, dark text on green for results and amber for refusals.
+
+#### Tests
+- `tests/rack-reset.test.js`, 45 tests, 100 % line, branch and function coverage of `rack-reset/script.js`:
+  - The solver against an independent GF(2) model and brute force, the pinned null-space dimension of every offered pair, the solver's answer clearing 240 seeded racks, and the par floor for every pair, including the fallback.
+  - Literal `rkr-state` and `rkr-best` samples written back byte for byte, field-by-field fallbacks, and a history shortened by the 500-press cap kept across a reload.
+  - The page booted from `index.html`: keys and focus filters, the second-press confirmation before a rack with presses is thrown away, toasts that keep their full time and go with their rack, second tabs, corrupt, blocked and full storage, contrast of small text and toasts, and the 320-1440 px layout.
+
+### Regex Par
+
+#### Added
+- New game `regex-par/` (prefix `rxp`): golf with regular expressions. Each of 18 original holes, made from real log and config lines (nginx, crontab, dmesg, df -h, journald, docker-compose, ip link, ss, git, blkid and others), lists lines to catch and lines to leave. One pattern has to catch every Catch line and no Leave line. Every character is a stroke against the hole's par.
+- Live colouring of every line while typing, with the matched part marked. An invalid pattern shows the engine's error text. Enter or Hole out scores the hole. Prev, Next and an 18-hole scorecard move between holes, and each hole keeps its draft.
+- A round card with a total, the shortest pattern per hole and the best round. New round asks for a second press within 4 s and keeps the bests.
+- Patterns run in a Web Worker made from a Blob, which is terminated after 300 ms and replaced by a fresh worker that first answers a test pattern. While a check is out, the lines stay dimmed and the status says it is checking.
+- When no worker can start (no Worker constructor, a CSP that blocks blob:, an error event, or no answer within 2 s), patterns run on the main thread. Patterns and lines are limited to 60 characters, and a static check counts the most backtracking steps a pattern can take on a line. A pattern over 1,500,000 steps is refused, and the refusal names the part at fault and the count. The mode in use is always shown.
+- Phones: chips for \d \w . * + ? [] () | ^ $ {} and a short live count just above the pattern box. A chip inserts at the caret through insertText where the browser has it, so undo works, and never takes the pattern past 200 characters.
+- Toasts in green (holed), red (refusals and misses) and blue (notes), each with at least 4.5:1 contrast.
+- Saves in `rxp-state` (hole, round, drafts, card) and `rxp-best` (best pattern per hole, best round). Both are parsed field by field and survive blocked or full storage with a warning that names the key. They are merged with another tab's newer round, card entries and shorter bests before every write and on the storage event.
+
+#### Tests
+- `tests/regex-par.test.js`, 54 tests:
+  - The course, with a plain-code reading of each hole's task checked against every line, and reference solutions within par kept only in the test.
+  - The main-thread step count against a test-side backtracking matcher (exact on lines where every atom matches, never lower on real lines). The refusals of known freezing patterns. A child process, killed after 120 s, times about 1,000 accepted fuzz patterns over all holes and worst-case lines.
+  - The page booted from `index.html` with a Worker stub for the working, failing and timed-out cases. Keys, chips, toasts, saves in every damaged form, second tabs and a reload round trip.
+  - Source checks: ids, the `rxp` prefix, ES5 and the IIFE, embed safety, CSS rules for every class, contrast and the 320-1440 px layout.
+  - Passes on Node 24 and Node 20.17.
+- 100 % line, branch and function coverage of `regex-par/script.js`.
+
+### Uptime Idle
+
+#### Added
+- New idle game `uptime-idle/` (prefix `upi`, new genre Simulation): an old laptop under the desk runs a DNS filter and earns uptime credits. Credits buy services (DNS filter, backup server, photo archive, media server, build farm) that earn per second and take a slot. They also buy hardware (mini PC, NAS, virtualization node) that gives slots and takes one of 8 desk places, server racks with 16 more places, and upgrades (RAID mirror, UPS, three cooling levels). Each copy costs 15% more than the one before.
+- A power bill on everything: watts x hours x price per kWh / 1000, the formula of the Homelab Power Cost Calculator (named in plain text, no link), times the PUE of the cooling. A machine that would bring the net income without incidents to 0 or below is refused, naming the values. A damaged save that holds a lab that cannot earn powers machines off, most watts first, until it earns.
+- Incidents from a seeded mulberry32 PRNG kept in the save: a failed disk halves the income until Replace disk, a power outage stops income for 30 s, and a kernel update offers +50% income for 60 s after Reboot. A RAID mirror and a UPS absorb the first two.
+- A session goal of about 3 minutes of the current income, paying 90 seconds of it, so a 3-5 minute visit finishes one.
+- Offline progress at the net income for up to 8 hours, after a reload, a hidden tab or a computer that slept with the tab open (found by the next tick). The welcome-back line names the time away, the time counted and the cap. Saves carry a high-water mark of the clock: a clock set back counts nothing until it passes the last save again, so setting the clock forwards and back pays the cap once.
+- Migrate to a new rack with a server rack and 300.0M cr earned in the run. It needs a second press between 400 ms and 4 s after the first, and turns the run's earnings into rack points worth +2% income each, for good.
+- Keys 1-9 buy the nine services and hardware items while the focus is in the game. Host-page fields, Ctrl/Alt/Meta and held keys are left alone, and a held Enter or Space on a game button clicks once.
+- Saves in `upi-state` and `upi-stats`, written every 5 s and after every action. Every field is parsed on its own, and blocked or full storage shows a warning naming the key. A second tab's newer save is taken over, with a toast only when that tab bought or migrated.
+
+#### Tests
+- `tests/uptime-idle.test.js` with 54 tests: the pure economy against an independent model, including power refusals, save repair and offline gain. Pacing simulations pin the first purchase, the first rack, the migration, the power share every minute and an idle lab that never overflows. Saves are checked field by field with a sample save written back byte for byte. The page is booted from `index.html` with mocked timers and Date.now to cover keys and focus, held keys, the migrate confirmation, incidents, hidden tabs, sleep gaps, clock round trips, reloads, storage failures and second tabs. Source checks cover ids, prefix, ES5, embed safety, CSS classes, button contrast and the 320-1440 px layout.
+- 100% line, branch and function coverage of `uptime-idle/script.js`; the module also passes on Node 20.17.
+
 ## [2026-11-05] - Seven new games
 
 Seven games join the collection, each in its own folder with the usual three plain files, its own

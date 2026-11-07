@@ -1,0 +1,723 @@
+/* Byte Catcher — style.css
+   Namespace: byc- (byte catcher)
+   All selectors use the byc- prefix to avoid conflicts with host page styles.
+   The console (queue, prompt, entry, pads and the status line) has no
+   scroll box of its own: on a 320 px phone every pad fits the width in
+   equal columns, the queue keeps five 44 px slots, a slot fits one line
+   (the "to" column is left out on phones), and the whole console with its
+   tallest pad and two lines of status fits a 568 px tall screen, so the
+   reason for a drop or a CRC error is in view while playing.  Buttons with
+   two lines of content are flex columns, so they do not centre a block of
+   text on their own. */
+
+.byc-wrapper {
+  --byc-bg-primary: #0a0f1e;
+  --byc-bg-secondary: #111827;
+  --byc-bg-card: #1a2236;
+  --byc-bg-input: #0d1424;
+  --byc-border: #2a3a5c;
+  --byc-border-focus: #3b82f6;
+  --byc-text-primary: #e2e8f0;
+  --byc-text-secondary: #94a3b8;
+  --byc-text-muted: #64748b;
+  --byc-accent-blue: #3b82f6;
+  --byc-accent-cyan: #22d3ee;
+  --byc-accent-green: #10b981;
+  --byc-accent-amber: #f59e0b;
+  --byc-accent-red: #ef4444;
+  --byc-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --byc-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --byc-radius: 8px;
+  --byc-key-height: 44px;
+  --byc-slot-height: 44px;
+
+  font-family: var(--byc-font-sans);
+  color: var(--byc-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--byc-bg-primary) 0%, var(--byc-bg-secondary) 100%);
+}
+
+.byc-wrapper *,
+.byc-wrapper *::before,
+.byc-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────────── */
+
+.byc-header {
+  margin-bottom: 18px;
+}
+
+.byc-title {
+  margin: 0;
+  font-family: var(--byc-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--byc-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+.byc-subtitle {
+  margin: 6px 0 0;
+  max-width: 560px;
+  color: var(--byc-text-secondary);
+  font-size: 0.92rem;
+}
+
+.byc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.byc-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.byc-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--byc-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.byc-select {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: var(--byc-bg-input);
+  border: 1px solid var(--byc-border);
+  border-radius: 6px;
+  color: var(--byc-text-primary);
+  font-family: var(--byc-font-mono);
+  font-size: 0.9rem;
+}
+
+.byc-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.byc-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--byc-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.byc-btn:hover {
+  background: #2563eb;
+}
+
+.byc-btn:active {
+  transform: scale(0.97);
+}
+
+.byc-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.byc-btn:focus-visible,
+.byc-select:focus-visible,
+.byc-help-title:focus-visible,
+.byc-key:focus-visible,
+.byc-slot:focus-visible {
+  outline: 2px solid var(--byc-accent-cyan);
+  outline-offset: 2px;
+}
+
+.byc-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--byc-border);
+  color: var(--byc-text-secondary);
+}
+
+.byc-btn--secondary:hover {
+  background: var(--byc-bg-secondary);
+  color: var(--byc-text-primary);
+}
+
+/* Stat values wrap instead of being cut off or widening their card. */
+.byc-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.byc-stat {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--byc-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.byc-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--byc-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.byc-stat-value {
+  display: block;
+  font-family: var(--byc-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--byc-accent-green);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ── The console ─────────────────────────────────────────────────────────── */
+
+.byc-console {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid #1f3a35;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #0f1a2c, #0a111f);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(148, 163, 184, 0.08);
+  font-family: var(--byc-font-mono);
+}
+
+.byc-console:focus {
+  outline: none;
+}
+
+.byc-console:focus-visible {
+  outline: 2px solid var(--byc-accent-cyan);
+  outline-offset: 2px;
+}
+
+.byc-console--ready .byc-queue,
+.byc-console--paused .byc-queue,
+.byc-console--over .byc-queue {
+  opacity: 0.6;
+}
+
+.byc-console--running {
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.byc-console--paused {
+  border-color: rgba(245, 158, 11, 0.55);
+}
+
+.byc-console--over {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.byc-console--ready {
+  border-style: dashed;
+}
+
+/* min-height: a line that wraps (a large text size) pushes the queue down
+   instead of running over its first slot. */
+.byc-iface-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 18px;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  color: var(--byc-text-secondary);
+}
+
+.byc-iface {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+/* The link LED: grey idle, green up, amber after a drop, red when down. */
+.byc-link {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--byc-text-muted);
+}
+
+.byc-link--idle {
+  background: var(--byc-text-muted);
+}
+
+.byc-link--up {
+  background: var(--byc-accent-green);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  animation: byc-blink 1.2s steps(2, start) infinite;
+}
+
+.byc-link--warn {
+  background: var(--byc-accent-amber);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+}
+
+.byc-link--down {
+  background: var(--byc-accent-red);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+
+/* ── The ingress queue ───────────────────────────────────────────────────── */
+
+.byc-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* A slot is a button with a line and a TTL bar under it. */
+.byc-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--byc-slot-height);
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid var(--byc-border);
+  border-radius: 6px;
+  background: var(--byc-bg-input);
+  color: var(--byc-text-primary);
+  font-family: var(--byc-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.byc-slot--empty {
+  cursor: default;
+  border-style: dashed;
+  color: var(--byc-text-muted);
+}
+
+.byc-slot--sel {
+  border-color: var(--byc-accent-cyan);
+  background: #0d2233;
+  box-shadow: inset 3px 0 0 var(--byc-accent-cyan);
+}
+
+.byc-slot--low .byc-slot-fill {
+  background: var(--byc-accent-red);
+  animation: byc-pulse 0.6s ease-in-out infinite alternate;
+}
+
+.byc-slot--low .byc-slot-ttl {
+  color: var(--byc-accent-red);
+}
+
+/* One line at every width from 320 px (the test measures it); a longer
+   value than any packet carries would wrap rather than widen the page. */
+.byc-slot-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.byc-slot-seq {
+  flex: none;
+  color: var(--byc-text-muted);
+}
+
+.byc-slot-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--byc-accent-green);
+  overflow-wrap: anywhere;
+}
+
+.byc-slot--empty .byc-slot-value {
+  color: var(--byc-text-muted);
+  font-weight: 400;
+}
+
+.byc-slot-to {
+  flex: none;
+  color: var(--byc-text-secondary);
+}
+
+.byc-slot-ttl {
+  flex: none;
+  margin-left: auto;
+  color: var(--byc-accent-cyan);
+}
+
+.byc-slot-bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: #1b263d;
+}
+
+.byc-slot-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--byc-accent-green);
+  transition: width 0.1s linear;
+}
+
+/* ── Prompt, entry and pads ──────────────────────────────────────────────── */
+
+/* The prompts are one line on a 320 px phone (the test measures them), and
+   one line is kept, so the pads never jump. */
+.byc-prompt {
+  min-height: 1.4em;
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--byc-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.byc-entry {
+  height: 34px;
+  margin: 4px 0 6px;
+  padding: 0 10px;
+  border: 1px solid var(--byc-border);
+  border-radius: 6px;
+  background: #050912;
+  color: var(--byc-accent-cyan);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.byc-pad {
+  display: grid;
+  gap: 5px;
+}
+
+.byc-pad--bits {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.byc-pad--grid {
+  grid-template-columns: 28px repeat(3, minmax(0, 1fr));
+  grid-auto-rows: var(--byc-key-height);
+}
+
+.byc-pad--octets {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.byc-pad--digits {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.byc-grid-head {
+  align-self: center;
+  color: var(--byc-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* A pad key: its label over the key that presses it. */
+.byc-key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: var(--byc-key-height);
+  margin: 0;
+  padding: 2px;
+  border: 1px solid var(--byc-border);
+  border-radius: 6px;
+  background: var(--byc-bg-card);
+  color: var(--byc-text-primary);
+  font-family: var(--byc-font-mono);
+  line-height: 1.1;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.byc-key:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.byc-key--on {
+  border-color: var(--byc-accent-green);
+  background: #0f3a2e;
+  color: #d1fae5;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+}
+
+.byc-key--bit .byc-pad-label,
+.byc-key--octet .byc-pad-label {
+  font-size: 0.9rem;
+}
+
+.byc-key--perm .byc-pad-label,
+.byc-key--digit .byc-pad-label {
+  font-size: 1.05rem;
+}
+
+.byc-pad-label {
+  display: block;
+  font-weight: 700;
+}
+
+/* The key that presses a pad key: at least 4.5:1 on a key, lit or not. */
+.byc-pad-key {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--byc-text-secondary);
+}
+
+.byc-key--on .byc-pad-key {
+  color: #a7f3d0;
+}
+
+.byc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.byc-btn--action {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+}
+
+/* ── Status, help, toast ─────────────────────────────────────────────────── */
+
+/* The status line at the foot of the console: the last forward, drop, CRC
+   error or refusal.  Two lines are kept; a longer message grows the console
+   at its foot, below everything that is tapped. */
+.byc-status {
+  min-height: 2.6em;
+  margin: 6px 0 0;
+  padding: 0 2px;
+  color: var(--byc-accent-green);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.byc-status-panel {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.byc-warning {
+  display: block;
+  margin-top: 10px;
+  color: var(--byc-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.byc-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--byc-border);
+  border-radius: var(--byc-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--byc-text-secondary);
+  font-size: 0.85rem;
+}
+
+.byc-help-title {
+  cursor: pointer;
+  color: var(--byc-text-primary);
+  font-weight: 600;
+}
+
+.byc-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.byc-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--byc-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.byc-toast.byc-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.byc-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--byc-text-muted);
+  font-size: 0.8rem;
+}
+
+.byc-hidden {
+  display: none;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes byc-blink {
+  50% { opacity: 0.4; }
+}
+
+@keyframes byc-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.45; }
+}
+
+@media (hover: hover) {
+  .byc-key:hover:not(:disabled),
+  .byc-slot:hover:not(:disabled) {
+    border-color: #33507f;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .byc-btn,
+  .byc-toast,
+  .byc-slot-fill {
+    transition: none;
+  }
+
+  .byc-link--up,
+  .byc-slot--low .byc-slot-fill {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .byc-wrapper {
+    padding: 20px 12px;
+  }
+
+  .byc-title {
+    font-size: 1.6rem;
+  }
+
+  .byc-toolbar {
+    align-items: stretch;
+  }
+
+  .byc-control,
+  .byc-toolbar-actions {
+    width: 100%;
+  }
+
+  .byc-select {
+    width: 100%;
+  }
+
+  .byc-toolbar-actions .byc-btn {
+    flex: 1 1 0;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .byc-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .byc-console {
+    padding: 6px;
+  }
+
+  .byc-status {
+    font-size: 0.72rem;
+  }
+
+  .byc-pad--bits {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .byc-slot {
+    padding: 4px 8px;
+  }
+
+  /* The prompt names what the selected packet is encoded to. */
+  .byc-slot-to {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .byc-wrapper {
+    padding: 16px 8px;
+  }
+
+  .byc-slot-line {
+    gap: 8px;
+  }
+
+  .byc-stat {
+    padding: 6px 7px;
+  }
+
+  .byc-stat-value {
+    font-size: 0.92rem;
+  }
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regex Par — Logs from VahaC</title>
+  <meta name="description" content="Regex Par: golf with regular expressions on 18 holes made from real nginx, syslog, cron, docker and network logs. Catch every line on one list and none on the other in as few characters as you can, against each hole's par. Patterns run in a Web Worker sandbox. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="rxp-wrapper">
+
+  <header class="rxp-header">
+    <div class="rxp-title-group">
+      <h1 class="rxp-title">Regex Par</h1>
+      <p class="rxp-subtitle">Golf with regular expressions on lines from real logs and configs: catch every line under Catch and none under Leave. Every character of your pattern is a stroke.</p>
+    </div>
+
+    <div class="rxp-header-actions">
+      <button id="rxp-new-round" class="rxp-btn rxp-btn--secondary" type="button" aria-label="Start a new round with a clean card">New round</button>
+    </div>
+  </header>
+
+  <section class="rxp-scorecard" aria-label="Scorecard">
+    <div id="rxp-card" class="rxp-card" role="group" aria-label="Holes 1 to 18: pick one to play it"></div>
+    <div class="rxp-course-line">
+      <span id="rxp-course" class="rxp-course">Round 1: no hole holed yet.</span>
+      <span id="rxp-best-course" class="rxp-best-course">Best round: --</span>
+    </div>
+  </section>
+
+  <main class="rxp-main">
+    <section class="rxp-hole" aria-label="The hole">
+      <div class="rxp-hole-head">
+        <span id="rxp-hole-number" class="rxp-hole-number">Hole 1 of 18</span>
+        <span id="rxp-par" class="rxp-par">Par</span>
+      </div>
+      <h2 id="rxp-hole-title" class="rxp-hole-title">Loading the course...</h2>
+      <p class="rxp-hole-meta">Lines from <code id="rxp-hole-source" class="rxp-hole-source">a log</code></p>
+      <p id="rxp-hole-task" class="rxp-hole-task"></p>
+    </section>
+
+    <section class="rxp-tee" aria-label="Your pattern">
+      <label class="rxp-label" for="rxp-pattern">Pattern (no flags: matching is case-sensitive)</label>
+      <div id="rxp-chips" class="rxp-chips" role="group" aria-label="Insert a regex token at the caret"></div>
+      <p id="rxp-live" class="rxp-live" aria-hidden="true"></p>
+      <div class="rxp-input-row">
+        <span class="rxp-slash" aria-hidden="true">/</span>
+        <input id="rxp-pattern" class="rxp-input" type="text" maxlength="200" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="your regex" aria-describedby="rxp-status">
+        <span class="rxp-slash" aria-hidden="true">/</span>
+      </div>
+      <div class="rxp-stroke-line">
+        <span id="rxp-strokes" class="rxp-strokes">0 strokes</span>
+        <span id="rxp-score" class="rxp-score"></span>
+        <span id="rxp-best-hole" class="rxp-best-hole">Best: --</span>
+      </div>
+      <div class="rxp-nav">
+        <button id="rxp-prev" class="rxp-btn rxp-btn--secondary" type="button" aria-label="Previous hole">← Prev</button>
+        <button id="rxp-submit" class="rxp-btn" type="button" aria-label="Hole out: score this pattern">Hole out</button>
+        <button id="rxp-next" class="rxp-btn rxp-btn--secondary" type="button" aria-label="Next hole">Next →</button>
+      </div>
+      <p id="rxp-status" class="rxp-status" aria-live="polite">Loading the course...</p>
+      <p id="rxp-sandbox" class="rxp-sandbox">Sandbox: starting...</p>
+    </section>
+
+    <section class="rxp-lists" aria-label="Test lines">
+      <div class="rxp-list-box rxp-list-box--match">
+        <h3 class="rxp-list-title">Catch <span id="rxp-match-count" class="rxp-count"></span></h3>
+        <ul id="rxp-match-list" class="rxp-list"></ul>
+      </div>
+      <div class="rxp-list-box rxp-list-box--skip">
+        <h3 class="rxp-list-title">Leave <span id="rxp-skip-count" class="rxp-count"></span></h3>
+        <ul id="rxp-skip-list" class="rxp-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <div id="rxp-warning" class="rxp-warning rxp-hidden" role="alert"></div>
+
+  <details class="rxp-help">
+    <summary class="rxp-help-title">How to play</summary>
+    <ul class="rxp-help-list">
+      <li>Each hole has lines to catch and lines to leave, taken from logs and configs. Write one regular expression that matches somewhere in every line under Catch and in none under Leave.</li>
+      <li>Every character is a stroke. Par is the length of a good solution: fewer strokes is a birdie (-1) or an eagle (-2), more is a bogey (+1).</li>
+      <li>The lines turn green or red while you type, and the part your pattern matches is marked. An invalid pattern shows the engine's error and nothing else happens.</li>
+      <li>Enter, or Hole out, scores the pattern. The first pattern that holes a hole goes on this round's card; a shorter one later still sets the hole's best. Prev, Next and the card move between holes, and every hole keeps its draft.</li>
+      <li>Complete all 18 holes for a round total. New round clears the card and the drafts and keeps your bests.</li>
+      <li>On a phone the chips just above the pattern box insert the tokens the keyboard hides, at the caret, and the short count just above the box shows how many lines pass while the keyboard is open.</li>
+      <li>Patterns run in a Web Worker that is stopped after 300 ms, so a runaway pattern such as (a+)+$ cannot freeze the page. Where the page cannot start a worker, patterns run on the page itself: up to 60 characters, and a pattern that could take more than 1,500,000 backtracking steps on a line, such as (a+)+, (a|a)* or (.?){20}, is refused before it runs. The line under the buttons says which mode is on.</li>
+      <li>Want to see why a pattern matches? Paste it into the Regex Tester in the Tools section.</li>
+    </ul>
+  </details>
+
+  <div id="rxp-toast" class="rxp-toast" aria-live="polite"></div>
+
+  <footer class="rxp-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

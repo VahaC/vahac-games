@@ -247,26 +247,34 @@ and localStorage key of a game (`.{p}-wrapper`, `#{p}-board`, `{p}-state`).
 
 | Prefix | Game                 | Folder                  | Status |
 |--------|----------------------|-------------------------|--------|
+| `bds`  | Bad Sector           | `bad-sector/`           | Built  |
 | `bmd`  | Bitmap Decoder       | `bitmap-decoder/`       | Built  |
+| `byc`  | Byte Catcher         | `byte-catcher/`         | Built  |
+| `dfg`  | Defrag               | `defrag/`               | Built  |
 | `ffl`  | Flip-Flop            | `flip-flop/`            | Built  |
 | `hcr`  | Hash Cracker         | `hash-cracker/`         | Built  |
+| `liv`  | Lost in /var         | `lost-in-var/`          | Built  |
 | `msp`  | Minesweeper Game     | `minesweeper/`          | Built  |
 | `ocs`  | On-Call Shift        | `oncall-shift/`         | Built  |
+| `pdp`  | Pod Packer           | `pod-packer/`           | Built  |
 | `pkn`  | Port Knocker         | `port-knocker/`         | Built  |
 | `ppn`  | Patch Panel          | `patch-panel/`          | Built  |
+| `rkr`  | Rack Reset           | `rack-reset/`           | Built  |
+| `rxp`  | Regex Par            | `regex-par/`            | Built  |
 | `rxt`  | Reaction Time Test   | `reaction-time/`        | Built  |
 | `sdk`  | Sudoku Game          | `sudoku/`               | Built  |
 | `snp`  | Snake Game           | `snake-game/`           | Built  |
 | `swp`  | Swap Space Solitaire | `swap-space-solitaire/` | Built  |
 | `tf8`  | 2048 Game            | `2048-game/`            | Built  |
 | `tst`  | Typing Speed Test    | `typing-speed-test/`    | Built  |
+| `upi`  | Uptime Idle          | `uptime-idle/`          | Built  |
 | `wrd`  | Cyberpunk Wordle     | `wordle-game/`          | Built  |
 
 ## Prefixes already used by vahac-tools
 
 Games and tools run on the same vahac.com origin and share one localStorage, so a new game must
 not reuse a tool prefix either. These are the 39 prefixes in the vahac-tools registry (checked
-against each tool folder's `.{p}-wrapper` in `style.css` on 2026-11-04):
+against each tool folder's `.{p}-wrapper` in `style.css` on 2026-11-06):
 
 `b64`, `brp`, `bsc`, `chm`, `cjs`, `crl`, `crn`, `csh`, `dcv`, `drc`, `egp`, `fvg`, `hav`, `hpc`, `hsg`, `icr`, `isc`, `jsf`, `jwt`, `lxi`, `mtx`, `ogm`, `pwg`, `rbt`, `rgx`, `sdr`, `sla`, `snc`, `tdf`, `tdl`, `ucb`, `urc`, `uts`, `vcg`, `wgc`, `wqr`, `yjt`, `zrc`, `zwc`
 

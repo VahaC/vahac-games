@@ -3,7 +3,7 @@
 A collection of standalone browser games by Vahac. Each game is implemented with plain HTML, CSS, and JavaScript, so it can run locally without a backend. The Games section on vahac.com is currently private, so the page below opens only for a logged-in site editor until the section goes public.
 
 Documentation status:
-- Last updated: 2026-11-05 (seven new games and two new genres)
+- Last updated: 2026-11-06 (eight new games and a new genre)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -16,31 +16,42 @@ Games are grouped by genre, the same groups the index page (`index.html`) uses.
 - `bitmap-decoder/` - Bitmap Decoder: nonograms whose clues are run-length encoding, with a daily 10x10 icon from a library of 55 original icons (one scored attempt per day, a streak and a share line), Endless 5x5, 10x10 and 15x15 boards that line logic alone solves, drag painting, a timer, the best time per size and auto save to localStorage.
 - `minesweeper/` - neon Minesweeper with Easy (9x9, 10 mines), Medium (14x14, 35) and Hard (18x18, 65) boards, a safe first click, right-click flags, flood reveal, a timer, the best time per difficulty and auto save to localStorage.
 - `patch-panel/` - Patch Panel: turn patch-cord tiles until every server, NAS and access point on the rack links up to the core switch with no loops or dangling cables, on 5x5, 7x7 and 9x9 boards with a wrap mode whose rim marks show where cables cross to the opposite edge, tile locks, a rotation target, the best time and rotations per board, a shared 7x7 Daily with a streak and auto save to localStorage.
+- `rack-reset/` - Rack Reset: press alarm LEDs on a rack's front panel until every row register reads 0, where each of six rack models flips the LEDs under its own 3x3 toggle mask written in hex, on 3x3 to 6x6 racks with an honest par from a built-in GF(2) solver, hints, undo, restart, the best presses over par per model and size and auto save to localStorage.
 - `sudoku/` - classic 9x9 Sudoku with a freshly generated puzzle every game, hints, restart and auto save to localStorage.
 
 ### Word
 
+- `regex-par/` - Regex Par: write one regular expression per hole that catches every Catch line and no Leave line, on 18 original holes made from real log and config lines (nginx, cron, dmesg, df, journald, docker-compose, ip link, ss, git, blkid), each character a stroke against par, with a scorecard, a best pattern per hole and a best round, patterns checked in a Web Worker with a 300 ms timeout (or on the main thread behind a static step limit when the page blocks workers), token chips for phones and auto save to localStorage.
 - `wordle-game/` - Cyberpunk Wordle: guess a hidden five-letter word in six tries, with tiles coloured green, amber or grey, a physical or on-screen keyboard, a round timer, a win counter and auto save to localStorage.
 
 ### Arcade
 
+- `bad-sector/` - Bad Sector: a brick breaker on an unrolled hard-disk platter: bounce the read head off the carriage through fragmented tracks of plain, bad (2-3 hits) and read-only sectors that flash their LBA when broken, with RAID1, ECC and SLOW-SEEK bonuses, SMART lives, faster tracks, a seeded Daily disk with one scored attempt, a streak and a share line, and auto save to localStorage.
 - `oncall-shift/` - On-Call Shift: a 3-minute night on call on a rack of twelve servers; fix each incident (cleanup, restart, scale or renew) before its SLA runs out, stop cascades from failed databases, and get an uptime score in nines and a postmortem; the shift, the best uptime per level and the last 5 shifts are saved in localStorage.
 - `snake-game/` - Snake on a 30x30 canvas grid: eat energy nodes for 10 points each, avoid the walls and your own tail, pick one of four speeds, and keep the saved game after a reload.
 
 ### Reflex and Typing
 
+- `byte-catcher/` - Byte Catcher: a router console where queued packets carry a value and a TTL; encode each one (DEC/HEX to 8 bits in Warm-up, prefix length to mask octets and back in CIDR, the 3x3 rwx grid to octal and back in chmod) before it is dropped; three drops end the run, and auto save to localStorage.
 - `reaction-time/` - reaction time test: wait for the neon signal, then click, tap or press Space; four difficulty delay windows, false-start detection, current/best/average times and a summary after 10 rounds, saved in localStorage.
 - `typing-speed-test/` - 60-second typing test on a random Easy, Medium or Hard sentence, with per-character highlighting, live WPM (correct characters / 5 per minute) and accuracy, and the best WPM of finished rounds and the difficulty saved in localStorage.
 
 ### Memory and Logic
 
+- `defrag/` - Defrag: tap a track, then another, to move the top fragment of a file onto an empty track or the same file until every file lies in one unbroken run, on 6 to 9 tracks of 4 or 5 blocks with files of different sizes and fixed system blocks, the fragmentation percentage as the live score, a par (an upper bound), a solver hint and dead-end warning, numbered levels 1-999 with the fewest moves per level, a shared Daily with a streak and auto save to localStorage.
 - `hash-cracker/` - Hash Cracker: crack an Easy (4 different digits), Normal (4 different hex symbols) or Hard (5 hex symbols, repeats allowed) key in 10 attempts from HIT and NEAR counts, with a live key-space counter in keys and bits, an on-screen hex keypad, wins, losses and streaks per mode, and auto save to localStorage.
+- `pod-packer/` - Pod Packer: a cluster scheduling puzzle (tap a pod, then a node) with CPU and RAM bars, anti-affinity, taints and tolerations, a draining node, an exact node target, evictions and moves as the score, and 50 fixed levels saved in localStorage.
 - `port-knocker/` - Port Knocker: watch 4, 6 or 9 patch-panel ports flash a knock sequence and knock it back in Forward (FIFO), Reverse (LIFO) or Stride mode within a 3 s knock window, with a log line from round 5, a seeded Daily with one scored attempt, a streak and a share line, optional sound, and the best length per mode and panel size saved in localStorage.
 
 ### Board and Cards
 
 - `flip-flop/` - Flip-Flop: Reversi in 1s and 0s on a memory-dump board against a computer opponent (Easy, Normal or Hard; a plain JavaScript search, no AI service) or a friend on the same device, with popcount and hex scores, an XOR flip hint, undo and auto save to localStorage.
 - `swap-space-solitaire/` - Swap Space Solitaire: an open card solitaire with 8 cascades, 4 swap slots (free cells) and 4 /dev/sd* disks (foundations), two-tap moves, numbered deals you can replay, a daily deal, undo of up to 500 moves, win and daily streaks, and auto save to localStorage.
+
+### Simulation
+
+- `lost-in-var/` - Lost in /var: a fake shell on a broken server where real commands (ls, cd, pwd, cat, grep, tail, ps, df, kill, with pipes into grep and tail, Tab completion and history) find the cause of an incident. It has a tutorial case and two incidents (a disk filled by a looping export, a port held by the old release) that close only once the log lines naming the cause were on screen and the cause is stopped. It also has points per case (par, hints, wrong kills), command and name chips for phones, and auto save to localStorage.
+- `uptime-idle/` - Uptime Idle: an idle homelab game. An old laptop running a DNS filter earns uptime credits for services (DNS filter, backup server, photo archive, media server, build farm), hardware (mini PC, NAS, virtualization node, server rack) and upgrades (RAID mirror, UPS, cooling). It has a power bill of watts x hours x price per kWh, seeded incidents (failed disk, power outage, kernel update), a session goal sized for a 3-5 minute visit, offline progress up to 8 hours, migrations to a new rack for rack points, and auto save to localStorage.
 
 ### Other files
 
@@ -60,7 +71,21 @@ Features:
 - Undo of up to 10 moves, plus New Game and Restart buttons, a best score, and "You reached 2048!" and Game Over messages.
 - Saves the board and score (`tf8-2048-game`) and the best score (`tf8-2048-best-score`) to localStorage after every move and picks up where you left off after a reload.
 
-### 2) Bitmap Decoder
+### 2) Bad Sector
+
+Path:
+- `bad-sector/index.html`
+
+Features:
+- Each track is an unrolled platter laid out as a fragmented disk: files of plain sectors (1 hit) and bad sectors (2 or 3 hits, labelled with their LBA), single read-only sectors that never break, and free gaps. Sectors walled in by read-only ones are left out. Later tracks have more rows, more bad and read-only sectors and faster heads.
+- Physics is a fixed-step model at 120 steps a second with sub-steps of half the head's radius and a speed cap, so a fast head never passes through a thin sector. Where the head lands on the carriage sets its angle (up to 60 degrees), and a broken sector flashes its LBA address.
+- Bonuses fall from some sectors: RAID1 adds a mirrored second head (from the head's own spot when the mirrored spot is inside a sector or a walled-in pocket), ECC widens the carriage for 12 s and SLOW-SEEK runs the heads at 60 % for 10 s. A lost head shows on the SMART readout and the third one fails the drive.
+- Controls: the carriage follows the mouse; a finger drags it from anywhere on the platter, with no dead zone after a wall; a tap launches. Keys work only with the platter focused: Left/Right or A/D, Space launches, P pauses. The game pauses on Pause, P and a hidden tab, and resuming never runs piled-up frames.
+- A game set aside (the other view, a reload) keeps its heads in flight, the carriage and falling bonuses, and comes back paused where it was, so switching views never hands a lost head back. New disk and Practice drop a scored free scan only on a second press within 4 s.
+- The Daily disk is one track for everyone from the local date (shared Daily rule, #1 is 2026-11-01). It has one scored attempt written to `bds-daily` as it begins, resumed after a reload, a streak, an unscored Practice and a share line with a clipboard fallback. At local midnight the Daily button and the streak move to the new day.
+- Saves in `bds-state`, `bds-best` and `bds-daily`, parsed field by field. Blocked or full storage never stops the game and the warning names each key. A second tab never overwrites a newer Daily record or another tab's best. The platter scales from 320 px phones to desktops and fits the height of a landscape phone.
+
+### 3) Bitmap Decoder
 
 Path:
 - `bitmap-decoder/index.html`
@@ -74,7 +99,20 @@ Features:
 - The clock runs from the moment a puzzle is shown and pauses in a hidden tab. The best time is kept per size. At midnight the page shows the next Daily and the streak as of the new day.
 - Saves in localStorage: `bmd-state` (mode, Endless size, rules, tool and the Endless puzzle in progress), `bmd-best` (best time per size) and `bmd-daily` (today's attempt, written the moment it begins, and the streak). Every field falls back on its own. Saves from other tabs are taken over, and a page shown again (including from the back/forward cache) reads the saves back before writing.
 
-### 3) Cyberpunk Wordle
+### 4) Byte Catcher
+
+Path:
+- `byte-catcher/index.html`
+
+Features:
+- Three modes: Warm-up (DEC and HEX to the 8 bit toggles), CIDR (/26 to the four mask octets, a dotted mask to its prefix length) and chmod (an octal mode on a 3x3 rwx grid, rwxr-x--- to its octal digits)
+- An ingress queue of five packets, each with a TTL bar; a packet whose TTL runs out, or one that arrives at a full queue, is dropped, and the third drop takes the link down
+- Toggles forward the oldest queued packet they match; typed entries go to the selected packet and a wrong one is a CRC error that says what it means ("255.255.255.128 is /25, not /26") on the status line inside the console
+- Points are 10 plus the seconds of TTL left, times a combo of up to x4 for a clean streak; best score and most packets forwarded are kept per mode
+- The pace rises quickly over four minutes and slowly up to ten, with per-mode floors set by the taps a packet needs
+- Keys only while the focus is on the console (1-8 or A S D F J K L ; for bits, 1-9 for the grid and mask octets, digits, Enter, Backspace, Up/Down during a run, P); pauses on a hidden tab, comes back paused after a reload, and takes over a run another tab saved instead of writing over it
+
+### 5) Cyberpunk Wordle
 
 Path:
 - `wordle-game/index.html`
@@ -84,7 +122,21 @@ Features:
 - Type on the physical keyboard or tap the on-screen QWERTY keyboard with Enter and Backspace.
 - A round timer and a win counter; the current round, the timer and the wins are saved in localStorage under `wrd-state` and restored after a reload.
 
-### 4) Flip-Flop
+### 6) Defrag
+
+Path:
+- `defrag/index.html`
+
+Features:
+- A disk of 6 to 9 tracks (4 or 5 blocks each) holds the blocks of 4 to 8 files (.log, .iso, .db, .jpg ...). Tap a track to pick up its top fragment (every block of one file on top), then tap another to write it there: onto an empty track or onto the same file, only when the whole fragment fits. On phones a disk of more than five tracks stands on two shelves, so 9 tracks fit 320 px.
+- Twists: from level 3 files have different sizes, and from level 5 a system file (boot.sys, swap.sys) has a fixed block at the bottom of its own track. That block never moves and the track takes no other file. The fragmentation ("fragmentation 75% → 0%") falls with every merge.
+- Boards are made from the defragmented disk by legal reverse moves and kept only when the solver (an iterative-deepening search with a node cap, memoised on canonical states) proves the level's minimum number of moves. Par is the shortest route found, shown as an upper bound ("par ≤ 9").
+- Hint (H) shows the solver's next move and is counted once per disk state. After every move a dead-end check warns when no route is left and says how many moves to undo. Undo has no limit up to the last 500 moves. Restart, and Prev, Next or N on a level with moves made, ask for a second press within 3 s.
+- Numbered levels 1-999, each seeded from its number; the next one opens once the one before is defragmented, and the fewest moves per level are kept. Keys work only while the focus is in the game: 1-9 tracks, U undo, H hint, R restart, N next level, Escape puts a picked fragment back. A mouse click on a game button hands the keys to the disk.
+- The Daily is one disk for everyone (6 files on 8 tracks), seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload, a streak of consecutive Dailies and an unscored practice run. The share line names the moves, undos and hints, with a selected-text fallback when the clipboard is unavailable.
+- Saves the level game and the view (`dfg-state`), the highest level and fewest moves per level (`dfg-progress`) and the Daily attempt, result and streak (`dfg-daily`), each field checked on its own. A second open tab takes over a newer Daily, or a game of the same level that is further along, instead of overwriting it, and never erases another tab's best. Blocked or full storage shows a warning naming the keys.
+
+### 7) Flip-Flop
 
 Path:
 - `flip-flop/index.html`
@@ -100,7 +152,7 @@ Features:
 - Wins, losses and draws per CPU level under `ffl-stats`, re-read before each result so a second open tab never overwrites it
 - Blocked or full storage never stops the game, and a warning names each key that is not saved
 
-### 5) Hash Cracker
+### 8) Hash Cracker
 
 Path:
 - `hash-cracker/index.html`
@@ -112,7 +164,20 @@ Features:
 - New Game or another mode switches at once while no attempt is made. Otherwise a second press within 4 s gives the key up, which counts as a loss. After a win or loss, Enter starts the next key.
 - The game in progress (mode, key, attempts and the key being typed) is saved after every change under `hcr-state`. Wins, losses, the current streak and the best streak per mode are saved under `hcr-stats`. Both are restored after a reload, and a damaged save falls back field by field.
 
-### 6) Minesweeper Game
+### 9) Lost in /var
+
+Path:
+- `lost-in-var/index.html`
+
+Features:
+- Three cases kept as plain data. First shift is a tutorial whose eight steps teach ls, cat, cd, tail, grep, df, ps and kill. No space left: checkout fails because a looping export filled /. Address in use: release 42 cannot bind :8080 while the release 41 server still holds it.
+- A pure shell: ls -l -a -h, cd, pwd, cat, grep -i -n -v -r, tail -n, ps and ps aux (also ax, -ef, -e), df -h, and kill with -9, -TERM, -s, -n and -l, plus help and clear. It handles quotes, * and ? wildcards, and pipes into grep and tail. As in bash, every command of a pipeline runs in a subshell, so a cd there does not move the shell. Errors are worded like bash and name the path, process id or signal ("cat: /var/log/ngnix.log: No such file or directory").
+- An incident closes only when its evidence was on screen (the log lines that name the cause) and the cause is stopped, in any order. A guess from ps aux is not enough. There is no rm: rm, sudo and unknown commands answer like a shell, with a note.
+- Points per case: 100, minus 3 per command over par, 10 per hint and 25 per wrong process killed, at least 10. help and clear are free. A hint once seen stays seen after Restart case. The best score of each case is kept.
+- Keys work only in the command field: Enter runs, Up and Down browse the history, and Tab completes a command or path when the field is not empty (on an empty field Tab moves the focus on). On phones, command chips, chips for the paths and process ids in the last output, and the ↑, ↓, Tab and Run keys solve a case by taps alone. A chip clicked with a mouse or the keyboard gives the focus back to the field.
+- Saves each case's folder, kills, goals met, history, command count and hints (`liv-state`) and the best score per case (`liv-progress`). Every field falls back on its own, and blocked or full storage shows a warning naming the key. A second tab's sessions are taken over, with a note in the terminal of every case that changed, and scores from two tabs are merged, never lowered.
+
+### 10) Minesweeper Game
 
 Path:
 - `minesweeper/index.html`
@@ -122,7 +187,7 @@ Features:
 - Right-click flags with a live mine counter; an empty cell opens outward until it reaches numbered cells; a timer runs while you play.
 - The game, its timer and its result are saved in localStorage (`msp-save-state`) on every move and every second, so a reload brings back a game in progress with its clock running or a finished game as it ended; the best time is kept per difficulty (`msp-best-easy`, `msp-best-medium`, `msp-best-hard`).
 
-### 7) On-Call Shift
+### 11) On-Call Shift
 
 Path:
 - `oncall-shift/index.html`
@@ -135,7 +200,7 @@ Features:
 - Keyboard while the rack has the focus: 1 to 4 choose an action, the arrows move the cursor, Enter applies, Space pauses and Escape clears. The shift pauses when the tab is hidden.
 - Saved in localStorage: the shift in progress (`ocs-state`, which comes back paused after a reload), the best uptime per level (`ocs-best`) and the last 5 shifts (`ocs-history`).
 
-### 8) Patch Panel
+### 12) Patch Panel
 
 Path:
 - `patch-panel/index.html`
@@ -149,7 +214,21 @@ Features:
 - The Daily is a 7x7 board for everyone, seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload. Its clock runs while it is on screen. A solved Daily offers an unscored practice run, and the result line can be copied to share.
 - Saves the free game and the view (`ppn-state`), the best per board (`ppn-best`) and the Daily attempt, result and streak (`ppn-daily`) to localStorage. A second open tab takes over a newer Daily instead of overwriting it, and never erases another tab's best.
 
-### 9) Port Knocker
+### 13) Pod Packer
+
+Path:
+- `pod-packer/index.html`
+
+Features:
+- Tap a pending pod, then a node, or a pod already running on that node. With nothing picked, a tap on a running pod evicts it. Refusals name the values, for example "Insufficient memory: pod cache-1 needs 1.5 GiB, node-3 has 0.0 GiB free."
+- Rules arrive early: anti-affinity on level 2, a gpu taint with tolerations and a node selector on level 3, and a draining node on level 4. They combine from level 5 on. An eviction from the draining node is final, and Undo cannot put a pod back on it.
+- Score: nodes used against a target, which is the exact minimum found by a bounded branch-and-bound search; evictions and moves against their minimums. Undo counts like doing the opposite by hand.
+- 50 levels, each built constructively from the seed FNV-1a("pdp:level-N") through mulberry32, so every visitor gets the same levels and each one can be scheduled within its target under every rule it turns on.
+- CPU and RAM bars for every node fit a 320 px screen in one column; two columns from 720 px. Pods are 44 px tap targets on touch screens.
+- Keyboard with the focus on the cluster: arrows pick a pod, 1-6 run it on that node, E evicts, U undoes, N starts the next level, Escape clears the pick. The game's own buttons and the host page keep their keys.
+- Saves the level in progress (pdp-state) and the best moves and evictions per level (pdp-progress). A damaged field falls back on its own. Blocked or full storage shows a warning naming the key, and the warning goes away once a write works again. A second tab's newer game is taken over before any action, and progress from different tabs is merged.
+
+### 14) Port Knocker
 
 Path:
 - `port-knocker/index.html`
@@ -161,7 +240,20 @@ Features:
 - Daily: one sequence a day, the same for everyone (FNV-1a + mulberry32 from the local date), on 6 ports with the mode rotating Forward/Reverse/Stride. There is one scored attempt, recorded before its first show; a reload resumes it or shows the result. The streak counts consecutive Daily wins, Share copies a result line (or selects it in a field), and a finished Daily can be replayed unscored. A result stored by another tab always stands.
 - Saved in localStorage: the game on screen (`pkn-state`, a reload brings the round back waiting for Start), the best length per mode and panel size (`pkn-best`), the Daily attempt and streak (`pkn-daily`) and the sound switch (`pkn-sound`, off by default; WebAudio tones are optional).
 
-### 10) Reaction Time Test
+### 15) Rack Reset
+
+Path:
+- `rack-reset/index.html`
+
+Features:
+- Six rack models (RK-272 cross, RK-525 X-link, RK-070 row bus, RK-575 H-frame, RK-632 hook, RK-777 block), each with its own 3x3 toggle mask written as three hex digits and drawn as a small stencil above the rack, on 3x3, 4x4, 5x5 and 6x6 racks. Every row of LEDs is also shown as a hex register (0x1F), and the rack is reset when every register reads 0.
+- Racks are made by random presses from all-off, so every rack can be cleared. A rack that is empty or needs fewer than 3 presses (3x3) or 4 presses (4x4 and up) is drawn again. Par is the true minimum: Gaussian elimination over GF(2) that also handles singular matrices, plus a check of every solution in the null space. Only model and size pairs with at most 2^12 candidates are offered; the largest is the block on 5x5 with 512. A line under the rack shows the rank and the null-space dimension.
+- Tap or click an LED to press it. With the rack focused: arrows, Space/Enter, H hint, U undo, R restart, N new game. Ctrl/Alt/Meta combinations and keys typed elsewhere on the host page are left alone. A click on Undo, Hint, Restart or New Game hands the keys back to the rack.
+- Undo (the last 500 presses, kept across a reload), Restart to the rack's first state, and Hint, which marks one LED of a fewest-press reset from where the rack is now. A rack with a hint used, or replayed after it was reset, is not scored.
+- With presses on the rack, a new model or size only chooses the next rack, and New Game or N has to be pressed a second time within 4 s; the toast names the rack that would be thrown away.
+- Saves the rack in play (`rkr-state`) and the fewest presses over par and racks cleared per model and size (`rkr-best`) to localStorage. A second open tab takes over a newer game instead of playing on or dealing over it, and bests from two tabs are merged. Blocked or full storage shows a warning that names the keys, what a reload will show and how to fix it.
+
+### 16) Reaction Time Test
 
 Path:
 - `reaction-time/index.html`
@@ -171,7 +263,20 @@ Features:
 - The reaction time comes from `performance.now()`, rounded to ms; it shows the current, best and average time, the attempts and a session timer, and a "Session Complete" summary after 10 successful rounds. The session then stays finished, also after a reload, until Play Again, New Game or Restart; Start or Enter show the summary again.
 - Mouse (the press counts, not the release), touch and keyboard: Enter starts a round, also from the difficulty select, and Space reacts. Keys typed into other page fields, buttons or links are left alone. The difficulty, the stats and the session time are saved in localStorage under `rxt-reaction-state`. The session timer resumes after a reload, and an idle second tab never overwrites a newer save.
 
-### 11) Snake Game
+### 17) Regex Par
+
+Path:
+- `regex-par/index.html`
+
+Features:
+- 18 original holes made from real log and config lines: nginx 5xx and request times, crontab, dmesg OOM kills, df -h, app and JSON logs, auth.log, journalctl, docker-compose images, MAC addresses, ss -tlnp, HH:MM times, release tags, private IPv4, ISO dates, commit subjects and UUIDs. Each hole has a par, and every character of the pattern is one stroke (birdie, par, bogey ...).
+- Every line turns green or red while you type and the matched part is marked. An invalid pattern shows the engine's own error text and nothing else happens. Enter or Hole out scores the hole; Prev, Next and the 18-hole scorecard move between holes, and each hole keeps its draft.
+- Patterns run in a Web Worker made from a Blob, which is terminated after 300 ms and replaced by a fresh one. Where the page cannot start a worker (no Worker, or a Content Security Policy that blocks blob:), patterns run on the main thread with patterns and lines of up to 60 characters. A static check counts the most backtracking steps a pattern can take on a line and refuses anything over 1,500,000, naming the part at fault, such as (a+)+, (a|a)* or (.?){20}. The line under the buttons says which mode is on.
+- Phones: chips for \d \w . * + ? [] () | ^ $ {} sit just above the pattern box and insert at the caret (through the browser's insertText command where it exists, so undo takes a chip back), next to a short count such as '4/4 caught, 0/5 wrong'. A chip never takes the pattern past 200 characters.
+- The first pattern that holes a hole goes on this round's card; a shorter one later still sets the hole's best. All 18 holes give a round total and the best round. New round asks for a second press within 4 s, then clears the card and drafts and keeps the bests.
+- Saves the hole on screen, the round, the drafts and the card (`rxp-state`) and the shortest pattern per hole plus the best round (`rxp-best`) to localStorage, field by field. A second open tab's card, drafts, newer round and shorter bests are merged in, never written over.
+
+### 18) Snake Game
 
 Path:
 - `snake-game/index.html`
@@ -181,7 +286,7 @@ Features:
 - Four speeds (Easy 160 ms, Normal 120 ms, Hard 85 ms, Insane 60 ms per tick), a timer of the time the snake moves (pauses excluded) and a best score.
 - The whole game (snake, food, score, best score, timer, speed) is saved in localStorage under `snp-snake-state` and comes back after a reload: a running or paused game waits for the first key, and a finished game starts over with the best score and speed kept. With storage blocked the game still plays, just without saving.
 
-### 12) Sudoku Game
+### 19) Sudoku Game
 
 Path:
 - `sudoku/index.html`
@@ -191,7 +296,7 @@ Features:
 - Hint fills one empty or wrong cell from the solution, wrong digits turn red as you type, and Restart returns to the original puzzle. Any finished grid that follows the rules wins.
 - Progress is saved in localStorage under `sdk-sudoku-game` after every move that changes the board and comes back after a reload; the save is removed when you win, and a broken save is replaced by a fresh puzzle.
 
-### 13) Swap Space Solitaire
+### 20) Swap Space Solitaire
 
 Path:
 - `swap-space-solitaire/index.html`
@@ -204,7 +309,7 @@ Features:
 - Undo of up to 500 moves. Restart, Give Up and New Deal ask for a second press. A clock runs from the first move, and stats show page faults, won/played, streak and best.
 - Saves the tab and the numbered deal (`swp-state`), the stats (`swp-stats`) and the day's attempt and daily streak (`swp-daily`) in localStorage. A second open tab's newer save is taken over, never written over, and a finished daily stays finished.
 
-### 14) Typing Speed Test
+### 21) Typing Speed Test
 
 Path:
 - `typing-speed-test/index.html`
@@ -214,6 +319,20 @@ Features:
 - Live WPM (correct characters / 5 per minute) and accuracy, with each typed character marked green (correct) or red (wrong) and the next character highlighted.
 - A finished round is locked until New Game, Restart or a difficulty change; the live WPM is recomputed every second, so it falls while you pause.
 - The best WPM (the final WPM of a finished round: the text completed, or the 60 s run out, scored over the full minute) and the chosen difficulty are kept in localStorage under `tst-state`. A best saved by an older version came from the live reading and may be higher.
+
+### 22) Uptime Idle
+
+Path:
+- `uptime-idle/index.html`
+
+Features:
+- Services earn credits per second and take one slot each. A mini PC, a NAS or a virtualization node adds slots and takes a place on the desk (8) or in a server rack (16 each). Each copy costs 15% more than the one before.
+- A power bill on everything: watts x hours x price per kWh / 1000 (the formula of the Homelab Power Cost Calculator, named in plain text), times the PUE of the cooling level. A machine whose power would eat all of the income is refused, with the numbers.
+- Incidents from a seeded PRNG: a failed disk halves the income until Replace disk (a RAID mirror makes it harmless), a power outage stops everything for 30 s (a UPS rides it out), and a kernel update gives +50% income for 60 s after Reboot.
+- A session goal of about 3 minutes of income that pays 90 seconds of it as a bonus, so a short visit always gets somewhere.
+- Offline progress at the net income for up to 8 hours, after closing the tab, hiding it or putting the computer to sleep. A welcome-back line names the time counted and the cap. A clock set back counts nothing until it passes the last save again, so setting it forwards and back pays the cap only once.
+- Migrate to a new rack once a server rack and 300.0M cr earned in the run are reached (with a second press to confirm): the run's earnings become rack points, +2% income each, for good.
+- Keys 1-9 buy the services and hardware while the focus is in the game. Saves go to `upi-state` and `upi-stats` every 5 s and after every action, and a second tab's newer save is taken over, never overwritten.
 
 ## Local Usage
 
@@ -236,7 +355,7 @@ port 5175 (vahac-tools uses 5173), so both repositories can run side by side. `.
 ## Tests
 
 The repository ships with a test suite covering every game and the index
-page (765 tests across 17 modules: one per game, two for the Reaction Time
+page (1193 tests across 25 modules: one per game, two for the Reaction Time
 Test, `hub.test.js` for the index page and `_smoke.test.js` for the test
 harness), powered by the built-in Node.js test runner — no external
 dependencies required.
@@ -297,10 +416,23 @@ shows up as a test that has to change.
   reload round trip, every class, id, custom property and storage key
   prefixed tf8-, ES5 syntax and the start-up guard, embed safety, and no
   horizontal overflow from 320 to 1440 px.
+- Bad Sector (53 tests):
+  - Pure logic against independent models: the cell encoding, pruning against a flood fill on 500 random grids, 240 seeded tracks, wall, carriage and sector bounces, no tunnelling at the speed cap against a fine-stepped model, hits, bonuses, the RAID1 mirror spot (sectors, read-only pockets, margins), lost heads, the cleared track and LBA flashes that fade on finished tracks.
+  - The Daily: FNV-1a and mulberry32 reference values, the pinned disk of 2026-11-06, local day keys without a jump at DST changes, the streak, the share line, and which of two tabs' records wins.
+  - Saves: `bdsParseState`/`bdsParseDaily`/`bdsParseBest` field by field, including heads in flight, falling bonuses, speed and carriage.
+  - The page booted like a browser from `index.html`: listeners once, DOMContentLoaded, nothing under Node, focus-only keys (Ctrl/Alt/Meta, host fields, held keys), mouse and touch with a drag into a wall and back, Pause and hidden tabs with no piled-up frames, heads in flight kept paused through view switches, New disk and reloads, the confirmation for New disk and Practice, the Daily flow, midnight, second tabs, corrupt, blocked and full storage, and toasts that keep their 2.2 s.
+  - Source checks: ids, the `bds-` prefix everywhere, ES5 IIFE, embed safety, canvas text of at least 9 px on a 320 px phone, and the 320-1440 px layout plus landscape phones.
 - Bitmap Decoder (42 tests):
   - Pure logic: `bmdCluesOf` against an independent RLE; `bmdSolveLine` against brute force over every placement; `bmdSolveGrid` on unique, ambiguous and contradictory puzzles; every one of the 55 library icons distinct and solved by line logic alone; Endless generation (3x3 majority smoothing, mirroring, density bounds, reproducible from the PRNG, library fallback); the daily number across DST; FNV-1a and mulberry32 against their definitions; the icon cycle against a reference written in the test; time, countdown and midnight arithmetic across European and US DST changes; the share line, hex dump and ASCII art; Easy and Hard moves and `bmdHasMoves`; `bmdParseState`, `bmdParseDaily` and `bmdParseBest` field by field.
   - The page, booted like a browser from `index.html` with timers and Date mocked: a first visit writing the Daily at once, listeners bound once, taps, marks, drags, Easy mistakes and losses, a decoded Daily with streak and best time, the streak across gaps, a Daily left open across midnight, a finished Daily that shows the new day at midnight with exactly one midnight timeout, Endless New Game, sizes and practice restarts, rules that switch at once only on a puzzle with no moves, grid keys and filters, a clock that runs from the moment a puzzle is shown and pauses in a hidden tab, a reload round trip, takeover of other tabs' saves, a page shown again or restored from the back/forward cache that keeps a Daily won elsewhere (and keeps its own copy while storage writes fail), corrupt, partial and foreign saves, blocked and full storage, Copy result with clipboard fallbacks, toast timing, and the phone size choice that shows a saved 15x15 board.
   - Source checks: ids, the bmd prefix everywhere, ES5 syntax and the start-up guard, embed safety, and the 320–414 px layout.
+- Byte Catcher (52 tests):
+  - Converters checked against independent conversions for every byte, prefix 0-32 and all 512 modes; the toggle matching brute-forced over every byte
+  - The pace pinned as literal values and first-minute arrivals; players with think time plus a cost per tap last within the same band of minutes in every mode
+  - The save format pinned byte for byte, field-by-field fallbacks, corrupt, blocked and full storage, a second tab, reload round trip
+  - The page booted from index.html: key filters (help summary, Start and New run, pad keys, arrows only in a running run), held keys, hidden tab, writes only on a change, toasts keep their 2 s
+  - Source checks: ids, byc- prefix, ES5 IIFE, embed safety, CSS rules for every class, contrast of the key hints, and the 320-414 px layout with the console and its status line within 568 px
+  - 100% lines, branches and functions of `byte-catcher/script.js`.
 - Cyberpunk Wordle (52 tests): the embedded word list kept intact (701
   five-letter entries; the ethnic slur KRAUT was removed), the answer picked
   with `Math.random`, `wrdScoreGuess` colouring repeated letters by the
@@ -323,12 +455,26 @@ shows up as a test that has to change.
   once and on DOMContentLoaded, and the source checks: ids, the ES5 IIFE, the
   `wrd-` prefix, embed safety, the page background and keyboard rows that fit
   320-414 px.
+- Defrag (61 tests):
+  - Pure functions against an independent model: moves, reverse moves (brute force), fragments and fragmentation, the state key, and the solver against breadth-first search on random small disks. Levels 1-24 and five Dailies checked for legal scrambles, the minimum moves and par, levels 1-6 by breadth-first search and the larger ones (8 and 9 tracks, system files) by a search of the test's own.
+  - The Daily: FNV-1a and mulberry32 reference values, the pinned disk of 2026-11-06, local day keys counted without a jump at daylight saving changes, the streak, the share line with undos and hints, and which of two tabs' records wins (hints count as steps).
+  - Saves: `dfgParseState`/`dfgParseProgress`/`dfgParseDaily` field by field, including a move count below its own history.
+  - The page booted like a browser from `index.html`: listeners bound once, a script in the head waiting for DOMContentLoaded, taps, refusals that name the tracks and files, focus-only keys (Ctrl/Alt/Meta, held keys and host-page fields left alone), a mouse click on a button handing the keys to the disk, hints counted once, dead ends, wins and bests, the second press for Restart, Prev, Next and N.
+  - The Daily on the page, midnight, the clipboard fallback, second tabs for the Daily and for the level game (tap, storage event, the race between check and write), corrupt, blocked and full storage, the 500-move undo history.
+  - Source checks: ids, the dfg- prefix everywhere, ES5 syntax and the IIFE, embed safety, CSS rules for every class, the 320-1440 px layout and text contrast.
 - Flip-Flop (53 tests):
   - Rules and alpha-beta checked against an independent regex-based Reversi model and a plain minimax, with crafted pass, endgame and node-cap positions and level ordering.
   - The page booted from the real index.html, with listeners once, saves (current, corrupt, partial, blocked, full), the multi-tab stats merge, reload round trips, key and focus filters, the XOR preview after the CPU reply, and mocked timers and toasts.
   - Source checks for ids, prefix, ES5, embed safety and the 320–414 px layout.
   - 100% lines, branches and functions of `flip-flop/script.js`.
 - Hash Cracker (43 tests): HIT/NEAR checked against an independent count (repeats included), uniform keys from one draw per symbol, the pruned search against brute force and its exact step budget, the key-space trail (Hard counted only once few enough keys are left) and 10-attempt fairness. The page is booted from the real index.html: keypad and physical keys, refusals that name their values, win, loss and give-up with a 4 s confirmation, a newer toast keeping its full 2 s, and a live log that only appends each attempt's lines. Also covered: saves (current format byte for byte, corrupt, partial, blocked and full storage, stats from another tab), reload round trips, host-page key and focus filters, listeners once, and source checks (ids, hcr prefix, ES5, embed safety, 320-414 px layout, a toast as wide as its message, touch-action: manipulation on tap targets and none anywhere).
+- Lost in /var (62 tests):
+  - Pure shell logic against independent models: the parser against a bash-rule word splitter on 3000 seeded lines, paths against Node's POSIX resolver, ls -h/df -h sizes in exact integer arithmetic, and every folder of every case listed and Tab-completed against the case data.
+  - Every command, flag and error message: ls, cd, pwd, cat, tail, grep (closed folders under -r), ps (aux, ax, -ef, -e), df, kill (-SIG, -s, -n, -l), help, clear, unknown commands, rm and sudo. Also pipes, where a cd runs in a subshell and a kill still stops its process.
+  - Goals checked on the lines shown (pipes count, empty output does not). A bounded breadth-first search shows that no incident closes in fewer than 3 commands and that guessing from ps aux never closes one. The hinted path closes within par, and the evidence stays readable after the kill.
+  - Saves field by field, with a literal `liv-state` and `liv-progress` sample pinned byte for byte.
+  - The page booted like a browser from `index.html`: listeners bound once, the script waiting for DOMContentLoaded, taps alone solving a case, the chip focus for mouse, keyboard, pen and touch, and keys only in the field (Ctrl/Alt/Meta and host-page fields left alone). Also hints, wrong kills, records, and Restart keeping the hints it charges.
+  - Reloads, corrupt, partial, blocked and full storage, second tabs (including a case not on screen), toasts keeping their full time, and source checks: ids, the liv- prefix, ES5, embed safety, the 320-1440 px layout and a 4.5:1 contrast check of the small text.
 - Minesweeper Game (39 tests): the three presets, empty boards and the
   neighbours of corner, edge and inner cells, adjacency (a mine cell counting
   itself, as saves have always stored it), first-click mine placement on 30
@@ -376,6 +522,12 @@ shows up as a test that has to change.
   - The Daily on the page: one attempt written at once, no Restart while in progress, the toast naming the free game New Game or Practice replaces, the streak, midnight, the clipboard fallback.
   - Second tabs: free play, ticks and hiding never touch `ppn-daily`; a newer record is taken over at a tap, a lock, a tick, on opening or through the storage event; a record from after today never blocks.
   - Storage and sources: saves in the current format written back byte for byte, a reload round trip, corrupt, blocked and full storage, the prefix, ES5 syntax, embed safety, and the 320-1440 px layout (tiles of at least 30 px, stat values that wrap instead of being cut off, the board's glow and focus ring inside its scroll box).
+- Pod Packer (47 tests):
+  - Pure logic: FNV-1a and mulberry32 reference values, levels 1 and 4 pinned, generated solutions on 40 seeds per level checked by an independent rule checker, and the node target checked against a brute force (up to 8 pods). An independent subset search covers all 50 real levels and 540 levels of 10-12 pods, some with rules lifted or a node grown so the minimum drops.
+  - Moves, undo (every history entry can be undone, and an eviction from the draining node is final), refusal texts, and saves parsed field by field against a literal sample save.
+  - The real index.html booted like a browser: taps on pods and nodes (a tap on a running pod while a pod is picked runs the picked pod there), keys only on the cluster, focus kept across moves and level rebuilds, reload, corrupt/blocked/full storage and the warning clearing once writes work again, second tabs (taps, keys, Undo, Restart, Next level, the level list), and toasts keeping their full time.
+  - Source checks: prefix, ES5 IIFE, embed safety, CSS rules for every class, the 320-1440 px layout, 44 px touch targets and 4.5:1 contrast for small texts.
+  - 100% lines, branches and functions of `pod-packer/script.js`.
 - Port Knocker (44 tests): the pure logic checked against independent models:
   - `pknExtendSequence` never repeats the last port; `pknExpectedOrder` for Forward, Reverse and Stride; `pknCheckInput`, the scores, rounds and pace.
   - The show timeline with the log line from round 5, and the keypad key mapping.
@@ -390,6 +542,12 @@ shows up as a test that has to change.
   - The Daily button's state-dependent accessible name, and optional WebAudio sound.
 
   Source checks: ids, the `pkn-` prefix, ES5 IIFE, embed safety, the 320-414 px layout.
+- Rack Reset (45 tests):
+  - Pure functions checked against an independent BigInt GF(2) model: masks and clipped stencils, the pinned null-space dimension of all 24 model and size pairs (at most 12, the largest 9), `rkrMinPresses` against brute force on every 3x3 rack and on sampled 4x4 racks, and on 240 seeded racks the solver's answer clears the rack and is the minimum over the null space.
+  - The generator: one draw per LED, redraws of empty racks and of racks below the par floor (3 on 3x3, 4 from 4x4 up) for every pair, the fallback for a stuck random source, the pinned first 5x5 cross of `seeded(1)`.
+  - Keys by value, and by physical key only on non-Latin layouts (Dvorak letters do nothing). `rkrParseState` and `rkrParseBest` field by field, including a history the 500-press cap has shortened, and literal `rkr-state` and `rkr-best` samples written back byte for byte.
+  - The page booted like a browser from `index.html`: listeners bound once, a script in the head waiting for DOMContentLoaded, taps and keys only with the board focused, focus handed back to the rack after a click on a button, the win and best per model and size, hints, undo up to 500 presses across a reload, Restart as an unscored replay, the second-press confirmation before a rack with presses is thrown away, toasts that keep their full time and go with their rack.
+  - Second tabs (storage event, a press, Undo, Hint, Restart, New Game or a select on a stale rack, a tab shown again, merged bests), corrupt, blocked and full storage with a warning by error, and source checks: ids, the prefix, ES5 and the IIFE, embed safety, CSS rules for every class, WCAG contrast of small text and toasts, and the 320-1440 px layout (LEDs of at least 36 px, a full-width toast).
 - Reaction Time Test (56 tests; 50 behaviour tests in `reaction-time.test.js`,
   6 source checks in `reaction-time.source.test.js`): the game booted like a
   browser from the real `index.html`, at once or on DOMContentLoaded, and
@@ -410,6 +568,13 @@ shows up as a test that has to change.
   first published version; corrupt, partial, full or blocked storage; toasts;
   and the markup ids, rxt prefixes, ES5 style, embed safety and the 320–414 px
   layout.
+- Regex Par (54 tests):
+  - The course: 18 holes with lines of at most 60 characters and a pinned hash. A plain-code reading of every hole's task agrees with each Catch and Leave line. A reference solution no longer than par is kept in the test, not the game, for every hole. No pattern of one or two characters holes any hole.
+  - The main-thread check: `rxpBacktrack` gives the same count as a test-side backtracking matcher on lines where every atom matches, and never a lower count on real lines. `rxpIsRisky` refuses the patterns that froze the page before, naming the part and the step count. A child process (killed after 120 s) runs about 1,000 accepted fuzz patterns over all 18 holes and over worst-case lines within 250 ms each.
+  - Pure functions: the quantifier reader, `rxpCompileSafe` and `rxpRunMain` limits, the worker program in a vm, `rxpReadReply`, scoring and score names, the save parsers field by field, and the two-tab merges.
+  - The page booted like a browser from `index.html`: listeners bound once, a script in the head waiting for DOMContentLoaded, live colouring, invalid and refused patterns, Enter only in the pattern box (no Ctrl/Alt/Meta, no auto-repeat, host-page keys left alone), the chips (insertText, setRangeText and plain writes, the 200-character limit), a full round, New round, toasts that keep their full time and show their kind.
+  - The worker sandbox with a Worker stub: the test pattern first, only the newest check queued with a dimmed 'checking' state, the 300 ms timeout with terminate() and a fresh worker, Enter waiting for a result, and main-thread fallback when the constructor throws, an error event arrives or the test pattern gets no answer.
+  - Storage and sources: the save format pinned byte for byte, a reload round trip, corrupt, partial, blocked and full storage, second tabs through the storage event and re-reads before writing, a tab shown again, the prefix, ES5 syntax and the IIFE, embed safety, a CSS rule for every class, 4.5:1 contrast for toasts and informational text, and the 320-1440 px layout.
 - Snake Game (60 tests): a fresh page load drawing a 3-segment snake that waits
   behind the start prompt, a tick moving the head and dropping the tail on the
   canvas, eating (growth, 10 points, food on a free cell, toast), a best score
@@ -469,6 +634,11 @@ shows up as a test that has to change.
   or key without leaked timers or listeners; pastes, deletions and extra
   characters; the 2 s toast; and the markup, `tst-` prefix, embed safety, ES5
   style and phone layout.
+- Uptime Idle (54 tests):
+  - Pure model checked against an independent economy model written in the test: prices, slots, places, watts and the power bill, the fixed tick, session goals, offline gain with the 8 h cap and clocks set back or far forwards, seeded incidents, purchases and their refusals (a machine that would bring the net income to 0 or below, checked across labs packed to the edge and a random buyer), the repair of a damaged save that cannot earn, and migrations. Pacing simulations: the first purchase within 30 s, the first rack within 20 minutes, a migration within about 2 hours, the power share checked every minute, and an idle lab that never overflows Number.MAX_SAFE_INTEGER. Saves are checked field by field, and a sample save is written back byte for byte.
+  - The page booted like a browser from `index.html` with timers and Date.now mocked: listeners bound once, taps and keys 1-9 with the focus filters, held Enter or Space clicking once, the two-press migrate with its 400 ms gap, incidents and their accessible names, toasts keeping their time, a hidden tab and a sleeping computer counting the gap in one sum, reloads, a clock set forwards and back again paying the cap once, corrupt, partial, blocked and full storage, and second-tab takeovers (silent for routine saves).
+  - Source checks: ids, the upi- prefix everywhere, ES5 syntax and the IIFE, embed safety, every class with a CSS rule, button contrast of 4.5:1 or more, and the 320-1440 px layout.
+  - 100% lines, branches and functions of `uptime-idle/script.js`.
 - Index page (38 tests in `hub.test.js`): the inline script of `index.html`
   booted like a browser page (at once, or on DOMContentLoaded while the
   document is still loading) with every id it looks up present and one set of
@@ -544,8 +714,8 @@ it.
 
 - All games are frontend-only and designed for straightforward local execution.
 - Use `css-template.md` as the baseline style guide when creating or redesigning a game.
-- Games with a Daily (Bitmap Decoder, Patch Panel, Port Knocker, Swap Space Solitaire) share one rule, and a new
-  game with a Daily follows it too: the day is the local calendar date; Daily #1 is 2026-11-01 and the number counts
+- Games with a Daily (Bad Sector, Bitmap Decoder, Defrag, Patch Panel, Port Knocker, Swap Space Solitaire) share
+  one rule, and a new game with a Daily follows it too: the day is the local calendar date; Daily #1 is 2026-11-01 and the number counts
   UTC days from it (DST-safe); the content is seeded with the FNV-1a hash of `<prefix>:<YYYY-MM-DD>` through
   mulberry32, never `Math.random`; the attempt is saved under `<prefix>-daily` as it begins, so a reload resumes it
   or shows its result and it is scored once (a practice replay is not scored); the streak counts consecutive Daily

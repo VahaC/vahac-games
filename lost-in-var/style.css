@@ -1,0 +1,637 @@
+/* Lost in /var — style.css
+   Namespace: liv- (lost in var)
+   All selectors use the liv- prefix to avoid conflicts with host page styles.
+   Phones: the terminal wraps long lines instead of widening the page, the
+   command field keeps a 16 px font (iOS zooms into smaller fields), and the
+   chips and keys are tap targets that never zoom on a double tap. */
+
+.liv-wrapper {
+  --liv-bg-primary: #0a0f1e;
+  --liv-bg-secondary: #111827;
+  --liv-bg-card: #1a2236;
+  --liv-bg-input: #0d1424;
+  --liv-border: #2a3a5c;
+  --liv-border-focus: #3b82f6;
+  --liv-text-primary: #e2e8f0;
+  --liv-text-secondary: #94a3b8;
+  --liv-text-muted: #64748b;
+  --liv-accent-blue: #3b82f6;
+  --liv-accent-cyan: #22d3ee;
+  --liv-accent-green: #10b981;
+  /* Solid greens under white text: 5.5:1 and 7.7:1 (small text needs 4.5:1). */
+  --liv-green-solid: #047857;
+  --liv-green-deep: #065f46;
+  --liv-accent-amber: #f59e0b;
+  --liv-accent-red: #ef4444;
+  --liv-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --liv-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --liv-radius: 8px;
+  --liv-term-bg: #05080f;
+  --liv-term-text: #cbd5e1;
+
+  font-family: var(--liv-font-sans);
+  color: var(--liv-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--liv-bg-primary) 0%, var(--liv-bg-secondary) 100%);
+}
+
+.liv-wrapper *,
+.liv-wrapper *::before,
+.liv-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.liv-header {
+  margin-bottom: 16px;
+}
+
+.liv-title {
+  margin: 0;
+  font-family: var(--liv-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--liv-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+.liv-subtitle {
+  margin: 6px 0 0;
+  max-width: 600px;
+  color: var(--liv-text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.liv-btn {
+  max-width: 100%;
+  padding: 0.65rem 1.5rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.liv-btn:active {
+  transform: scale(0.97);
+}
+
+.liv-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.liv-btn:focus-visible,
+.liv-case-btn:focus-visible,
+.liv-chip:focus-visible,
+.liv-help-title:focus-visible {
+  outline: 2px solid var(--liv-accent-cyan);
+  outline-offset: 2px;
+}
+
+.liv-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--liv-border);
+  color: var(--liv-text-secondary);
+}
+
+.liv-btn--next {
+  background: var(--liv-green-solid);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+}
+
+/* ── Cases ───────────────────────────────────────────────────────────────── */
+
+.liv-cases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* A button centres its content vertically: the three lines of a case are
+   laid out as a column from the top instead. */
+.liv-case-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px;
+  text-align: left;
+  background: var(--liv-bg-card);
+  color: var(--liv-text-primary);
+  border: 1px solid var(--liv-border);
+  border-radius: var(--liv-radius);
+  font-family: inherit;
+  line-height: 1.3;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.liv-case-btn[aria-pressed="true"] {
+  border-color: var(--liv-accent-cyan);
+  box-shadow: 0 0 0 1px var(--liv-accent-cyan), 0 0 14px rgba(34, 211, 238, 0.25);
+}
+
+.liv-case-num {
+  max-width: 100%;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--liv-text-secondary);
+}
+
+.liv-case-name {
+  max-width: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.liv-case-meta {
+  max-width: 100%;
+  font-size: 0.75rem;
+  color: var(--liv-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.liv-case-btn--solved .liv-case-meta {
+  color: var(--liv-accent-green);
+}
+
+/* ── Brief ───────────────────────────────────────────────────────────────── */
+
+.liv-brief {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--liv-border);
+  border-radius: var(--liv-radius);
+  background: rgba(26, 34, 54, 0.85);
+}
+
+.liv-case-title {
+  margin: 0 0 4px;
+  font-family: var(--liv-font-mono);
+  font-size: 1.1rem;
+  color: var(--liv-accent-cyan);
+  overflow-wrap: anywhere;
+}
+
+.liv-brief-text {
+  margin: 0 0 8px;
+  color: var(--liv-text-secondary);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.liv-goals,
+.liv-hints {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.liv-goal,
+.liv-hint-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 4px 0;
+  font-size: 0.88rem;
+}
+
+.liv-goal-mark {
+  flex: 0 0 auto;
+  font-family: var(--liv-font-mono);
+  color: var(--liv-text-secondary);
+}
+
+.liv-goal-text,
+.liv-hint-text {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.liv-goal--done .liv-goal-mark {
+  color: var(--liv-accent-green);
+}
+
+.liv-goal--done .liv-goal-text {
+  color: var(--liv-text-secondary);
+  text-decoration: line-through;
+}
+
+.liv-goal--next .liv-goal-text {
+  color: var(--liv-text-primary);
+  font-weight: 600;
+}
+
+.liv-hint-text {
+  color: var(--liv-accent-amber);
+}
+
+.liv-score {
+  margin: 0 0 10px;
+  font-family: var(--liv-font-mono);
+  font-size: 0.8rem;
+  color: var(--liv-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.liv-brief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.liv-brief-actions .liv-btn {
+  white-space: normal;
+}
+
+/* ── Terminal ────────────────────────────────────────────────────────────── */
+
+.liv-terminal {
+  min-width: 0;
+  border: 1px solid var(--liv-border);
+  border-radius: var(--liv-radius);
+  background: var(--liv-term-bg);
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.08);
+}
+
+.liv-term-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: #0f1626;
+  border-bottom: 1px solid var(--liv-border);
+}
+
+.liv-term-dots {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  margin-right: 32px;
+  border-radius: 50%;
+  background: var(--liv-accent-red);
+  box-shadow: 16px 0 0 var(--liv-accent-amber), 32px 0 0 var(--liv-accent-green);
+}
+
+.liv-term-title {
+  min-width: 0;
+  font-family: var(--liv-font-mono);
+  font-size: 0.8rem;
+  color: var(--liv-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.liv-screen {
+  height: 20rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 10px 12px;
+  font-family: var(--liv-font-mono);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--liv-term-text);
+}
+
+.liv-screen:focus-visible {
+  outline: 2px solid var(--liv-accent-cyan);
+  outline-offset: -2px;
+}
+
+/* Long lines (ps aux, nginx errors) wrap inside the terminal. */
+.liv-line {
+  min-height: 1.45em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.liv-line--cmd {
+  color: var(--liv-text-primary);
+}
+
+.liv-line--out {
+  color: var(--liv-term-text);
+}
+
+.liv-line--err {
+  color: #f87171;
+}
+
+.liv-line--sys {
+  color: #67e8f9;
+}
+
+.liv-line--win {
+  color: var(--liv-accent-green);
+  font-weight: 700;
+}
+
+.liv-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--liv-border);
+  background: #070b15;
+}
+
+.liv-prompt {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  font-family: var(--liv-font-mono);
+  font-size: 0.82rem;
+  color: var(--liv-accent-green);
+  overflow-wrap: anywhere;
+}
+
+.liv-input {
+  flex: 1 1 10rem;
+  min-width: 0;
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--liv-bg-input);
+  color: var(--liv-text-primary);
+  border: 1px solid var(--liv-border);
+  border-radius: 6px;
+  font-family: var(--liv-font-mono);
+  font-size: 16px;
+  outline: none;
+}
+
+.liv-input:focus {
+  border-color: var(--liv-border-focus);
+}
+
+.liv-input::placeholder {
+  color: var(--liv-text-secondary);
+}
+
+/* ── Chips and keys ──────────────────────────────────────────────────────── */
+
+.liv-chips,
+.liv-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.liv-chips {
+  margin-top: 10px;
+}
+
+.liv-chip {
+  max-width: 100%;
+  min-height: 36px;
+  padding: 4px 10px;
+  background: var(--liv-bg-card);
+  color: var(--liv-text-primary);
+  border: 1px solid var(--liv-border);
+  border-radius: 6px;
+  font-family: var(--liv-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.liv-chip--name {
+  border-color: rgba(34, 211, 238, 0.45);
+  color: var(--liv-accent-cyan);
+}
+
+.liv-chip--example {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: var(--liv-accent-amber);
+}
+
+.liv-names-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 8px;
+}
+
+.liv-names-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--liv-text-secondary);
+}
+
+.liv-keys {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.liv-btn--key {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.5rem;
+  background: var(--liv-bg-card);
+  border: 1px solid var(--liv-border);
+  font-family: var(--liv-font-mono);
+}
+
+.liv-btn--run {
+  background: var(--liv-green-solid);
+  border-color: transparent;
+}
+
+/* ── Status, help, toast ─────────────────────────────────────────────────── */
+
+.liv-status-panel {
+  margin-top: 14px;
+}
+
+.liv-status {
+  padding: 10px 14px;
+  border-radius: var(--liv-radius);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  color: var(--liv-accent-cyan);
+  font-family: var(--liv-font-mono);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.liv-warning {
+  display: block;
+  margin-top: 8px;
+  color: #f87171;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.liv-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--liv-border);
+  border-radius: var(--liv-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--liv-text-secondary);
+  font-size: 0.85rem;
+}
+
+.liv-help-title {
+  cursor: pointer;
+  color: var(--liv-text-primary);
+  font-weight: 600;
+}
+
+.liv-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.liv-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--liv-green-solid);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.liv-toast.liv-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.liv-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--liv-text-secondary);
+  font-size: 0.8rem;
+}
+
+.liv-hidden {
+  display: none;
+}
+
+@media (hover: hover) {
+  .liv-btn:hover {
+    background: #1d4ed8;
+  }
+
+  .liv-btn--secondary:hover,
+  .liv-btn--key:hover,
+  .liv-chip:hover,
+  .liv-case-btn:hover {
+    background: var(--liv-bg-secondary);
+    border-color: #33507f;
+  }
+
+  .liv-btn--run:hover,
+  .liv-btn--next:hover {
+    background: var(--liv-green-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liv-btn,
+  .liv-toast {
+    transition: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .liv-wrapper {
+    padding: 20px 12px;
+  }
+
+  .liv-title {
+    font-size: 1.6rem;
+  }
+
+  .liv-screen {
+    height: 16rem;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .liv-input-row {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 399px) {
+  .liv-wrapper {
+    padding: 16px 8px;
+  }
+
+  .liv-cases {
+    gap: 6px;
+  }
+
+  .liv-case-btn {
+    padding: 6px 7px;
+  }
+
+  .liv-case-name {
+    font-size: 0.82rem;
+  }
+
+  .liv-brief {
+    padding: 10px;
+  }
+
+  .liv-screen {
+    padding: 8px;
+    font-size: 0.75rem;
+  }
+
+  .liv-input-row {
+    padding: 8px;
+  }
+
+  .liv-keys {
+    gap: 6px;
+  }
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost in /var — Logs from VahaC</title>
+  <meta name="description" content="Lost in /var: log in to a fake shell on a broken server and find the cause with real commands (ls, cd, cat, grep, tail, ps, df, kill). A tutorial case and two incidents, points per case, command chips for phones. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="liv-wrapper">
+
+  <header class="liv-header">
+    <h1 class="liv-title">Lost in /var</h1>
+    <p class="liv-subtitle">A server broke. Log in, read the logs, list the processes and stop the cause with real shell commands. Nothing gets deleted.</p>
+  </header>
+
+  <div id="liv-cases" class="liv-cases" role="group" aria-label="Cases"></div>
+
+  <section class="liv-brief" aria-label="Case brief">
+    <h2 id="liv-case-title" class="liv-case-title">Case 1</h2>
+    <p id="liv-brief" class="liv-brief-text"></p>
+    <ol id="liv-goals" class="liv-goals" aria-label="Goals"></ol>
+    <ol id="liv-hints" class="liv-hints liv-hidden" aria-label="Hints shown"></ol>
+    <p id="liv-score" class="liv-score"></p>
+    <div class="liv-brief-actions">
+      <button id="liv-hint" class="liv-btn liv-btn--secondary" type="button" aria-label="Show the next hint (costs 10 points)">Hint</button>
+      <button id="liv-restart" class="liv-btn liv-btn--secondary" type="button" aria-label="Restart this case on a fresh copy of its server">Restart case</button>
+      <button id="liv-next" class="liv-btn liv-btn--next liv-hidden" type="button" aria-label="Open the next case">Next case</button>
+    </div>
+  </section>
+
+  <section class="liv-terminal" aria-label="Terminal">
+    <div class="liv-term-bar">
+      <span class="liv-term-dots" aria-hidden="true"></span>
+      <span id="liv-term-title" class="liv-term-title"></span>
+    </div>
+    <div id="liv-screen" class="liv-screen" role="log" aria-live="polite" aria-label="Terminal output" tabindex="0"></div>
+    <div class="liv-input-row">
+      <label id="liv-prompt" class="liv-prompt" for="liv-input"></label>
+      <input id="liv-input" class="liv-input" type="text" maxlength="300" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="type help, or tap a chip" aria-label="Shell command">
+    </div>
+  </section>
+
+  <div id="liv-chips" class="liv-chips" role="group" aria-label="Command chips"></div>
+
+  <div id="liv-names-row" class="liv-names-row liv-hidden">
+    <span class="liv-names-label">From the last output:</span>
+    <div id="liv-names" class="liv-names" role="group" aria-label="Names from the last output"></div>
+  </div>
+
+  <div class="liv-keys" role="group" aria-label="Shell keys">
+    <button id="liv-hist-up" class="liv-btn liv-btn--key" type="button" aria-label="Previous command in the history (Up)">↑</button>
+    <button id="liv-hist-down" class="liv-btn liv-btn--key" type="button" aria-label="Next command in the history (Down)">↓</button>
+    <button id="liv-complete" class="liv-btn liv-btn--key" type="button" aria-label="Complete the name being typed (Tab)">Tab</button>
+    <button id="liv-run" class="liv-btn liv-btn--key liv-btn--run" type="button" aria-label="Run the command (Enter)">Run ↵</button>
+  </div>
+
+  <section class="liv-status-panel">
+    <div id="liv-status" class="liv-status" aria-live="polite">Connecting...</div>
+    <div id="liv-warning" class="liv-warning liv-hidden" role="alert"></div>
+  </section>
+
+  <details class="liv-help">
+    <summary class="liv-help-title">How to play</summary>
+    <ul class="liv-help-list">
+      <li>Each case logs you in to a server that has a problem. Read the ticket, then use the shell to find the cause and stop it. Start with Case 1: its steps teach every command.</li>
+      <li>An incident closes when you have found the evidence (the log lines that name the cause show in the terminal) and stopped the cause, in any order. A lucky guess from ps aux is not enough.</li>
+      <li>Commands: ls, cd, pwd, cat, grep, tail, ps, df, kill, help and clear, with the flags help lists. A pipe works into grep or tail: ps aux | grep node.</li>
+      <li>Keys in the command field: Enter runs, Up and Down bring back earlier commands, Tab completes a name (on an empty field Tab moves on, as usual).</li>
+      <li>Phones: the chips type a command, the names from the last output add a file, folder or process id, and the arrow, Tab and Run buttons do the rest.</li>
+      <li>Points: 100, minus 3 for each command over the case's par, 10 for each hint and 25 for each wrong process you kill. help and clear are free. A hint you have seen stays seen after Restart case. Your best score per case is kept.</li>
+      <li>There is no rm. On these servers you never delete anything to fix it: you find the cause.</li>
+    </ul>
+  </details>
+
+  <div id="liv-toast" class="liv-toast" aria-live="polite"></div>
+
+  <footer class="liv-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

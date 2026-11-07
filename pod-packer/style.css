@@ -1,0 +1,699 @@
+/* Pod Packer — style.css
+   Namespace: pdp- (pod packer)
+   All selectors use the pdp- prefix to avoid conflicts with host page styles.
+   Layout: one column on phones (the queue, then the nodes stacked, each with
+   a CPU and a RAM bar), two node columns from 720 px.  Every text that can
+   grow (pod names, sizes, refusals) wraps instead of widening the page. */
+
+.pdp-wrapper {
+  --pdp-bg-primary: #0a0f1e;
+  --pdp-bg-secondary: #111827;
+  --pdp-bg-card: #1a2236;
+  --pdp-bg-input: #0d1424;
+  --pdp-border: #2a3a5c;
+  --pdp-border-focus: #3b82f6;
+  --pdp-text-primary: #e2e8f0;
+  --pdp-text-secondary: #94a3b8;
+  --pdp-text-muted: #64748b;
+  --pdp-accent-blue: #3b82f6;
+  --pdp-accent-cyan: #22d3ee;
+  --pdp-accent-green: #10b981;
+  --pdp-accent-amber: #f59e0b;
+  --pdp-accent-red: #ef4444;
+  --pdp-accent-violet: #a78bfa;
+  --pdp-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --pdp-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --pdp-radius: 8px;
+  --pdp-cpu: #38bdf8;
+  --pdp-mem: #a78bfa;
+
+  font-family: var(--pdp-font-sans);
+  color: var(--pdp-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  background:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--pdp-bg-primary) 0%, var(--pdp-bg-secondary) 100%);
+}
+
+.pdp-wrapper *,
+.pdp-wrapper *::before,
+.pdp-wrapper *::after {
+  box-sizing: border-box;
+}
+
+.pdp-hidden {
+  display: none;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────────── */
+
+.pdp-header {
+  margin-bottom: 16px;
+}
+
+.pdp-title {
+  margin: 0;
+  font-family: var(--pdp-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--pdp-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+.pdp-subtitle {
+  margin: 6px 0 0;
+  max-width: 560px;
+  color: var(--pdp-text-secondary);
+  font-size: 0.92rem;
+}
+
+.pdp-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pdp-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pdp-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--pdp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pdp-select {
+  min-width: 130px;
+  max-width: 100%;
+  padding: 0.55rem 0.8rem;
+  background: var(--pdp-bg-input);
+  border: 1px solid var(--pdp-border);
+  border-radius: 6px;
+  color: var(--pdp-text-primary);
+  font-family: var(--pdp-font-mono);
+  font-size: 0.9rem;
+  touch-action: manipulation;
+}
+
+.pdp-option {
+  background: var(--pdp-bg-input);
+  color: var(--pdp-text-primary);
+}
+
+.pdp-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pdp-btn {
+  padding: 0.6rem 1.2rem;
+  background: var(--pdp-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.pdp-btn:hover {
+  background: #2563eb;
+}
+
+.pdp-btn:active {
+  transform: scale(0.97);
+}
+
+.pdp-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.pdp-btn:focus-visible,
+.pdp-select:focus-visible,
+.pdp-help-title:focus-visible {
+  outline: 2px solid var(--pdp-accent-cyan);
+  outline-offset: 2px;
+}
+
+.pdp-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--pdp-border);
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-btn--secondary:hover {
+  background: var(--pdp-bg-secondary);
+  color: var(--pdp-text-primary);
+}
+
+.pdp-btn--next {
+  background: linear-gradient(135deg, #047857, var(--pdp-accent-green));
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+}
+
+/* ── Goal, rules and score ───────────────────────────────────────────────── */
+
+.pdp-goal {
+  margin: 0 0 6px;
+  font-family: var(--pdp-font-mono);
+  font-size: 0.85rem;
+  color: var(--pdp-text-primary);
+}
+
+.pdp-rules {
+  margin: 0 0 12px;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.8rem;
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-rule {
+  margin: 2px 0;
+}
+
+.pdp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pdp-stat {
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--pdp-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(59, 130, 246, 0.22);
+}
+
+.pdp-stat-label {
+  display: block;
+  font-size: 0.66rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pdp-text-secondary);
+}
+
+/* Values and their minimums wrap instead of being cut off. */
+.pdp-stat-value {
+  display: block;
+  font-family: var(--pdp-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--pdp-accent-cyan);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.pdp-stat-sub {
+  display: block;
+  font-size: 0.68rem;
+  line-height: 1.3;
+  color: var(--pdp-text-secondary);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ── The cluster ─────────────────────────────────────────────────────────── */
+
+.pdp-board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 10px;
+  background: #070b16;
+}
+
+.pdp-board:focus {
+  outline: none;
+}
+
+.pdp-board:focus-visible {
+  outline: 2px solid var(--pdp-accent-cyan);
+  outline-offset: -2px;
+}
+
+.pdp-board--passed {
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: inset 0 0 18px rgba(16, 185, 129, 0.15);
+}
+
+.pdp-board--picking .pdp-node {
+  cursor: pointer;
+}
+
+.pdp-panel {
+  min-width: 0;
+}
+
+.pdp-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-family: var(--pdp-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--pdp-accent-cyan);
+}
+
+.pdp-queue,
+.pdp-node-pods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pdp-queue {
+  min-height: 44px;
+}
+
+.pdp-queue-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--pdp-text-secondary);
+}
+
+/* A pod is a button with two or three lines: a button centres its content,
+   so it is a flex column with its lines aligned to the start. */
+.pdp-pod {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--pdp-border);
+  border-radius: 6px;
+  background: var(--pdp-bg-card);
+  color: var(--pdp-text-primary);
+  font-family: var(--pdp-font-mono);
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pdp-pod:hover {
+  border-color: var(--pdp-accent-blue);
+}
+
+.pdp-pod:focus {
+  outline: none;
+}
+
+.pdp-pod:focus-visible {
+  outline: 2px solid var(--pdp-accent-cyan);
+  outline-offset: 1px;
+}
+
+.pdp-pod-name {
+  font-weight: 700;
+  color: var(--pdp-accent-cyan);
+}
+
+.pdp-pod-size {
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-pod-tags {
+  color: var(--pdp-accent-amber);
+}
+
+.pdp-pod--anti {
+  border-left: 3px solid var(--pdp-accent-amber);
+}
+
+.pdp-pod--gpu {
+  border-color: rgba(167, 139, 250, 0.7);
+}
+
+.pdp-pod--tolerates {
+  border-style: dashed;
+}
+
+.pdp-pod--stranded {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.pdp-pod--selected {
+  border-color: var(--pdp-accent-cyan);
+  background: rgba(34, 211, 238, 0.16);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.45);
+}
+
+.pdp-nodes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.pdp-node {
+  min-width: 0;
+  padding: 6px 8px 8px;
+  border: 1px solid var(--pdp-border);
+  border-radius: var(--pdp-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.9), rgba(13, 20, 36, 0.9));
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* No opacity on a node card: it would dim the CPU and RAM numbers the player
+   reads to choose a node.  Empty and blocked nodes show it by their frame. */
+.pdp-node--empty {
+  border-style: dotted;
+}
+
+.pdp-node--taint {
+  border-color: rgba(167, 139, 250, 0.55);
+}
+
+.pdp-node--drain {
+  border-style: dashed;
+  border-color: rgba(239, 68, 68, 0.55);
+  background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0 8px, transparent 8px 16px), #0d1424;
+}
+
+.pdp-node--fits {
+  border-color: var(--pdp-accent-green);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.4);
+}
+
+.pdp-node--blocked {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: inset 4px 0 0 rgba(239, 68, 68, 0.75);
+}
+
+.pdp-node-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-family: var(--pdp-font-mono);
+  font-size: 0.78rem;
+}
+
+.pdp-node-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid var(--pdp-border);
+  border-radius: 4px;
+  color: var(--pdp-text-secondary);
+  font-size: 0.7rem;
+}
+
+.pdp-node-name {
+  font-weight: 700;
+  color: var(--pdp-text-primary);
+}
+
+.pdp-tag {
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  line-height: 1.6;
+}
+
+.pdp-tag--taint {
+  background: rgba(167, 139, 250, 0.18);
+  color: var(--pdp-accent-violet);
+}
+
+.pdp-tag--drain {
+  background: rgba(239, 68, 68, 0.18);
+  color: var(--pdp-accent-red);
+}
+
+/* A meter: label, bar and value side by side; the bar takes what is left. */
+.pdp-meter {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr) 6.4rem;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--pdp-font-mono);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.pdp-meter-label {
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-bar {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.14);
+}
+
+.pdp-bar-fill,
+.pdp-bar-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transition: width 0.2s, left 0.2s;
+}
+
+.pdp-meter--cpu .pdp-bar-fill {
+  background: var(--pdp-cpu);
+}
+
+.pdp-meter--mem .pdp-bar-fill {
+  background: var(--pdp-mem);
+}
+
+.pdp-bar-fill--full {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.pdp-bar-ghost {
+  background: repeating-linear-gradient(90deg, rgba(16, 185, 129, 0.7) 0 4px, rgba(16, 185, 129, 0.35) 4px 8px);
+}
+
+.pdp-bar-ghost--over {
+  background: repeating-linear-gradient(90deg, rgba(239, 68, 68, 0.75) 0 4px, rgba(239, 68, 68, 0.4) 4px 8px);
+}
+
+.pdp-meter-value {
+  color: var(--pdp-text-secondary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pdp-node-pods {
+  margin-top: 6px;
+  min-height: 8px;
+}
+
+/* ── Hint, status, help ──────────────────────────────────────────────────── */
+
+.pdp-hint {
+  min-height: 3.2em;
+  margin: 10px 0 0;
+  font-family: var(--pdp-font-mono);
+  font-size: 0.78rem;
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-status-panel {
+  margin-top: 8px;
+}
+
+.pdp-status {
+  padding: 10px 12px;
+  border-radius: var(--pdp-radius);
+  background: var(--pdp-bg-card);
+  border: 1px solid var(--pdp-border);
+  font-size: 0.88rem;
+}
+
+.pdp-warning {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--pdp-radius);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--pdp-accent-amber);
+  font-size: 0.82rem;
+}
+
+.pdp-help {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: var(--pdp-radius);
+  background: rgba(26, 34, 54, 0.6);
+  border: 1px solid var(--pdp-border);
+}
+
+.pdp-help-title {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-help-list {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  color: var(--pdp-text-secondary);
+}
+
+.pdp-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--pdp-bg-card);
+  border: 1px solid var(--pdp-accent-cyan);
+  color: var(--pdp-text-primary);
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.pdp-toast.pdp-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.pdp-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--pdp-text-secondary);
+}
+
+/* ── Wider screens ───────────────────────────────────────────────────────── */
+
+@media (min-width: 720px) {
+  .pdp-nodes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pdp-board {
+    padding: 12px;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .pdp-wrapper {
+    padding: 20px 12px;
+  }
+
+  .pdp-title {
+    font-size: 1.6rem;
+  }
+
+  .pdp-btn {
+    padding: 0.55rem 0.8rem;
+  }
+
+  .pdp-stats {
+    gap: 6px;
+  }
+
+  .pdp-stat {
+    padding: 5px 6px;
+  }
+
+  .pdp-stat-value {
+    font-size: 0.95rem;
+  }
+
+  /* The longest hints take three lines on a phone: keep room for them, so
+     the page below does not jump while you pick pods. */
+  .pdp-hint {
+    min-height: 4.8em;
+  }
+}
+
+/* Four cards in a row leave too little for a label like EVICTIONS. */
+@media (max-width: 399px) {
+  .pdp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Touch screens: a pod is a full 44 px tap target, and pods sit further
+   apart, so a tap lands on the pod (or the node) it was meant for. */
+@media (pointer: coarse) {
+  .pdp-pod {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .pdp-queue,
+  .pdp-node-pods {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp-bar-fill,
+  .pdp-bar-ghost,
+  .pdp-node,
+  .pdp-btn,
+  .pdp-toast {
+    transition: none;
+  }
+}

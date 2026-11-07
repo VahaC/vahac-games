@@ -1,0 +1,596 @@
+/* Uptime Idle — style.css
+   Namespace: upi- (uptime idle)
+   All selectors use the upi- prefix to avoid conflicts with host page styles.
+   Layout: the stats and the shop are CSS grids of minmax(0, 1fr) columns, so
+   no card widens the page; long numbers and names wrap inside their card
+   (overflow-wrap: anywhere) from 320 px phones up.  Shop items are buttons
+   whose content is a flex column (a button would centre it vertically). */
+
+.upi-wrapper {
+  --upi-bg-primary: #0a0f1e;
+  --upi-bg-secondary: #111827;
+  --upi-bg-card: #1a2236;
+  --upi-bg-input: #0d1424;
+  --upi-border: #2a3a5c;
+  --upi-border-focus: #3b82f6;
+  --upi-text-primary: #e2e8f0;
+  --upi-text-secondary: #94a3b8;
+  --upi-text-muted: #64748b;
+  --upi-accent-blue: #3b82f6;
+  --upi-accent-cyan: #22d3ee;
+  --upi-accent-green: #10b981;
+  --upi-accent-amber: #f59e0b;
+  --upi-accent-red: #ef4444;
+  --upi-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --upi-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --upi-radius: 8px;
+
+  font-family: var(--upi-font-sans);
+  color: var(--upi-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--upi-bg-primary) 0%, var(--upi-bg-secondary) 100%);
+}
+
+.upi-wrapper *,
+.upi-wrapper *::before,
+.upi-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* The wrapper takes the focus of a click anywhere in the game (tabindex -1),
+   so the keys work after a click; it needs no ring of its own. */
+.upi-wrapper:focus {
+  outline: none;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.upi-header {
+  margin-bottom: 16px;
+}
+
+.upi-title {
+  margin: 0;
+  font-family: var(--upi-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--upi-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+.upi-subtitle {
+  margin: 6px 0 0;
+  max-width: 560px;
+  color: var(--upi-text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.upi-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--upi-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  white-space: normal;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.upi-btn:hover {
+  background: #2563eb;
+}
+
+.upi-btn:active {
+  transform: scale(0.97);
+}
+
+.upi-btn:focus-visible,
+.upi-item:focus-visible,
+.upi-help-title:focus-visible {
+  outline: 2px solid var(--upi-accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Dark text on amber: #111827 on #f59e0b is about 8:1, on #fbbf24 about 10:1. */
+.upi-btn--incident {
+  background: linear-gradient(135deg, var(--upi-accent-amber), #fbbf24);
+  color: #111827;
+}
+
+.upi-btn--incident:hover {
+  background: #fbbf24;
+}
+
+.upi-btn--migrate {
+  background: transparent;
+  border: 1px solid var(--upi-border);
+  color: var(--upi-text-secondary);
+}
+
+.upi-btn--migrate:hover {
+  background: var(--upi-bg-card);
+  color: var(--upi-text-primary);
+}
+
+/* White text needs the darker greens: about 7.6:1 on #065f46, 5.5:1 on #047857. */
+.upi-btn--ready,
+.upi-btn--ready:hover {
+  border-color: var(--upi-accent-green);
+  background: linear-gradient(135deg, #065f46, #047857);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+}
+
+.upi-btn--armed,
+.upi-btn--armed:hover {
+  border-color: var(--upi-accent-amber);
+  background: var(--upi-accent-amber);
+  color: #111827;
+}
+
+/* ── Stats ───────────────────────────────────────────────────────────────── */
+
+.upi-stats {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.upi-stat {
+  grid-column: span 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  background: var(--upi-bg-card);
+  border: 1px solid var(--upi-border);
+  border-radius: var(--upi-radius);
+}
+
+.upi-stat--wide {
+  grid-column: span 5;
+}
+
+.upi-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--upi-text-muted);
+}
+
+.upi-stat-value {
+  font-family: var(--upi-font-mono);
+  font-size: 1rem;
+  color: var(--upi-text-primary);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.upi-stat-value--big {
+  font-size: 1.5rem;
+  color: var(--upi-accent-green);
+}
+
+.upi-stat-value--bad {
+  color: var(--upi-accent-red);
+}
+
+.upi-breakdown {
+  margin: 8px 0 12px;
+  color: var(--upi-text-secondary);
+  font-family: var(--upi-font-mono);
+  font-size: 0.78rem;
+}
+
+.upi-welcome {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--upi-accent-cyan);
+  border-radius: var(--upi-radius);
+  background: rgba(34, 211, 238, 0.08);
+  color: var(--upi-accent-cyan);
+  font-size: 0.88rem;
+}
+
+/* ── Panels: goal, incident, migration, log ──────────────────────────────── */
+
+.upi-panel {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: var(--upi-bg-card);
+  border: 1px solid var(--upi-border);
+  border-radius: var(--upi-radius);
+}
+
+.upi-panel-title {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--upi-text-secondary);
+}
+
+.upi-goal-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.upi-goal-reward {
+  color: var(--upi-accent-amber);
+  font-family: var(--upi-font-mono);
+  font-size: 0.85rem;
+}
+
+.upi-goal-text {
+  margin: 4px 0 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.upi-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--upi-bg-input);
+  border: 1px solid var(--upi-border);
+  overflow: hidden;
+}
+
+.upi-bar-fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #047857, var(--upi-accent-green));
+  transition: width 0.25s linear;
+}
+
+.upi-goal-progress {
+  margin: 6px 0 0;
+  font-family: var(--upi-font-mono);
+  font-size: 0.8rem;
+  color: var(--upi-text-secondary);
+}
+
+.upi-incident {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--upi-border);
+  border-left: 4px solid var(--upi-accent-green);
+  border-radius: var(--upi-radius);
+  background: var(--upi-bg-input);
+}
+
+.upi-incident--disk {
+  border-left-color: var(--upi-accent-red);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.upi-incident--outage {
+  border-left-color: var(--upi-accent-amber);
+  background: rgba(245, 158, 11, 0.08);
+  animation: upi-blink 1s steps(2) infinite;
+}
+
+.upi-incident--kernel {
+  border-left-color: var(--upi-accent-cyan);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.upi-incident-text {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--upi-font-mono);
+  font-size: 0.85rem;
+}
+
+.upi-migrate-text {
+  margin: 4px 0 10px;
+  font-size: 0.88rem;
+  color: var(--upi-text-secondary);
+}
+
+.upi-log {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--upi-font-mono);
+  font-size: 0.78rem;
+  color: var(--upi-text-secondary);
+}
+
+.upi-log-line {
+  padding: 2px 0;
+  border-bottom: 1px dashed rgba(42, 58, 92, 0.6);
+}
+
+.upi-lifetime {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--upi-text-muted);
+}
+
+/* ── Shop ────────────────────────────────────────────────────────────────── */
+
+.upi-shop {
+  margin-bottom: 12px;
+}
+
+.upi-shop-title {
+  margin: 14px 0 8px;
+  font-size: 1rem;
+  color: var(--upi-accent-cyan);
+}
+
+.upi-shop-note {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--upi-text-muted);
+}
+
+.upi-items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* A shop item: a button whose lines stack from the top (a button centres
+   its content vertically), at any length of name or price. */
+.upi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 0;
+  min-height: 88px;
+  padding: 8px 10px;
+  background: var(--upi-bg-card);
+  border: 1px solid var(--upi-border);
+  border-radius: var(--upi-radius);
+  color: var(--upi-text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+}
+
+.upi-item:active {
+  transform: scale(0.98);
+}
+
+.upi-item-top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.upi-item-key {
+  flex: none;
+  padding: 0 5px;
+  border: 1px solid var(--upi-border);
+  border-radius: 4px;
+  font-family: var(--upi-font-mono);
+  font-size: 0.7rem;
+  color: var(--upi-text-muted);
+}
+
+.upi-item-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.upi-item-owned {
+  flex: none;
+  font-family: var(--upi-font-mono);
+  color: var(--upi-accent-cyan);
+}
+
+.upi-item-effect {
+  color: var(--upi-text-secondary);
+  font-size: 0.78rem;
+}
+
+.upi-item-cost {
+  margin-top: auto;
+  font-family: var(--upi-font-mono);
+  color: var(--upi-accent-green);
+}
+
+.upi-item--short .upi-item-cost {
+  color: var(--upi-accent-amber);
+}
+
+.upi-item--blocked {
+  opacity: 0.6;
+}
+
+.upi-item--blocked .upi-item-cost {
+  color: var(--upi-text-muted);
+}
+
+.upi-item--done {
+  border-style: dashed;
+}
+
+.upi-item--done .upi-item-cost {
+  color: var(--upi-text-muted);
+}
+
+/* ── Messages ────────────────────────────────────────────────────────────── */
+
+.upi-warning {
+  margin: 8px 0;
+  color: var(--upi-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.upi-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--upi-border);
+  border-radius: var(--upi-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--upi-text-secondary);
+  font-size: 0.85rem;
+}
+
+.upi-help-title {
+  cursor: pointer;
+  color: var(--upi-text-primary);
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+.upi-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.upi-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  /* As wide as the message, up to the viewport less 1rem a side (with auto
+     width a box at left: 50% would only get the right half of the screen). */
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--upi-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.upi-toast.upi-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.upi-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--upi-text-muted);
+  font-size: 0.8rem;
+}
+
+.upi-hidden {
+  display: none;
+}
+
+@keyframes upi-blink {
+  50% { opacity: 0.6; }
+}
+
+@media (hover: hover) {
+  .upi-item:hover {
+    border-color: #33507f;
+    background: #1e2940;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upi-btn,
+  .upi-item,
+  .upi-bar-fill,
+  .upi-toast {
+    transition: none;
+  }
+
+  .upi-incident--outage {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .upi-wrapper {
+    padding: 20px 12px;
+  }
+
+  .upi-title {
+    font-size: 1.6rem;
+  }
+
+  .upi-stats {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .upi-stat--wide {
+    grid-column: span 3;
+  }
+
+  .upi-stat-value--big {
+    font-size: 1.2rem;
+  }
+
+  .upi-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .upi-btn--migrate {
+    width: 100%;
+  }
+}
+
+@media (max-width: 359px) {
+  .upi-wrapper {
+    padding: 16px 8px;
+  }
+
+  .upi-stat {
+    padding: 6px 7px;
+  }
+
+  .upi-stat-value {
+    font-size: 0.9rem;
+  }
+
+  .upi-stat-value--big {
+    font-size: 1.05rem;
+  }
+
+  .upi-item {
+    padding: 7px 8px;
+    font-size: 0.8rem;
+  }
+}

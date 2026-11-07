@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pod Packer — Logs from VahaC</title>
+  <meta name="description" content="Pod Packer: be the scheduler of a small cluster. Fit every pod onto nodes with CPU and memory bars, keep anti-affinity, taints and tolerations and a draining node, and use the exact minimum number of nodes with as few evictions and moves as you can. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="pdp-wrapper" id="pdp-game">
+
+  <header class="pdp-header">
+    <h1 class="pdp-title">Pod Packer</h1>
+    <p class="pdp-subtitle">You are the scheduler: run every pod on a node with enough CPU and memory, keep the placement rules, and use as few nodes as the target allows.</p>
+  </header>
+
+  <section class="pdp-toolbar" aria-label="Level controls">
+    <div class="pdp-control">
+      <label class="pdp-label" for="pdp-level">Level</label>
+      <select id="pdp-level" class="pdp-select" aria-label="Choose a level">
+        <option value="1">Level 1</option>
+      </select>
+    </div>
+    <div class="pdp-toolbar-actions">
+      <button id="pdp-undo" class="pdp-btn pdp-btn--secondary" type="button" aria-label="Undo the last action (U)">Undo</button>
+      <button id="pdp-restart" class="pdp-btn pdp-btn--secondary" type="button" aria-label="Restart this level">Restart</button>
+      <button id="pdp-next" class="pdp-btn pdp-btn--next pdp-hidden" type="button" aria-label="Start the next level">Next level</button>
+    </div>
+  </section>
+
+  <p id="pdp-goal" class="pdp-goal"></p>
+  <ul id="pdp-rules" class="pdp-rules" aria-label="Rules on this level"></ul>
+
+  <section class="pdp-stats" aria-label="Scheduler score">
+    <div class="pdp-stat">
+      <span class="pdp-stat-label">Nodes used</span>
+      <span id="pdp-nodes-used" class="pdp-stat-value">0</span>
+      <span id="pdp-nodes-target" class="pdp-stat-sub">target 0</span>
+    </div>
+    <div class="pdp-stat">
+      <span class="pdp-stat-label">Evictions</span>
+      <span id="pdp-evictions" class="pdp-stat-value">0</span>
+      <span id="pdp-evictions-min" class="pdp-stat-sub">min 0</span>
+    </div>
+    <div class="pdp-stat">
+      <span class="pdp-stat-label">Moves</span>
+      <span id="pdp-moves" class="pdp-stat-value">0</span>
+      <span id="pdp-moves-min" class="pdp-stat-sub">min 0</span>
+    </div>
+    <div class="pdp-stat">
+      <span class="pdp-stat-label">Best</span>
+      <span id="pdp-best" class="pdp-stat-value">--</span>
+      <span class="pdp-stat-sub">moves / evictions</span>
+    </div>
+  </section>
+
+  <div id="pdp-board" class="pdp-board" tabindex="0" role="group" aria-label="Cluster: pending pods and nodes">
+    <section class="pdp-panel pdp-panel--queue" aria-label="Pending pods">
+      <h2 class="pdp-panel-title">Pending pods <span id="pdp-pending-count" class="pdp-count">0</span></h2>
+      <div id="pdp-queue" class="pdp-queue"></div>
+      <p id="pdp-queue-empty" class="pdp-queue-empty pdp-hidden">The queue is empty.</p>
+    </section>
+    <section class="pdp-panel pdp-panel--nodes" aria-label="Nodes">
+      <h2 class="pdp-panel-title">Nodes</h2>
+      <div id="pdp-nodes" class="pdp-nodes"></div>
+    </section>
+  </div>
+
+  <p id="pdp-hint" class="pdp-hint" aria-live="polite"></p>
+
+  <section class="pdp-status-panel">
+    <div id="pdp-status" class="pdp-status" aria-live="polite">Starting the scheduler...</div>
+    <div id="pdp-warning" class="pdp-warning pdp-hidden" role="alert"></div>
+  </section>
+
+  <details class="pdp-help">
+    <summary class="pdp-help-title">How to play</summary>
+    <ul class="pdp-help-list">
+      <li>Tap a pending pod, then a node: the pod runs there if the node has enough CPU and memory left and no rule says no. A refusal names the numbers, like a scheduler would.</li>
+      <li>While a pending pod is picked, a tap anywhere on a node, the pods on it included, runs the picked pod there. Tap the picked pod again (or press Escape) to put it down.</li>
+      <li>With nothing picked, tap a pod on a node to evict it back to the queue (it stays picked, so the next node you tap runs it).</li>
+      <li>A level is passed when every pod runs, the draining node is empty and no more nodes run pods than the target. The target is the exact minimum number of nodes.</li>
+      <li>Anti-affinity: replicas of one app (api-1, api-2) never share a node. Taint gpu: only pods that tolerate gpu run on that node, and a pod that needs gpu runs nowhere else. Draining node: it takes no new pods, so its pods have to move.</li>
+      <li>Score: evictions and moves against their minimums. Every placement, eviction and undo is a move; Undo counts like doing the opposite by hand. An eviction from the draining node is final: Undo cannot put a pod back on it.</li>
+      <li>Keyboard, with the focus on the cluster (click it or Tab to it): arrows pick a pod, 1-6 run it on that node, E evicts it, U undoes, N starts the next level, Escape clears the pick.</li>
+    </ul>
+  </details>
+
+  <div id="pdp-toast" class="pdp-toast" aria-live="polite"></div>
+
+  <footer class="pdp-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

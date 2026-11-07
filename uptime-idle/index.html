@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uptime Idle — Logs from VahaC</title>
+  <meta name="description" content="Uptime Idle: an idle homelab game. An old laptop under the desk earns uptime credits; buy services, mini PCs, NAS boxes, virtualization nodes and server racks while the power bill, failed disks and outages eat into the profit. Offline progress up to 8 hours, session goals and migrations to a new rack. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="upi-wrapper" id="upi-root" tabindex="-1">
+
+  <header class="upi-header">
+    <h1 class="upi-title">Uptime Idle</h1>
+    <p class="upi-subtitle">An old laptop under the desk earns uptime credits. Grow it into a rack of servers before the power bill and the outages eat the profit.</p>
+  </header>
+
+  <section class="upi-stats" aria-label="Homelab stats">
+    <div class="upi-stat upi-stat--wide">
+      <span class="upi-stat-label">Credits</span>
+      <span id="upi-credits" class="upi-stat-value upi-stat-value--big">0 cr</span>
+    </div>
+    <div class="upi-stat upi-stat--wide">
+      <span class="upi-stat-label">Net income</span>
+      <span id="upi-net" class="upi-stat-value upi-stat-value--big">+0 cr/s</span>
+    </div>
+    <div class="upi-stat">
+      <span class="upi-stat-label">Power</span>
+      <span id="upi-power" class="upi-stat-value">0 W</span>
+    </div>
+    <div class="upi-stat">
+      <span class="upi-stat-label">Uptime</span>
+      <span id="upi-uptime" class="upi-stat-value">100%</span>
+    </div>
+    <div class="upi-stat">
+      <span class="upi-stat-label">Slots</span>
+      <span id="upi-slots" class="upi-stat-value">0/0</span>
+    </div>
+    <div class="upi-stat">
+      <span class="upi-stat-label">Places</span>
+      <span id="upi-places" class="upi-stat-value">0/0</span>
+    </div>
+    <div class="upi-stat">
+      <span class="upi-stat-label">Rack bonus</span>
+      <span id="upi-mult" class="upi-stat-value">×1.00</span>
+    </div>
+  </section>
+  <p id="upi-breakdown" class="upi-breakdown">Booting the laptop...</p>
+
+  <div id="upi-welcome" class="upi-welcome upi-hidden" role="status"></div>
+
+  <section class="upi-panel upi-goal" aria-label="Session goal">
+    <div class="upi-goal-head">
+      <span class="upi-panel-title">Session goal</span>
+      <span id="upi-goal-reward" class="upi-goal-reward"></span>
+    </div>
+    <p id="upi-goal-text" class="upi-goal-text"></p>
+    <div id="upi-goal-bar" class="upi-bar" role="progressbar" aria-label="Session goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="upi-goal-fill" class="upi-bar-fill"></div>
+    </div>
+    <p id="upi-goal-progress" class="upi-goal-progress"></p>
+  </section>
+
+  <section id="upi-incident" class="upi-incident" aria-label="Incidents">
+    <p id="upi-incident-text" class="upi-incident-text"></p>
+    <button id="upi-incident-action" class="upi-btn upi-btn--incident upi-hidden" type="button" aria-label="Nothing to do">Nothing to do</button>
+  </section>
+
+  <section class="upi-shop" aria-label="Shop">
+    <h2 class="upi-shop-title">Services <span class="upi-shop-note">earn credits, one slot each</span></h2>
+    <div id="upi-services" class="upi-items"></div>
+    <h2 class="upi-shop-title">Hardware <span class="upi-shop-note">slots for services; the desk holds 8 machines</span></h2>
+    <div id="upi-hardware" class="upi-items"></div>
+    <h2 class="upi-shop-title">Upgrades</h2>
+    <div id="upi-upgrades" class="upi-items"></div>
+  </section>
+
+  <section class="upi-panel upi-migrate-panel" aria-label="Migrate to a new rack">
+    <span class="upi-panel-title">Migrate to a new rack</span>
+    <p id="upi-migrate-text" class="upi-migrate-text"></p>
+    <button id="upi-migrate" class="upi-btn upi-btn--migrate" type="button" aria-label="Migrate to a new rack: start over with a permanent income bonus">Migrate to a new rack</button>
+  </section>
+
+  <section class="upi-panel upi-log-panel" aria-label="Event log">
+    <span class="upi-panel-title">Log</span>
+    <ol id="upi-log" class="upi-log" aria-live="polite"></ol>
+    <p id="upi-lifetime" class="upi-lifetime"></p>
+  </section>
+
+  <div id="upi-warning" class="upi-warning upi-hidden" role="alert"></div>
+
+  <details class="upi-help">
+    <summary class="upi-help-title">How to play</summary>
+    <ul class="upi-help-list">
+      <li>Services earn credits every second and take one slot each. The old laptop has 2 slots; a mini PC, a NAS or a virtualization node adds more.</li>
+      <li>Every machine takes a place: the desk holds 8. A server rack holds 16 more. A machine whose power would eat all of the income is refused: buy a service first.</li>
+      <li>Each copy of an item costs 15% more than the one before.</li>
+      <li>The power bill follows the usual formula, watts × hours × price per kWh / 1000 (the one the Homelab Power Cost Calculator uses): each second of play is billed as one hour at 4 cr per kWh, times the PUE of your cooling. Better cooling lowers the PUE.</li>
+      <li>Incidents: a failed disk halves the income until you replace it (a RAID mirror makes it harmless), a power outage stops everything for 30 s (a UPS rides it out), and a kernel update gives +50% income for 60 s if you reboot in time.</li>
+      <li>The session goal asks for about 3 minutes of income and pays a bonus of 90 seconds of it, so a short visit always gets somewhere.</li>
+      <li>Closed, hidden or asleep, the lab keeps earning at its net income for up to 8 hours. A clock set backwards counts nothing until it is past the time of the last save again.</li>
+      <li>With a server rack and 300.0M cr earned in a run you can migrate to a new rack: everything starts over, and the run's earnings become rack points, +2% income each, for good.</li>
+      <li>Keyboard, with the focus in the game: 1 to 9 buy the services and hardware in shop order. Tab and Enter reach every button.</li>
+    </ul>
+  </details>
+
+  <div id="upi-toast" class="upi-toast" aria-live="polite"></div>
+
+  <footer class="upi-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

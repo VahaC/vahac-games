@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bad Sector — Logs from VahaC</title>
+  <meta name="description" content="Bad Sector: bounce the read head off the carriage and break the sectors of an unrolled hard-disk platter. Bad sectors take several hits, read-only sectors never break, and RAID1, ECC and SLOW-SEEK bonuses drop from broken ones. SMART lives, a Daily disk with a streak, best score and track. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="bds-wrapper">
+
+  <header class="bds-header">
+    <div class="bds-title-group">
+      <h1 class="bds-title">Bad Sector</h1>
+      <p class="bds-subtitle">Bounce the read head off the carriage and break every sector of the platter until the surface scan completes.</p>
+    </div>
+
+    <div class="bds-header-actions">
+      <button id="bds-new" class="bds-btn" type="button" aria-label="Start a new free scan from track 1">New disk</button>
+      <button id="bds-daily-button" class="bds-btn bds-btn--daily" type="button" aria-label="Open the Daily disk">Daily</button>
+    </div>
+  </header>
+
+  <section class="bds-stats" aria-label="Drive stats">
+    <div class="bds-stat">
+      <span class="bds-stat-label">Score</span>
+      <span id="bds-score" class="bds-stat-value">0</span>
+    </div>
+    <div class="bds-stat">
+      <span class="bds-stat-label">Track</span>
+      <span id="bds-level" class="bds-stat-value">1</span>
+    </div>
+    <div class="bds-stat">
+      <span class="bds-stat-label">Sectors</span>
+      <span id="bds-sectors" class="bds-stat-value">0/0</span>
+    </div>
+    <div class="bds-stat">
+      <span class="bds-stat-label">SMART realloc</span>
+      <span id="bds-smart" class="bds-stat-value">0/3</span>
+    </div>
+    <div class="bds-stat">
+      <span class="bds-stat-label">Best</span>
+      <span id="bds-best" class="bds-stat-value">--</span>
+    </div>
+    <div class="bds-stat">
+      <span class="bds-stat-label">Streak</span>
+      <span id="bds-streak" class="bds-stat-value">0</span>
+    </div>
+  </section>
+
+  <main class="bds-main">
+    <div class="bds-drive">
+      <div class="bds-drive-head">
+        <span id="bds-mode" class="bds-mode">Free scan · track 1</span>
+        <span id="bds-effects" class="bds-effects">No bonus active</span>
+      </div>
+      <div id="bds-stage" class="bds-stage">
+        <canvas id="bds-canvas" class="bds-canvas" width="720" height="960" tabindex="0" role="img" aria-label="The platter. With the focus here: Left and Right or A and D move the carriage, Space launches, P pauses."></canvas>
+        <div id="bds-overlay" class="bds-overlay">
+          <p id="bds-overlay-text" class="bds-overlay-text">Spinning up the platter...</p>
+        </div>
+      </div>
+    </div>
+    <div class="bds-controls">
+      <button id="bds-pause" class="bds-btn bds-btn--secondary" type="button" aria-pressed="false" aria-label="Pause or resume the scan">Pause</button>
+      <button id="bds-next" class="bds-btn bds-btn--next bds-hidden" type="button" aria-label="Start the next track">Next track</button>
+      <button id="bds-practice" class="bds-btn bds-btn--secondary bds-hidden" type="button" aria-label="Practice this Daily disk, not scored">Practice</button>
+    </div>
+  </main>
+
+  <section class="bds-status-panel">
+    <div id="bds-status" class="bds-status" aria-live="polite">Spinning up the platter...</div>
+    <div id="bds-warning" class="bds-warning bds-hidden" role="alert"></div>
+    <div id="bds-share" class="bds-share bds-hidden">
+      <button id="bds-share-button" class="bds-btn" type="button" aria-label="Copy the Daily result">Copy result</button>
+      <input id="bds-share-text" class="bds-share-text bds-hidden" type="text" readonly aria-label="Daily result to copy">
+    </div>
+  </section>
+
+  <details class="bds-help">
+    <summary class="bds-help-title">How to play</summary>
+    <ul class="bds-help-list">
+      <li>The read head bounces off the walls and the carriage at the bottom. Where it lands on the carriage sets the angle: straight up in the middle, steeper toward the ends.</li>
+      <li>Plain sectors break with one hit, bad sectors (amber and red, with their LBA) take two or three, and read-only sectors (grey, striped) never break. A broken sector flashes its LBA address.</li>
+      <li>Some sectors drop a bonus capsule: RAID1 adds a mirrored second head, ECC widens the carriage for 12 s and SLOW-SEEK (SLOW on its capsule) slows the heads for 10 s. Catch it with the carriage.</li>
+      <li>A head that falls past the carriage is a reallocated sector on the SMART readout. The third one fails the drive. A track with no sector left is a complete surface scan, and the next track has more rows and faster heads.</li>
+      <li>Mouse: the carriage follows the pointer. Touch: drag anywhere on the platter, for example in the strip below the carriage, and the carriage moves as far as your finger. A tap or a click launches the head.</li>
+      <li>Keyboard, with the platter focused (click it or Tab to it): Left and Right or A and D move the carriage, Space launches, P pauses. The game also pauses when the tab is hidden, and a game you come back to (from the other view or after a reload) waits paused with its head where it was.</li>
+      <li>The Daily disk is the same track for everyone, one scored attempt per day. Clear it on consecutive days to grow your streak, and replay it unscored with Practice.</li>
+    </ul>
+  </details>
+
+  <div id="bds-toast" class="bds-toast" aria-live="polite"></div>
+
+  <footer class="bds-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

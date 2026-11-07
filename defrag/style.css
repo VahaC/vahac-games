@@ -1,0 +1,644 @@
+/* Defrag — style.css
+   Namespace: dfg- (defrag)
+   All selectors use the dfg- prefix to avoid conflicts with host page styles.
+   Layout: the disk is a grid of tracks whose columns shrink with the page
+   (minmax(0, ...)), so it never widens it.  On screens up to 640 px a disk
+   of more than five tracks stands on two shelves (--dfg-shelf columns, set
+   by the script with --dfg-tracks), and every track keeps at least 46 px at
+   320 px.  Long words and numbers wrap instead of widening the page. */
+
+.dfg-wrapper {
+  --dfg-bg-primary: #0a0f1e;
+  --dfg-bg-secondary: #111827;
+  --dfg-bg-card: #1a2236;
+  --dfg-bg-input: #0d1424;
+  --dfg-border: #2a3a5c;
+  --dfg-border-focus: #3b82f6;
+  --dfg-text-primary: #e2e8f0;
+  --dfg-text-secondary: #94a3b8;
+  --dfg-text-muted: #64748b;
+  --dfg-accent-blue: #3b82f6;
+  --dfg-accent-cyan: #22d3ee;
+  --dfg-accent-green: #10b981;
+  --dfg-accent-amber: #f59e0b;
+  --dfg-accent-red: #ef4444;
+  --dfg-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --dfg-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --dfg-radius: 8px;
+  --dfg-block: 30px;
+
+  font-family: var(--dfg-font-sans);
+  color: var(--dfg-text-primary);
+  line-height: 1.6;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.1), transparent 45%),
+    linear-gradient(180deg, var(--dfg-bg-primary) 0%, var(--dfg-bg-secondary) 100%);
+}
+
+.dfg-wrapper *,
+.dfg-wrapper *::before,
+.dfg-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header and controls ─────────────────────────────────────────────────── */
+
+.dfg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dfg-title-group {
+  min-width: 0;
+}
+
+.dfg-title {
+  margin: 0;
+  font-family: var(--dfg-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--dfg-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
+}
+
+.dfg-subtitle {
+  margin: 6px 0 0;
+  max-width: 540px;
+  color: var(--dfg-text-secondary);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.dfg-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dfg-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--dfg-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.dfg-btn:hover {
+  background: #2563eb;
+}
+
+.dfg-btn:active {
+  transform: scale(0.97);
+}
+
+.dfg-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+.dfg-btn:focus-visible,
+.dfg-help-title:focus-visible {
+  outline: 2px solid var(--dfg-accent-cyan);
+  outline-offset: 2px;
+}
+
+.dfg-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--dfg-border);
+  color: var(--dfg-text-secondary);
+}
+
+.dfg-btn--secondary:hover {
+  background: var(--dfg-bg-secondary);
+  color: var(--dfg-text-primary);
+}
+
+.dfg-btn--daily {
+  background: linear-gradient(135deg, #047857, var(--dfg-accent-blue));
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+/* Next level, once it is open and the disk on screen is defragmented. */
+.dfg-btn--go {
+  border-color: var(--dfg-accent-green);
+  color: var(--dfg-accent-green);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.dfg-levelbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dfg-levelbar .dfg-btn {
+  flex: none;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.dfg-mode {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--dfg-font-mono);
+  font-size: 0.8rem;
+  color: var(--dfg-text-secondary);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.dfg-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dfg-stat {
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--dfg-radius);
+  background: linear-gradient(180deg, rgba(26, 34, 54, 0.95), rgba(13, 20, 36, 0.95));
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.dfg-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dfg-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* Values wrap instead of being cut off; nothing is ever hidden. */
+.dfg-stat-value {
+  display: block;
+  font-family: var(--dfg-font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--dfg-accent-green);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ── The console and the disk ────────────────────────────────────────────── */
+
+.dfg-main {
+  display: block;
+}
+
+.dfg-console {
+  padding: 12px;
+  border: 1px solid #1f3b35;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.03) 0 1px, transparent 1px 3px),
+    #060a13;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.dfg-console-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 6px;
+  font-family: var(--dfg-font-mono);
+  font-size: 0.8rem;
+}
+
+.dfg-prompt {
+  color: var(--dfg-accent-green);
+}
+
+.dfg-prompt::after {
+  content: '_';
+  margin-left: 2px;
+  animation: dfg-blink 1s steps(1) infinite;
+}
+
+.dfg-frag-line {
+  min-width: 0;
+  color: var(--dfg-accent-amber);
+  overflow-wrap: anywhere;
+}
+
+.dfg-meter {
+  height: 6px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  background: rgba(16, 185, 129, 0.25);
+  overflow: hidden;
+}
+
+.dfg-meter-fill {
+  width: 0;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--dfg-accent-amber) 0 6px, #b45309 6px 8px);
+  transition: width 0.3s;
+}
+
+.dfg-disk {
+  --dfg-tracks: 5;
+  --dfg-shelf: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--dfg-tracks), minmax(0, 76px));
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  background: #070b16;
+  box-shadow: inset 0 0 22px rgba(16, 185, 129, 0.05);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dfg-disk:focus {
+  outline: none;
+}
+
+.dfg-disk:focus-visible {
+  outline: 2px solid var(--dfg-accent-cyan);
+  outline-offset: -2px;
+}
+
+.dfg-disk--solved {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.6), inset 0 0 40px rgba(16, 185, 129, 0.25);
+}
+
+/* A track: its number on top, then its blocks from the bottom up. */
+.dfg-track {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 3px;
+  border: 1px solid #1e2a44;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #0d1424, #0a101d);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.dfg-track-num {
+  display: block;
+  font-family: var(--dfg-font-mono);
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--dfg-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.dfg-slots {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+.dfg-slot,
+.dfg-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--dfg-block);
+  min-width: 0;
+  border-radius: 3px;
+  font-family: var(--dfg-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  overflow: hidden;
+}
+
+/* The free room of a track: its outline keeps 3:1 against the track. */
+.dfg-slot {
+  border: 1px dashed #56688c;
+}
+
+.dfg-block {
+  color: #0a0f1e;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s;
+}
+
+.dfg-block--lift {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 2px var(--dfg-accent-cyan);
+}
+
+/* A fixed system block: striped and never lifted. */
+.dfg-block--sys {
+  background-image: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.28) 0 4px, transparent 4px 8px);
+}
+
+.dfg-type-log { background-color: #34d399; }
+.dfg-type-iso { background-color: #a78bfa; }
+.dfg-type-db { background-color: #60a5fa; }
+.dfg-type-jpg { background-color: #f472b6; }
+.dfg-type-txt { background-color: #e2e8f0; }
+.dfg-type-tar { background-color: #fbbf24; }
+.dfg-type-mp4 { background-color: #f87171; }
+.dfg-type-cfg { background-color: #22d3ee; }
+.dfg-type-boot { background-color: #fb923c; }
+.dfg-type-swap { background-color: #2dd4bf; }
+
+.dfg-track--sys {
+  border-color: #7c4a1d;
+  background: linear-gradient(180deg, #1a1208, #0a101d);
+}
+
+.dfg-track--sys .dfg-track-num {
+  color: #fb923c;
+}
+
+.dfg-track--selected {
+  border-color: var(--dfg-accent-cyan);
+  box-shadow: 0 0 0 1px var(--dfg-accent-cyan), 0 0 14px rgba(34, 211, 238, 0.35);
+}
+
+.dfg-track--target {
+  border-style: dashed;
+  border-color: var(--dfg-accent-green);
+}
+
+.dfg-track--hint-from {
+  border-color: var(--dfg-accent-amber);
+  animation: dfg-pulse 1.2s ease-in-out infinite;
+}
+
+.dfg-track--hint-to {
+  border-style: dashed;
+  border-color: var(--dfg-accent-amber);
+}
+
+/* ── Status, notes, share ────────────────────────────────────────────────── */
+
+.dfg-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dfg-status-panel {
+  margin-top: 14px;
+}
+
+.dfg-status {
+  padding: 12px 14px;
+  border-radius: var(--dfg-radius);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.14);
+  color: var(--dfg-accent-green);
+  font-family: var(--dfg-font-mono);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.dfg-note {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--dfg-radius);
+  font-family: var(--dfg-font-mono);
+  font-size: 0.82rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.dfg-note--hint {
+  color: var(--dfg-accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.dfg-note--dead {
+  color: var(--dfg-accent-red);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.dfg-warning {
+  display: block;
+  margin-top: 8px;
+  color: var(--dfg-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.dfg-share {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dfg-share-text {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  padding: 0.55rem 0.75rem;
+  background: var(--dfg-bg-input);
+  border: 1px solid var(--dfg-border);
+  border-radius: 6px;
+  color: var(--dfg-text-primary);
+  font-family: var(--dfg-font-mono);
+  font-size: 0.85rem;
+}
+
+.dfg-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--dfg-border);
+  border-radius: var(--dfg-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--dfg-text-secondary);
+  font-size: 0.85rem;
+}
+
+.dfg-help-title {
+  cursor: pointer;
+  color: var(--dfg-text-primary);
+  font-weight: 600;
+}
+
+.dfg-help-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+/* As wide as its message, up to the phone's width less 16 px a side. */
+.dfg-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(100px);
+  background: var(--dfg-accent-green);
+  color: #0a0f1e;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.dfg-toast.dfg-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.dfg-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--dfg-text-muted);
+  font-size: 0.8rem;
+}
+
+.dfg-hidden {
+  display: none;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes dfg-blink {
+  50% { opacity: 0; }
+}
+
+@keyframes dfg-pulse {
+  50% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.55); }
+}
+
+@media (hover: hover) {
+  .dfg-track:hover {
+    border-color: #33507f;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dfg-btn,
+  .dfg-track,
+  .dfg-block,
+  .dfg-meter-fill,
+  .dfg-toast {
+    transition: none;
+  }
+
+  .dfg-prompt::after,
+  .dfg-track--hint-from {
+    animation: none;
+  }
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .dfg-wrapper {
+    padding: 20px 12px;
+  }
+
+  .dfg-title {
+    font-size: 1.6rem;
+  }
+
+  .dfg-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dfg-console {
+    padding: 8px;
+  }
+
+  /* More than five tracks stand on two shelves. */
+  .dfg-disk {
+    grid-template-columns: repeat(var(--dfg-shelf), minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .dfg-actions .dfg-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .dfg-wrapper {
+    --dfg-block: 26px;
+  }
+
+  .dfg-disk {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .dfg-track {
+    padding: 2px;
+    gap: 3px;
+  }
+
+  .dfg-levelbar .dfg-btn {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .dfg-wrapper {
+    padding: 16px 8px;
+  }
+
+  .dfg-header-actions {
+    width: 100%;
+  }
+
+  .dfg-header-actions .dfg-btn {
+    flex: 1 1 0;
+  }
+
+  .dfg-stat {
+    padding: 6px 7px;
+  }
+
+  .dfg-stat-value {
+    font-size: 0.92rem;
+  }
+}
