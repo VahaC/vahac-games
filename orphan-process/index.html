@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orphan Process — Logs from VahaC</title>
+  <meta name="description" content="Orphan Process: a side-view platformer through a Linux file system. You are a freshly forked process whose parent died: run and jump through /home and /tmp, read man pages, send kill signals, dash with renice, reap zombies by killing their parent and look for PID 1 before the OOM killer finds you. Fully client-side, made for a desktop keyboard.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="orp-wrapper">
+
+  <header class="orp-header">
+    <h1 class="orp-title">Orphan Process</h1>
+    <p class="orp-subtitle">A freshly forked process whose parent died walks the file system looking for PID 1 before the OOM killer finds it.</p>
+  </header>
+
+  <p id="orp-narrow" class="orp-narrow">Orphan Process needs a keyboard and a window at least 720 px wide.</p>
+
+  <main id="orp-game" class="orp-game">
+    <div id="orp-stage" class="orp-stage">
+      <canvas id="orp-canvas" class="orp-canvas" width="480" height="270" tabindex="0" role="img" aria-label="The game. With the focus here: arrows or A and D move, Up, W or Space jumps, Down and jump drops through a platform, X or J sends a signal, C or K dashes, M opens the map, P or Esc pauses, F toggles fullscreen."></canvas>
+
+      <div id="orp-msg" class="orp-msg orp-hidden" aria-live="polite">
+        <p id="orp-msg-title" class="orp-msg-title"></p>
+        <p id="orp-msg-text" class="orp-msg-text"></p>
+      </div>
+
+      <div id="orp-start" class="orp-overlay">
+        <div class="orp-panel">
+          <h2 class="orp-panel-title">Orphan Process</h2>
+          <p class="orp-panel-text">Episode 1: /home and /tmp.</p>
+          <div class="orp-panel-actions">
+            <button id="orp-new" class="orp-btn" type="button" aria-label="Start a new game">New game</button>
+            <button id="orp-continue" class="orp-btn orp-btn--secondary" type="button" aria-label="Continue the saved game from its last tty" disabled>Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="orp-focus" class="orp-overlay orp-overlay--focus orp-hidden">
+        <button id="orp-focus-button" class="orp-btn" type="button" aria-label="Click to play: give the game the keyboard">Click to play</button>
+      </div>
+
+      <div id="orp-paused" class="orp-overlay orp-hidden">
+        <div class="orp-panel orp-panel--wide">
+          <h2 class="orp-panel-title">Paused</h2>
+          <p id="orp-man-count" class="orp-panel-text"></p>
+          <ul id="orp-man-list" class="orp-man-list" aria-label="Man pages found"></ul>
+          <div class="orp-panel-actions">
+            <button id="orp-resume" class="orp-btn" type="button" aria-label="Resume the game">Resume</button>
+            <button id="orp-back-tty" class="orp-btn orp-btn--secondary" type="button" aria-label="Restart at the last tty, keeping everything collected">Back to last tty</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="orp-end" class="orp-overlay orp-hidden">
+        <div class="orp-panel">
+          <h2 class="orp-panel-title">Episode 1 complete</h2>
+          <ul id="orp-end-stats" class="orp-end-stats" aria-label="Your run"></ul>
+          <p class="orp-panel-text">To be continued: /var/log</p>
+          <div class="orp-panel-actions">
+            <button id="orp-end-button" class="orp-btn" type="button" aria-label="Back to the title screen">Back to title</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="orp-warning" class="orp-warning orp-hidden" role="alert"></div>
+  </main>
+
+  <details id="orp-guide" class="orp-help" open>
+    <summary class="orp-help-title">How to play: keys, the top bar, capabilities, enemies and the boss</summary>
+    <div class="orp-guide">
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Goal</h3>
+        <p class="orp-guide-para">You are a process that was just forked, and your parent process has died: you are an orphan. You walk through a Linux file system looking for PID 1, the first process, which adopts orphans. Episode 1 covers /home and /tmp: 15 rooms, two capabilities and one boss, tmpfiles.d. It ends when you take the boss&#8217;s reward, with a screen of your time, deaths, man pages and completion.</p>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Controls</h3>
+        <p class="orp-guide-para">The game reads the keyboard only while it has the focus: click the game, or Click to play. It pauses when it loses the focus or the tab is hidden.</p>
+        <table class="orp-guide-keys">
+          <thead><tr><th scope="col">Keys</th><th scope="col">What they do</th></tr></thead>
+          <tbody>
+            <tr><td>Left and Right, A and D</td><td>Move.</td></tr>
+            <tr><td>Up, W or Space</td><td>Jump. Hold the key to jump higher; let go early for a short hop.</td></tr>
+            <tr><td>Down and jump</td><td>Drop through a one-way platform you stand on.</td></tr>
+            <tr><td>X or J</td><td>Send a signal. Needs the kill capability.</td></tr>
+            <tr><td>C or K</td><td>Dash. Needs the renice capability.</td></tr>
+            <tr><td>M</td><td>Open or close the map. The game stands still while it is open.</td></tr>
+            <tr><td>P or Esc</td><td>Pause and resume.</td></tr>
+            <tr><td>F</td><td>Fullscreen on and off.</td></tr>
+            <tr><td>Enter</td><td>Close a message.</td></tr>
+          </tbody>
+        </table>
+        <p class="orp-guide-para">Until you own a capability, its keys only show &#8220;Operation not permitted&#8221;.</p>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">The top bar, left to right</h3>
+        <ul class="orp-guide-list">
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">RSS</strong> is your health (in Linux, RSS is the memory a process holds). You start with 5 chips. A hit or spikes cost one chip, and then you blink for 1 s and cannot be hurt. A tty refills all of them, a chip item refills one. At 0 the process is killed and restarts at the last tty, keeping everything it collected.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">CPU</strong> is your energy. A signal costs 10 CPU and a dash 30 CPU. It refills by 20 a second, up to its maximum (100 at the start).</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">NICE</strong> is your level, and the thin bar after it is your XP toward the next one. In Linux the nice value is a process&#8217;s priority, from 19 (least important) to -20. You start at nice 19 and go one down with every level. It is not the dash: the dash is the renice capability.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">MAN</strong> counts the man pages you found, out of 12.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">SWEEP</strong> shows only in /tmp. The bar empties over 20 seconds; in its last 1 s the temporary crates blink, then they vanish for 3 s (the bar turns red) and come back.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">PID</strong> is your process id. It goes up by one after every death.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">Area</strong> is /HOME or /TMP.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-text"><strong class="orp-guide-name">Boss bar</strong> at the bottom of the screen shows TMPFILES.D and its HP while the boss is awake.</span></li>
+        </ul>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Capabilities</h3>
+        <ul class="orp-guide-list">
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-capKill" class="orp-guide-sprite" data-orp-sprite="capKill" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-signal1" class="orp-guide-sprite" data-orp-sprite="signal1" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">kill</strong> lies on a pedestal in /home/Documents. X or J sends a signal straight ahead for 8 tiles. It costs 10 CPU, and you can send one every 0.25 s. It hurts bugs, daemons, turrets and the boss&#8217;s open core, flips signal switches and stops at walls. It passes through zombies.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-capNice" class="orp-guide-sprite" data-orp-sprite="capNice" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-heroDash" class="orp-guide-sprite" data-orp-sprite="heroDash" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">renice</strong> is the reward for beating the boss of /tmp. C or K dashes 4 tiles in 0.2 s the way you face, without falling. It costs 30 CPU, and the next dash can start 0.5 s after the last one started. It breaks cracked walls for good, and a jump followed by a dash crosses a gap of 5 tiles that a jump alone cannot. renice is the Linux command that changes the priority of a running process; owning it does not change your NICE level.</span></li>
+        </ul>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Things in the world</h3>
+        <ul class="orp-guide-list">
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-ttyOff" class="orp-guide-sprite" data-orp-sprite="ttyOff" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-ttyOn" class="orp-guide-sprite" data-orp-sprite="ttyOn" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">tty</strong> (a terminal) is a checkpoint. Touch it: your progress is saved, RSS is refilled and its screen lights. After a death, or after Back to last tty, you restart at the last tty you touched (or at the start if there is none).</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-man" class="orp-guide-sprite" data-orp-sprite="man" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Man page</strong> gives 10 XP and one true sentence about Linux. There are 12; the pause screen lists the ones you found.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-chip" class="orp-guide-sprite" data-orp-sprite="chip" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Chip</strong> heals 1 RSS. Every third enemy you defeat drops one.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-module" class="orp-guide-sprite" data-orp-sprite="module" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Memory module</strong> adds 1 max RSS for good. Two are hidden in the world.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-switchOff" class="orp-guide-sprite" data-orp-sprite="switchOff" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-switchOn" class="orp-guide-sprite" data-orp-sprite="switchOn" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-gate" class="orp-guide-sprite" data-orp-sprite="gate" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Signal switch and gate:</strong> hit the switch with a signal. It stays on and opens the gate in the same room.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-doorTop" class="orp-guide-sprite" data-orp-sprite="doorTop" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-doorBottom" class="orp-guide-sprite" data-orp-sprite="doorBottom" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">r-- door</strong> is read-only for you: it needs setuid, which no process has in this episode. It cannot be opened; touching it says Permission denied.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-cracked" class="orp-guide-sprite" data-orp-sprite="cracked" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Cracked wall</strong> breaks only under a renice dash.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-platform" class="orp-guide-sprite" data-orp-sprite="platform" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">One-way platform:</strong> jump up through it and land on top; Down and jump drop through.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-crate" class="orp-guide-sprite" data-orp-sprite="crate" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-crateTemp" class="orp-guide-sprite" data-orp-sprite="crateTemp" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Crate and temporary crate:</strong> a crate is solid. A temporary crate vanishes during the sweep in /tmp and in the boss fight; if it comes back where you stand, it lifts you on top.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-crumble" class="orp-guide-sprite" data-orp-sprite="crumble" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-crumble2" class="orp-guide-sprite" data-orp-sprite="crumble2" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Crumbling tile</strong> falls 0.4 s after you land on it and comes back 3 s later.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-spikes" class="orp-guide-sprite" data-orp-sprite="spikes" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Spikes</strong> (a segfault) cost 1 RSS and put you back on the last safe ground.</span></li>
+        </ul>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Enemies</h3>
+        <p class="orp-guide-para">Touching an enemy or a shot costs 1 RSS. Before you have kill you cannot hurt anything: jump over or go around. Defeated enemies come back when you enter the room again.</p>
+        <ul class="orp-guide-list">
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-bug1" class="orp-guide-sprite" data-orp-sprite="bug1" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Bug:</strong> 1 HP, 5 XP. Walks the floor and turns at walls and ledges. Jump over it, or send one signal.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-daemon1" class="orp-guide-sprite" data-orp-sprite="daemon1" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Leaky daemon</strong> (a daemon is a background process): 3 HP, 15 XP. Stands still and, every 3 s while you are near, spawns a zombie, at most 3 alive at once. Three signals; when it dies, all its zombies are reaped.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-zombie1" class="orp-guide-sprite" data-orp-sprite="zombie1" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Zombie process</strong> (a process that has ended but whose parent never collected it): floats slowly toward you, through walls, when you are within 8 tiles. Signals pass through it, so it cannot be killed. Kill its daemon and it is reaped for 2 XP.</span></li>
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-turret1" class="orp-guide-sprite" data-orp-sprite="turret1" width="16" height="16" aria-hidden="true"></canvas><canvas id="orp-guide-turretShot" class="orp-guide-sprite" data-orp-sprite="turretShot" width="16" height="16" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">Lockfile turret and its shot:</strong> 2 HP, 10 XP. Faces you and fires a slow straight shot every 2 s; the shot stops at walls and cannot be hit. Jump over the shots; two signals destroy the turret.</span></li>
+        </ul>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">The boss, tmpfiles.d</h3>
+        <ul class="orp-guide-list">
+          <li class="orp-guide-item"><span class="orp-guide-pics"><canvas id="orp-guide-bossIdle" class="orp-guide-sprite orp-guide-sprite--boss" data-orp-sprite="bossIdle" width="32" height="32" aria-hidden="true"></canvas><canvas id="orp-guide-bossOpen" class="orp-guide-sprite orp-guide-sprite--boss" data-orp-sprite="bossOpen" width="32" height="32" aria-hidden="true"></canvas></span><span class="orp-guide-text"><strong class="orp-guide-name">tmpfiles.d</strong> (the service that cleans /tmp) sleeps at the far end of its arena until you are 5 tiles in. Then it wakes, and a gate shuts the door behind you until it is down. It has 12 HP in three phases of 4, and each phase is faster. Left: closed; right: its core open.</span></li>
+        </ul>
+        <ol class="orp-guide-steps">
+          <li>Wind-up: it shakes. Get ready to jump, or go up to a platform.</li>
+          <li>Sweep: it slides along the floor to the other end. Be up on a one-way platform, or jump over it.</li>
+          <li>Warning: the temporary crates blink.</li>
+          <li>Delete: the crates vanish for 3.5 s while temp files hang under the ceiling and then fall: one over you, the others 5 columns apart. Step away from the one over you; a platform above you stops them.</li>
+          <li>Core open for 2 s: shoot it. Only the open core takes damage, at most one hit every 0.7 s. The hit that ends a phase closes it, and it rages for 1 s.</li>
+        </ol>
+        <p class="orp-guide-para">Winning gives 40 XP, opens the gate and leaves the renice capability on a pedestal; taking it ends the episode 2.5 s later. If you die, you restart at the tty just before the arena, and the fight starts again with the boss at full HP. To leave in the middle of the fight, pause (P or Esc) and press Back to last tty.</p>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Levels and XP</h3>
+        <p class="orp-guide-para">XP comes from defeated enemies and from man pages. The first level needs 20 XP, and each next one 10 more than the one before. Every level adds 10 max CPU; every second level also adds 1 max RSS and refills RSS. A level shows a message such as &#8220;nice 18: Max CPU 110.&#8221; Enemies come back when you enter a room again, so you can always earn more XP; man pages and items stay collected.</p>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Map, pause and saving</h3>
+        <p class="orp-guide-para">M shows the map: the rooms by area, the ones you visited lit, the current one marked, and your completion. The pause screen lists the man pages you found and has two buttons: Resume, and Back to last tty, which restarts you at the last tty with full RSS, keeps everything you collected and does not count as a death.</p>
+        <p class="orp-guide-para">Your progress is saved in this browser the moment it changes, and also when you pause, leave the game or hide the tab. Your position is not saved: after a reload, Continue resumes at the last tty with everything you collected. New game over a saved game asks for a second press within 4 s.</p>
+      </section>
+      <section class="orp-guide-section">
+        <h3 class="orp-guide-heading">Secrets</h3>
+        <p class="orp-guide-para">Some cracked walls back in /home open once you have renice. It is worth going back.</p>
+      </section>
+    </div>
+  </details>
+
+  <div id="orp-toast" class="orp-toast" aria-live="polite"></div>
+
+  <footer class="orp-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

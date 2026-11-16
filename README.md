@@ -28,6 +28,7 @@ Games are grouped by genre, the same groups the index page (`index.html`) uses.
 
 - `bad-sector/` - Bad Sector: a brick breaker on an unrolled hard-disk platter: bounce the read head off the carriage through fragmented tracks of plain, bad (2-3 hits) and read-only sectors that flash their LBA when broken, with RAID1, ECC and SLOW-SEEK bonuses, SMART lives, faster tracks, a seeded Daily disk with one scored attempt, a streak and a share line, and auto save to localStorage.
 - `oncall-shift/` - On-Call Shift: a 3-minute night on call on a rack of twelve servers; fix each incident (cleanup, restart, scale or renew) before its SLA runs out, stop cascades from failed databases, and get an uptime score in nines and a postmortem; the shift, the best uptime per level and the last 5 shifts are saved in localStorage.
+- `orphan-process/` - Orphan Process: a side-view platformer for a desktop keyboard through a Linux file system: a forked process whose parent died crosses 15 hand-made rooms of /home and /tmp, reads 12 man pages, sends kill signals, reaps zombies by killing their parent daemon, beats the tmp cleaner for the renice dash and goes back for two secrets, with tty checkpoints and auto save to localStorage.
 - `snake-game/` - Snake on a 30x30 canvas grid: eat energy nodes for 10 points each, avoid the walls and your own tail, pick one of four speeds, and keep the saved game after a reload.
 
 ### Reflex and Typing
@@ -200,7 +201,25 @@ Features:
 - Keyboard while the rack has the focus: 1 to 4 choose an action, the arrows move the cursor, Enter applies, Space pauses and Escape clears. The shift pauses when the tab is hidden.
 - Saved in localStorage: the shift in progress (`ocs-state`, which comes back paused after a reload), the best uptime per level (`ocs-best`) and the last 5 shifts (`ocs-history`).
 
-### 12) Patch Panel
+### 12) Orphan Process
+
+Path:
+- `orphan-process/index.html`
+
+Features:
+- A side-view platformer for a desktop keyboard. You are a freshly forked process whose parent died, looking for PID 1 through a Linux file system. Episode 1 is /home and /tmp: 15 hand-made rooms, two abilities, one boss and a first run of 20-30 minutes, ending with a stats screen and "To be continued: /var/log". A window narrower than 720 px shows a notice instead of the game.
+- Keys only while the game has the focus (a "Click to play" overlay gives it): arrows or A/D move, Up, W or Space jump (hold it to jump higher), Down and jump drop through a platform, X or J send a signal, C or K dash, M shows the map, P or Esc pause, F toggles fullscreen (a whole multiple of 480x270), Enter closes a message. Losing the focus or hiding the tab pauses. Until a capability is owned its key only shows "Operation not permitted". The pause screen has Resume and Back to last tty, which restarts at the last tty with full RSS, keeps everything collected and is not a death (a way out of the boss fight).
+- A pure fixed-step simulation at 120 steps a second (at most 0.25 s of catch-up a frame) on a 480x270 canvas of 16 px tiles, shown at 960x540. Each frame draws between the last two steps on a backing store at the scale the canvas is shown at, so motion is smooth on 144 and 165 Hz displays too. The hero's physics constants are fixed, and the level budget follows from them: a step up of 2 tiles and a gap of 3. No room asks for more; the one 5-tile reach is a dash, and only where the dash is needed.
+- RSS (health), CPU (energy) and nice (the level, from 19 down). XP comes from enemies and man pages; each level adds 10 max CPU and every second one 1 max RSS. A thorough first run reaches nice 12 by the boss. Two memory modules add 1 max RSS each. At RSS 0 the process restarts at the last tty and keeps what it collected.
+- `kill` (found in Documents) sends a signal that hurts processes and flips switches; `renice` (the boss's reward; saved as `nice`) dashes 4 tiles and breaks cracked walls. Enemies and hazards: bugs, leaky daemons whose zombie processes cannot be killed (kill the daemon and they are reaped), lockfile turrets, spikes, crumbling tiles, switches and gates, an r-- door that stays shut in episode 1, and the /tmp cleanup sweep that deletes temporary crates for 3 s every 20 s (they blink for a second first).
+- The world: ~ (moving and jumping, the first tty), .config (bugs to dodge without a weapon), the .cache shaft with .ssh beside it (the r-- door), Documents (kill, then a daemon and its zombies), Downloads (the big fight, with .local/bin beside it) and the gate to /tmp (a switch to shoot); then /tmp (the sweep, taught where a fall does no harm), tmp.XXXX (crumbling tiles over spikes), .X11-unix (the turret corridor), systemd-private (a climb on temporary crates, with sess_ beside it), tty1 and the arena, tmpfiles.d. 12 man pages, each with one true sentence; a tty every two or three rooms and one right before the arena.
+- The boss, tmpfiles.d (the tmp cleaner), has 12 HP in three phases, each faster. It winds up and sweeps the floor to the other side (be up on a platform), makes the temporary crates blink and deletes them while temp files hang from the ceiling and then fall (one over you, the others 5 columns apart; a platform above you stops them), and opens its core for 2 s, the only time a signal hurts it (at most one hit every 0.7 s). The last hit of a phase makes it rage for a second. Once it wakes, a gate shuts the arena's door until it is down. A death restarts the fight from tty1.
+- Beating it drops renice, and taking renice ends the episode (time, deaths, man pages, completion). Continue goes back to tty1 with the dash: the arena's cracked walls lead down to .local/bin (a shortcut back to /home) and on toward /var/log, and the two secrets of /home open (a memory module in .local/bin and init(1) in ~).
+- HUD: RSS chips, CPU, nice with its XP bar, man pages found of 12, the sweep bar in /tmp, the PID (one higher after every death) and the area; the boss's HP bar at the bottom of the arena. The map (M) shows the rooms by area, the visited ones lit, the current one marked, and the completion; the pause screen lists the man pages found.
+- How to play, open under the game (and shown on a narrow window too): an illustrated guide with the game's own sprites (drawn from its atlas into small canvases at start-up) covering the goal, the keys, the top bar (NICE is the level, not the dash), both capabilities, everything in the world, the enemies, the boss step by step, levels, the map, pause and saving, and a hint about the secrets.
+- Saves in `orp-state` (version 2; any other version counts as no save): the run, the last tty, stats, abilities, collected items, switches, broken walls, the boss, whether the end screen was shown, visited rooms, play time and deaths, written the moment one of them changes. Every field falls back on its own, a tty past the gate turns its switch on, and blocked or full storage never stops the game (Continue still resumes the game of the same page load). Between two tabs, within one run the save with more play time wins; a New game in another tab is a later run, and a tab still on an older one stops saving.
+
+### 13) Patch Panel
 
 Path:
 - `patch-panel/index.html`
@@ -214,7 +233,7 @@ Features:
 - The Daily is a 7x7 board for everyone, seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload. Its clock runs while it is on screen. A solved Daily offers an unscored practice run, and the result line can be copied to share.
 - Saves the free game and the view (`ppn-state`), the best per board (`ppn-best`) and the Daily attempt, result and streak (`ppn-daily`) to localStorage. A second open tab takes over a newer Daily instead of overwriting it, and never erases another tab's best.
 
-### 13) Pod Packer
+### 14) Pod Packer
 
 Path:
 - `pod-packer/index.html`
@@ -228,7 +247,7 @@ Features:
 - Keyboard with the focus on the cluster: arrows pick a pod, 1-6 run it on that node, E evicts, U undoes, N starts the next level, Escape clears the pick. The game's own buttons and the host page keep their keys.
 - Saves the level in progress (pdp-state) and the best moves and evictions per level (pdp-progress). A damaged field falls back on its own. Blocked or full storage shows a warning naming the key, and the warning goes away once a write works again. A second tab's newer game is taken over before any action, and progress from different tabs is merged.
 
-### 14) Port Knocker
+### 15) Port Knocker
 
 Path:
 - `port-knocker/index.html`
@@ -240,7 +259,7 @@ Features:
 - Daily: one sequence a day, the same for everyone (FNV-1a + mulberry32 from the local date), on 6 ports with the mode rotating Forward/Reverse/Stride. There is one scored attempt, recorded before its first show; a reload resumes it or shows the result. The streak counts consecutive Daily wins, Share copies a result line (or selects it in a field), and a finished Daily can be replayed unscored. A result stored by another tab always stands.
 - Saved in localStorage: the game on screen (`pkn-state`, a reload brings the round back waiting for Start), the best length per mode and panel size (`pkn-best`), the Daily attempt and streak (`pkn-daily`) and the sound switch (`pkn-sound`, off by default; WebAudio tones are optional).
 
-### 15) Rack Reset
+### 16) Rack Reset
 
 Path:
 - `rack-reset/index.html`
@@ -253,7 +272,7 @@ Features:
 - With presses on the rack, a new model or size only chooses the next rack, and New Game or N has to be pressed a second time within 4 s; the toast names the rack that would be thrown away.
 - Saves the rack in play (`rkr-state`) and the fewest presses over par and racks cleared per model and size (`rkr-best`) to localStorage. A second open tab takes over a newer game instead of playing on or dealing over it, and bests from two tabs are merged. Blocked or full storage shows a warning that names the keys, what a reload will show and how to fix it.
 
-### 16) Reaction Time Test
+### 17) Reaction Time Test
 
 Path:
 - `reaction-time/index.html`
@@ -263,7 +282,7 @@ Features:
 - The reaction time comes from `performance.now()`, rounded to ms; it shows the current, best and average time, the attempts and a session timer, and a "Session Complete" summary after 10 successful rounds. The session then stays finished, also after a reload, until Play Again, New Game or Restart; Start or Enter show the summary again.
 - Mouse (the press counts, not the release), touch and keyboard: Enter starts a round, also from the difficulty select, and Space reacts. Keys typed into other page fields, buttons or links are left alone. The difficulty, the stats and the session time are saved in localStorage under `rxt-reaction-state`. The session timer resumes after a reload, and an idle second tab never overwrites a newer save.
 
-### 17) Regex Par
+### 18) Regex Par
 
 Path:
 - `regex-par/index.html`
@@ -276,7 +295,7 @@ Features:
 - The first pattern that holes a hole goes on this round's card; a shorter one later still sets the hole's best. All 18 holes give a round total and the best round. New round asks for a second press within 4 s, then clears the card and drafts and keeps the bests.
 - Saves the hole on screen, the round, the drafts and the card (`rxp-state`) and the shortest pattern per hole plus the best round (`rxp-best`) to localStorage, field by field. A second open tab's card, drafts, newer round and shorter bests are merged in, never written over.
 
-### 18) Snake Game
+### 19) Snake Game
 
 Path:
 - `snake-game/index.html`
@@ -286,7 +305,7 @@ Features:
 - Four speeds (Easy 160 ms, Normal 120 ms, Hard 85 ms, Insane 60 ms per tick), a timer of the time the snake moves (pauses excluded) and a best score.
 - The whole game (snake, food, score, best score, timer, speed) is saved in localStorage under `snp-snake-state` and comes back after a reload: a running or paused game waits for the first key, and a finished game starts over with the best score and speed kept. With storage blocked the game still plays, just without saving.
 
-### 19) Sudoku Game
+### 20) Sudoku Game
 
 Path:
 - `sudoku/index.html`
@@ -296,7 +315,7 @@ Features:
 - Hint fills one empty or wrong cell from the solution, wrong digits turn red as you type, and Restart returns to the original puzzle. Any finished grid that follows the rules wins.
 - Progress is saved in localStorage under `sdk-sudoku-game` after every move that changes the board and comes back after a reload; the save is removed when you win, and a broken save is replaced by a fresh puzzle.
 
-### 20) Swap Space Solitaire
+### 21) Swap Space Solitaire
 
 Path:
 - `swap-space-solitaire/index.html`
@@ -309,7 +328,7 @@ Features:
 - Undo of up to 500 moves. Restart, Give Up and New Deal ask for a second press. A clock runs from the first move, and stats show page faults, won/played, streak and best.
 - Saves the tab and the numbered deal (`swp-state`), the stats (`swp-stats`) and the day's attempt and daily streak (`swp-daily`) in localStorage. A second open tab's newer save is taken over, never written over, and a finished daily stays finished.
 
-### 21) Typing Speed Test
+### 22) Typing Speed Test
 
 Path:
 - `typing-speed-test/index.html`
@@ -320,7 +339,7 @@ Features:
 - A finished round is locked until New Game, Restart or a difficulty change; the live WPM is recomputed every second, so it falls while you pause.
 - The best WPM (the final WPM of a finished round: the text completed, or the 60 s run out, scored over the full minute) and the chosen difficulty are kept in localStorage under `tst-state`. A best saved by an older version came from the live reading and may be higher.
 
-### 22) Uptime Idle
+### 23) Uptime Idle
 
 Path:
 - `uptime-idle/index.html`
@@ -355,9 +374,9 @@ port 5175 (vahac-tools uses 5173), so both repositories can run side by side. `.
 ## Tests
 
 The repository ships with a test suite covering every game and the index
-page (1197 tests across 25 modules: one per game, two for the Reaction Time
-Test, `hub.test.js` for the index page and `_smoke.test.js` for the test
-harness), powered by the built-in Node.js test runner — no external
+page (1301 tests across 27 modules: one per game, two for the Reaction Time
+Test and for Orphan Process, `hub.test.js` for the index page and
+`_smoke.test.js` for the test harness), powered by the built-in Node.js test runner — no external
 dependencies required.
 
 Requirements: Node.js 20 or newer for `npm test` (20.11 or later, because
@@ -514,6 +533,15 @@ shows up as a test that has to change.
     - A level change mid-shift waiting for New Shift, with shift numbers only for shifts that ran.
     - Toasts, the clipboard fallback, blocked or full storage, and corrupt saves.
   - Source checks: ids, the ocs- prefix everywhere, ES5 syntax, embed safety, the 320-414 px layout, and the rack plus the action bar fitting a 320 px tall landscape screen.
+- Orphan Process (104 tests; 99 in `orphan-process.test.js`, 5 route tests in `orphan-process.route.test.js`):
+  - Physics against the spec's constants: the jump and its cut, running and air control, coyote time and the jump buffer, the design budget (a 2-tile step and a 3-tile gap, not a 3-tile step), one-way platforms, and `orpStep` leaving its input alone.
+  - Mechanics in rooms made for one test: hits, knock-back and spikes, death and respawn, CPU, levelling, kill and its cooldown, switches and gates, the dash and cracked walls, bugs, daemons, zombies and reaping, turrets, crumbling tiles, the sweep with its blink and crates that lift the hero (onto a whole pile), the r-- door, pickups (the renice pedestal only once the boss is down) and ttys, and a capability key pressed without the capability: one "Operation not permitted" per press, nothing else changed, silent with the capability.
+  - The world: all 15 rooms well formed (sizes, closed edges, exits that match both ways, the map grid, every legend letter) and a room validator, a movement model built from the physics constants, which proves every room, item and tty reachable with the abilities held at that point (kill, then the gate switch, then nice), no pit a trap even while crates or crumbling tiles are away, nice opening exactly the two /home secrets, the shortcut and the way onward, a tty every two or three rooms, and a thorough run at nice 12-13 by the boss. Room by room, with every ability, from every way in (each exit, each tty, the start) every exit and item of the room is reached; a place where it is not fails the test unless it is listed there as a known gap (none is).
+  - The boss: the loop and its timings, files that hang before they fall and stop on platforms, damage only on the open core with the 0.7 s limit and the rage, each phase faster, a scripted player that wins without dying, a hero that stands still and loses, the restart from tty1, and the arena afterwards (the shortcut into .local/bin, the way onward, the camera). The gate that shuts the arena's door from waking to defeat (never on the hero, open again after a death), a hero standing still on any floor column hit within one loop in every phase from either end, and the sweep starting over after a death or leaving the arena.
+  - The page booted like a browser from `index.html`: focus-only keys that never scroll the page and never reach the host page's shortcuts, pause and the man list, Back to last tty (out of the boss fight with the gate open again, from a room with no tty touched to the start, not a death), the map, the guide (every sprite it names drawn once, every number checked against the game's constants), the dash shown as renice, fullscreen sizes, messages that wait their turn and count their 4.5 s only while the game runs (not paused, on the map, in a hidden tab or without the focus), drawing (entities, the boss by state and its HP bar, the death flash), a HUD laid out without overlap from 5 to 26 max RSS, the end screen (also after a reload right after taking nice), Continue and reloads, saves of other versions, corrupt, partial, blocked and full storage (Continue from memory), runs between tabs (more play time within a run, the later New game between runs), and the 120 Hz loop with its 0.25 s catch-up, drawn between steps on a backing store at the shown scale: at 60, 120, 144 and 165 Hz a running hero moves the same distance every frame to a screen pixel.
+  - Source checks: ids, the orp- prefix, ES5 syntax and the IIFE, embed safety, the sprite block and its atlas, and the 320-1440 px layout with the narrow-window notice.
+  - The route played with the real physics: a bot feeds keys to `orpStep` at 1/120 s along waypoints, from the new-game start through every man page, both memory modules and every tty to the boss, wins the fight, and after Continue takes the way onward, the shortcut and the way back through /home for both secrets, without a hit; and with kill only, from /tmp back through the gate room and up its ladder into Downloads, and across .X11-unix from its tty to its west exit. Every jump also lands with the key pressed 4 steps early or late (one jump of a chain or all of them) and with the run-up 3 px off; a failure names the room and the waypoint.
+  - 100% lines, branches and functions of `orphan-process/script.js`.
 - Patch Panel (60 tests):
   - Pure functions checked against an independent board model: rotations and symmetry periods, edges with and without wrap, the rim crossings of wrap boards with the look of each end (a loop across the rim and an open end on boards of their own), the tiles across the rim and the hint, open ends, the switch's network and uplinks, loop cells. 240 seeded boards are spanning trees with at most three links a tile and are never scrambled solved, plus the fallback for a stuck random source and the target count.
   - The Daily: FNV-1a and mulberry32 reference values, the pinned board of 2026-11-05, local day keys counted without a jump at daylight saving changes, the streak, the share line, and which of two tabs' Daily records wins.

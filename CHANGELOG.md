@@ -4,6 +4,120 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-16] - Orphan Process
+
+Orphan Process joins Arcade: a side-view platformer for a desktop keyboard through /home and /tmp, with 15
+hand-made rooms, two abilities and the tmp cleaner as its boss. It sits in its own folder with the usual three
+plain files, the prefix `orp` and its own test module at 100 % line, branch and function coverage. It uses no
+image files, no network call and no outside resource: the sprites are ASCII maps in `script.js`. The suite now has
+1301 tests in 27 modules.
+
+### Index page
+
+#### Added
+- Orphan Process in Arcade. The page now lists 23 games in 7 genres.
+
+#### Tests
+- `tests/hub.test.js` follows the new lists: the counts, the genre chips and the listing by genre.
+
+### Orphan Process
+
+#### Added
+- New arcade game `orphan-process/` (prefix `orp`): a freshly forked process whose parent died looks for PID 1
+  through a Linux file system. Desktop only: a window narrower than 720 px shows a notice instead of the game.
+- A pure fixed-step simulation (120 steps a second, at most 0.25 s of catch-up a frame) on a 480x270 canvas of
+  16 px tiles, shown at 960x540 and in fullscreen at a whole multiple of it. Keys only while the game has the
+  focus; losing it or hiding the tab pauses.
+- The hero's physics as the spec fixes them (run 96 px/s, jump 270 px/s with a 40 % cut, gravity 900 px/s2,
+  coyote time and a jump buffer), one-way platforms, and the level budget that follows: a step up of 2 tiles, a
+  gap of 3.
+- RSS, CPU and nice (levels from 19 down, from enemies and man pages), two memory modules, tty checkpoints and a
+  restart at the last tty that keeps everything collected.
+- Two abilities: `kill` (a signal that hurts processes and flips switches) and `renice` (a 4-tile dash that breaks
+  cracked walls). Bugs, leaky daemons and their unkillable zombie processes (reaped when the daemon dies),
+  lockfile turrets, spikes, crumbling tiles, switches and gates, an r-- door, and the /tmp cleanup sweep that
+  deletes temporary crates for 3 s every 20 s after they blink for a second.
+- Episode 1, 15 hand-made rooms: ~, .config, .cache, .ssh, Documents (kill), Downloads, .local/bin and the gate to
+  /tmp; /tmp, tmp.XXXX, .X11-unix, systemd-private, sess_, tty1 and the arena tmpfiles.d. Each room teaches or
+  tests one idea, 12 man pages carry one true sentence each, and a tty comes every two or three rooms.
+- The boss, tmpfiles.d: 12 HP in three faster phases. A wind-up, a sweep along the floor, blinking crates, the
+  crates deleted while temp files hang and fall, then its core open for 2 s, the only time a signal hurts it.
+  Every attack is announced and can be avoided with running, jumping and the platforms. Its HP bar shows at the
+  bottom of the screen.
+- Beating it drops renice; taking renice shows the end-of-episode screen (time, deaths, man pages, completion). After
+  it, the dash opens the arena's shortcut down to .local/bin, the way onward and the two secrets of /home (a
+  memory module in .local/bin, init(1) in ~). One-way platforms in .config and at the foot of the Documents
+  ladder lead back up, so /home can be reached again from /tmp.
+- HUD as in the style sample, a map of the rooms by area with the completion, a pause screen with the man pages
+  found, a death flash, and saves in `orp-state` (versioned) parsed field by field; between two tabs the save with
+  more play time wins.
+
+#### Fixed (after review)
+- The boss arena had a spot out of every attack's reach (the west door): from waking until the boss is down a gate
+  now shuts the door. It shuts while the hero is at least 4 tiles away and opens again when the boss is down or the
+  hero dies.
+- The boss's deleted crates no longer follow the hero out: a death or leaving the arena restarts the sweep.
+- A man page that gives a level keeps its message for the full 4.5 s; messages that come while one shows wait their
+  turn (the same message is not queued twice).
+- A message's 4.5 s now count only while the game runs: paused, on the map, in a hidden tab or without the focus the
+  message and the queue behind it wait. Enter still closes it.
+- Two rooms could only be crossed one way. The gate to /tmp gets a ladder of one-way platforms by its west wall
+  (rows 7 to 15, columns 9-10) up to the opening to Downloads, apart from the climb to the switch; .X11-unix gets a
+  one-way platform east of its middle block (row 16, columns 42-45), under the line of fire of the turret on the
+  block, so the block, the west exit and the chip on the platform above are reached from the east too.
+- Saves are version 2 (any other version counts as no save) and carry the run: New game makes a run id and its
+  birth time. Within one run the save with more play time wins; between runs the later New game wins, so a tab on
+  an older run stops saving instead of undoing a New game made in another tab. A tty past the gate turns its switch
+  on when a save is loaded.
+- The dash capability is shown as `renice` (the Linux command that changes a running process's priority), so it
+  is no longer read as the NICE level in the HUD; saves keep its id `nice`, so existing games load unchanged.
+- Pressing Signal without `kill` or Dash without `renice` shows "Operation not permitted" with the missing
+  capability's name, once per press; nothing else changes.
+- The pause screen has Back to last tty: a restart at the last tty with full RSS, as a reload and Continue would
+  do, that is not a death, so the boss fight can be left mid-way.
+- How to play is an illustrated guide, open under the game and shown on a narrow window too: the goal, the keys,
+  the top bar, both capabilities, everything in the world, the enemies, the boss step by step, levels, the map,
+  pause and saving, with the game's own sprites drawn into small canvases from its atlas.
+- Reloading within 2.5 s of taking nice no longer skips the end screen: the save says when it was shown, and
+  Continue shows it first when it was not.
+- The HUD no longer overlaps at a high max RSS: above 14 chips RSS shows as "rss/max" with a bar, and the PID sits
+  just before the area name.
+- Continue is offered only when it resumes a game: the last save is also kept in memory, so with blocked or full
+  storage Continue resumes the game of the same page load.
+- Keys the game takes no longer reach the host page's own shortcuts (they stop at the canvas); other keys and every
+  key outside the game are left alone.
+- Smooth motion on 144 and 165 Hz displays: each frame draws between the last two steps (nothing is blended across
+  a room change, a respawn or the return after spikes), on a backing store at the integer scale the canvas is shown
+  at (2 at 960x540, the fullscreen multiple, 1 when narrower), so moving things move by screen pixels.
+
+#### Tests
+- `tests/orphan-process.test.js` with 99 tests:
+  - The physics constants and the design budget, the mechanics in rooms made for one test, and `orpStep` left
+    pure.
+  - The world: every room well formed, and a room validator built from the physics constants that proves every
+    room, item and tty reachable with the abilities held at that point, no pit a trap (also while crates or
+    crumbling tiles are away), nice opening exactly the two secrets, the shortcut and the way onward, a tty every
+    two or three rooms, and a thorough run at nice 12-13 by the boss.
+  - The boss: its loop and timings, the files, damage only on the open core, faster phases, a scripted player that
+    wins without dying, a hero that stands still and loses, and the restart from tty1.
+  - The page booted from `index.html`: keys and focus, pause, map, fullscreen, drawing, the end screen, saves,
+    corrupt, blocked and full storage, second tabs and the loop.
+  - Source checks: ids, the prefix, ES5 IIFE, embed safety, the sprite block and atlas, and the 320-1440 px layout.
+  - After review: the arena gate and a hero standing still on every floor column hit within one loop in every
+    phase; the sweep after a death or leaving the arena; the message queue; the end screen after a quick reload;
+    runs between tabs; saves of other versions and the repairs on load; Continue from memory; keys kept from the
+    host page; the HUD layout from 5 to 26 max RSS; the room validator room by room from every way in (no known gaps
+    left; a new one fails); messages that wait while the game does not run; and
+    at 60, 120, 144 and 165 Hz a running hero moving the same distance every frame to a screen pixel, with the
+    backing store following the scale.
+- `tests/orphan-process.route.test.js` with 5 tests: a bot plays the whole route with the real physics, room by
+  room along waypoints, through every man page, module and tty, the boss and the secrets after it, without a hit,
+  and with kill only the way back through the gate room into Downloads and across .X11-unix to its west exit;
+  every jump also lands with the key pressed 4 steps early or late and the run-up 3 px off. A failure names the
+  room and the waypoint.
+- 100 % line, branch and function coverage of `orphan-process/script.js`. One step of the game takes about
+  0.02 ms under Node in the largest room.
+
 ## [2026-11-07] - Bitmap Decoder: bigger boards and mistake limits
 
 Bitmap Decoder's Endless mode gets three bigger boards for wide screens, up to 30x30 on a 1280 px screen.

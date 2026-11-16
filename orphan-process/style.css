@@ -1,0 +1,477 @@
+/* Orphan Process — style.css
+   Namespace: orp- (orphan process)
+   All selectors use the orp- prefix to avoid conflicts with host page styles.
+   The game is a canvas of 480x270 logical pixels drawn with
+   image-rendering: pixelated, shown at 960x540 when the wrapper has room
+   (the wrapper is at most 1000 px wide) and scaled down to the wrapper
+   width otherwise.  A window narrower than 720 px gets a short notice
+   instead of the game, and nothing is wider than a 320 px phone. */
+
+.orp-wrapper {
+  --orp-bg-primary: #0a0f1e;
+  --orp-bg-secondary: #111827;
+  --orp-bg-card: #1a2236;
+  --orp-bg-input: #0d1424;
+  --orp-border: #2a3a5c;
+  --orp-border-focus: #3b82f6;
+  --orp-text-primary: #e2e8f0;
+  --orp-text-secondary: #94a3b8;
+  --orp-text-muted: #64748b;
+  --orp-accent-blue: #3b82f6;
+  --orp-accent-cyan: #22d3ee;
+  --orp-accent-green: #10b981;
+  --orp-accent-amber: #f59e0b;
+  --orp-accent-red: #ef4444;
+  --orp-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --orp-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --orp-radius: 8px;
+
+  font-family: var(--orp-font-sans);
+  color: var(--orp-text-primary);
+  line-height: 1.6;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  background:
+    radial-gradient(circle at top, rgba(52, 211, 153, 0.08), transparent 45%),
+    linear-gradient(180deg, var(--orp-bg-primary) 0%, var(--orp-bg-secondary) 100%);
+}
+
+.orp-wrapper *,
+.orp-wrapper *::before,
+.orp-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.orp-header {
+  margin-bottom: 18px;
+}
+
+.orp-title {
+  margin: 0;
+  font-family: var(--orp-font-mono);
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--orp-accent-green);
+  text-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+}
+
+.orp-subtitle {
+  margin: 6px 0 0;
+  max-width: 640px;
+  color: var(--orp-text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ── The game ────────────────────────────────────────────────────────────── */
+
+.orp-narrow {
+  display: none;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--orp-border);
+  border-radius: var(--orp-radius);
+  background: var(--orp-bg-card);
+  color: var(--orp-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* The overlays sit over the canvas in a positioned block. */
+.orp-stage {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  box-shadow: 0 0 0 1px var(--orp-border);
+  background: #05080f;
+}
+
+.orp-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  background: #05080f;
+  outline: none;
+}
+
+.orp-canvas:focus-visible {
+  outline: 2px solid var(--orp-accent-cyan);
+  outline-offset: -2px;
+}
+
+.orp-stage:fullscreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: none;
+  box-shadow: none;
+}
+
+/* The script sets the size inline (a whole multiple of 480 x 270, see
+   orpFitFullscreen); flex must not shrink it. */
+.orp-stage:fullscreen .orp-canvas {
+  flex: none;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.orp-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: rgba(5, 8, 15, 0.55);
+}
+
+/* Click to play: a click beside the button reaches the canvas too. */
+.orp-overlay--focus {
+  pointer-events: none;
+  background: rgba(5, 8, 15, 0.35);
+}
+
+.orp-overlay--focus .orp-btn {
+  pointer-events: auto;
+}
+
+.orp-panel {
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 16px 22px;
+  border: 1px solid var(--orp-border);
+  border-radius: var(--orp-radius);
+  background: rgba(13, 20, 36, 0.94);
+  text-align: center;
+}
+
+.orp-panel--wide {
+  width: 100%;
+  max-width: 640px;
+  text-align: left;
+}
+
+.orp-panel-title {
+  margin: 0 0 6px;
+  font-family: var(--orp-font-mono);
+  font-size: 1.3rem;
+  color: var(--orp-accent-green);
+}
+
+.orp-panel-text {
+  margin: 0 0 10px;
+  color: var(--orp-text-secondary);
+  font-size: 0.9rem;
+}
+
+.orp-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.orp-man-list,
+.orp-end-stats {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: var(--orp-text-primary);
+}
+
+.orp-end-stats {
+  padding-left: 0;
+  list-style: none;
+  font-family: var(--orp-font-mono);
+}
+
+.orp-man-item,
+.orp-end-item {
+  margin: 2px 0;
+}
+
+.orp-man-name {
+  font-family: var(--orp-font-mono);
+  color: var(--orp-accent-cyan);
+}
+
+/* The message box: a man page, a capability, a level, a refusal.  It sits
+   under the HUD, away from the floor the hero walks on. */
+.orp-msg {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  width: min(80%, 560px);
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border: 1px solid var(--orp-accent-cyan);
+  border-radius: var(--orp-radius);
+  background: rgba(5, 8, 15, 0.92);
+  pointer-events: none;
+}
+
+.orp-msg-title {
+  margin: 0;
+  font-family: var(--orp-font-mono);
+  font-weight: 700;
+  color: var(--orp-accent-cyan);
+}
+
+.orp-msg-text {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--orp-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.orp-btn {
+  padding: 0.65rem 1.5rem;
+  background: var(--orp-accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.orp-btn:hover {
+  background: #2563eb;
+}
+
+.orp-btn:active {
+  transform: scale(0.97);
+}
+
+.orp-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.orp-btn:focus-visible,
+.orp-help-title:focus-visible {
+  outline: 2px solid var(--orp-accent-cyan);
+  outline-offset: 2px;
+}
+
+.orp-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--orp-border);
+  color: var(--orp-text-secondary);
+}
+
+.orp-btn--secondary:hover {
+  background: var(--orp-bg-secondary);
+  color: var(--orp-text-primary);
+}
+
+/* ── Status and help ─────────────────────────────────────────────────────── */
+
+.orp-warning {
+  margin-top: 10px;
+  color: var(--orp-accent-red);
+  font-size: 0.85rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.orp-help {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--orp-border);
+  border-radius: var(--orp-radius);
+  background: rgba(13, 20, 36, 0.8);
+  color: var(--orp-text-secondary);
+  font-size: 0.85rem;
+}
+
+.orp-help-title {
+  cursor: pointer;
+  color: var(--orp-text-primary);
+  font-weight: 600;
+}
+
+/* The illustrated guide under the game (also shown when the narrow-window
+   notice replaces the game).  Each entry is a row of sprites (16x16 at
+   32 px, the 32x32 boss at 64 px) and its text, which wraps beside them. */
+.orp-guide {
+  margin-top: 4px;
+}
+
+.orp-guide-section {
+  margin-top: 14px;
+}
+
+.orp-guide-heading {
+  margin: 0 0 6px;
+  font-family: var(--orp-font-mono);
+  font-size: 0.95rem;
+  color: var(--orp-accent-green);
+}
+
+.orp-guide-para {
+  margin: 6px 0;
+}
+
+.orp-guide-list {
+  list-style: none;
+  margin: 6px 0;
+  padding: 0;
+}
+
+.orp-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--orp-border);
+}
+
+.orp-guide-pics {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.orp-guide-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.orp-guide-name {
+  color: var(--orp-text-primary);
+}
+
+.orp-guide-sprite {
+  display: block;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.orp-guide-sprite--boss {
+  width: 64px;
+  height: 64px;
+}
+
+.orp-guide-steps {
+  margin: 6px 0;
+  padding-left: 22px;
+}
+
+.orp-guide-keys {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 6px 0;
+}
+
+.orp-guide-keys th,
+.orp-guide-keys td {
+  padding: 4px 8px 4px 0;
+  border-top: 1px solid var(--orp-border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.orp-guide-keys th {
+  color: var(--orp-text-primary);
+}
+
+/* Centred between left and right without a transform on the x axis, so a
+   long message wraps instead of widening the page. */
+.orp-toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 2rem;
+  width: fit-content;
+  max-width: 560px;
+  margin: 0 auto;
+  transform: translateY(100px);
+  background: var(--orp-accent-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.orp-toast.orp-show {
+  transform: translateY(0);
+  opacity: 1;
+  animation: orp-fork 0.3s ease-out;
+}
+
+.orp-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--orp-text-muted);
+  font-size: 0.8rem;
+}
+
+.orp-hidden {
+  display: none !important;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes orp-fork {
+  from { opacity: 0.2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orp-btn,
+  .orp-toast {
+    transition: none;
+  }
+
+  .orp-toast.orp-show {
+    animation: none;
+  }
+}
+
+/* ── Narrow windows ──────────────────────────────────────────────────────── */
+
+@media (max-width: 719px) {
+  .orp-wrapper {
+    padding: 20px 12px;
+  }
+
+  .orp-title {
+    font-size: 1.6rem;
+  }
+
+  .orp-narrow {
+    display: block;
+  }
+
+  .orp-game {
+    display: none;
+  }
+}

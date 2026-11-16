@@ -256,6 +256,7 @@ and localStorage key of a game (`.{p}-wrapper`, `#{p}-board`, `{p}-state`).
 | `liv`  | Lost in /var         | `lost-in-var/`          | Built  |
 | `msp`  | Minesweeper Game     | `minesweeper/`          | Built  |
 | `ocs`  | On-Call Shift        | `oncall-shift/`         | Built  |
+| `orp`  | Orphan Process       | `orphan-process/`       | Built  |
 | `pdp`  | Pod Packer           | `pod-packer/`           | Built  |
 | `pkn`  | Port Knocker         | `port-knocker/`         | Built  |
 | `ppn`  | Patch Panel          | `patch-panel/`          | Built  |
