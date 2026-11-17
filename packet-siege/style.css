@@ -1,0 +1,1278 @@
+/* Packet Siege — style.css
+   Namespace: pks- (packet siege)
+   All selectors use the pks- prefix to avoid conflicts with host page styles.
+
+   The game is one framed console (.pks-frame): every screen swaps in place
+   inside it at the frame's size.  The script lays the frame out (ui-layout,
+   ui-frame): it sets the frame's size and puts the HUD, the field, the tray
+   band, the cards and the status line at absolute boxes in it, so this
+   sheet only draws them.  The field is a 320x180 canvas shown at a whole
+   multiple of the frame's parent width (3x from 960 px, 2x from 640, 1x from
+   320, a fraction below); in fullscreen or maximised (.pks-frame--max) the
+   frame fills the screen.  Component rules are written under .pks-wrapper so
+   they outrank a host page's bare element rules; the reset below stops
+   those rules (button { text-transform: uppercase } ...) at the wrapper.
+   Font sizes inside the frame are in px: the layout counts on them, whatever
+   the host's root font size.  Only the canvas, the cards and the buttons
+   drop the double-tap zoom; the page keeps scrolling. */
+
+.pks-wrapper {
+  --pks-bg-primary: #0a0f1e;
+  --pks-bg-secondary: #111827;
+  --pks-bg-card: #1a2236;
+  --pks-bg-input: #0d1424;
+  --pks-bg-selected: #0b3a4a;
+  --pks-bg-frame: #0d1424;
+  --pks-bg-bar: #121a2c;
+  --pks-border: #2a3a5c;
+  --pks-border-focus: #3b82f6;
+  --pks-text-primary: #e2e8f0;
+  --pks-text-secondary: #94a3b8;
+  --pks-text-muted: #64748b;
+  --pks-accent-blue: #2563eb;
+  --pks-accent-blue-hover: #1d4ed8;
+  --pks-accent-cyan: #22d3ee;
+  --pks-accent-green: #10b981;
+  --pks-accent-amber: #f59e0b;
+  --pks-accent-red: #ef4444;
+  --pks-text-warn: #fca5a5;
+  --pks-text-poor: #f87171;
+  --pks-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Consolas', monospace;
+  --pks-font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --pks-radius: 8px;
+
+  font-family: var(--pks-font-sans);
+  font-size: 15px;
+  color: var(--pks-text-primary);
+  background: var(--pks-bg-primary);
+  line-height: 1.5;
+  text-align: left;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+.pks-wrapper *,
+.pks-wrapper *::before,
+.pks-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* What the host page's bare element rules may set and the game relies on. */
+.pks-wrapper button,
+.pks-wrapper h1,
+.pks-wrapper h2,
+.pks-wrapper h3,
+.pks-wrapper p,
+.pks-wrapper ul,
+.pks-wrapper li,
+.pks-wrapper canvas,
+.pks-wrapper section,
+.pks-wrapper header,
+.pks-wrapper footer {
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: inherit;
+  line-height: inherit;
+  box-shadow: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pks-wrapper button {
+  width: auto;
+  height: auto;
+  max-width: none;
+  float: none;
+  font-size: inherit;
+  text-shadow: none;
+  text-decoration: none;
+}
+
+.pks-wrapper .pks-hidden {
+  display: none !important;
+}
+
+/* Visually hidden, still read by screen readers. */
+.pks-wrapper .pks-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Title and footer (outside the frame) ────────────────────────────────── */
+
+.pks-wrapper .pks-header {
+  margin-bottom: 16px;
+}
+
+.pks-wrapper .pks-title {
+  margin: 0;
+  font-family: var(--pks-font-mono);
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--pks-accent-cyan);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+}
+
+.pks-wrapper .pks-subtitle {
+  margin: 6px 0 0;
+  color: var(--pks-text-secondary);
+  font-size: 15px;
+}
+
+.pks-wrapper .pks-footer {
+  margin-top: 20px;
+  color: var(--pks-text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── The frame ───────────────────────────────────────────────────────────── */
+
+.pks-wrapper .pks-holder {
+  position: relative;
+  width: 100%;
+}
+
+.pks-wrapper .pks-frame {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: 560px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--pks-bg-frame);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--pks-border), 0 12px 36px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--pks-text-primary);
+}
+
+/* Maximised: the frame over the whole viewport, above the host page. */
+.pks-wrapper .pks-frame--max {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2147483000;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pks-wrapper .pks-frame:fullscreen {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pks-wrapper .pks-frame:-webkit-full-screen {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pks-wrapper .pks-play {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.pks-wrapper .pks-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  margin: 0;
+  padding: 0 18px;
+  background: var(--pks-accent-blue);
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: var(--pks-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.pks-wrapper .pks-btn:hover {
+  background: var(--pks-accent-blue-hover);
+}
+
+.pks-wrapper .pks-btn:active {
+  transform: scale(0.97);
+}
+
+.pks-wrapper .pks-btn:disabled {
+  background: var(--pks-bg-card);
+  border-color: var(--pks-border);
+  color: var(--pks-text-secondary);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pks-wrapper .pks-btn--secondary {
+  background: var(--pks-bg-card);
+  border-color: var(--pks-border);
+  color: var(--pks-text-primary);
+}
+
+.pks-wrapper .pks-btn--secondary:hover {
+  background: var(--pks-bg-secondary);
+}
+
+.pks-wrapper .pks-btn--small {
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.pks-wrapper .pks-btn[aria-pressed="true"] {
+  border-color: var(--pks-accent-cyan);
+}
+
+.pks-wrapper button:focus-visible {
+  outline: 2px solid var(--pks-accent-cyan);
+  outline-offset: 2px;
+}
+
+.pks-wrapper .pks-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ── Full-frame screens: level select, loadout, codex ────────────────────── */
+
+.pks-wrapper .pks-screen {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--pks-bg-frame);
+}
+
+.pks-wrapper .pks-screen-head {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+  min-height: 52px;
+  padding: 3px 8px;
+  background: var(--pks-bg-bar);
+  border-bottom: 1px solid var(--pks-border);
+}
+
+.pks-wrapper .pks-screen-head--column {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+.pks-wrapper .pks-head-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.pks-wrapper .pks-screen-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.pks-wrapper .pks-screen-foot {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--pks-bg-bar);
+  border-top: 1px solid var(--pks-border);
+}
+
+.pks-wrapper .pks-screen-title {
+  margin: 0;
+  font-family: var(--pks-font-mono);
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--pks-text-primary);
+}
+
+/* ── Level select ────────────────────────────────────────────────────────── */
+
+.pks-wrapper .pks-total {
+  margin: 0;
+  font-family: var(--pks-font-mono);
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-total span {
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-rotate {
+  display: none;
+  margin: 0 0 8px;
+  color: var(--pks-text-secondary);
+  font-size: 13px;
+}
+
+/* The offer to resume a level in progress. */
+.pks-wrapper .pks-run {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  background: var(--pks-bg-selected);
+  border: 1px solid var(--pks-accent-cyan);
+  border-radius: 6px;
+}
+
+.pks-wrapper .pks-run-text {
+  flex: 1 1 180px;
+  margin: 0;
+  color: var(--pks-text-primary);
+}
+
+.pks-wrapper .pks-run-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The zone picker: 15 tiles, the zone shown pressed. */
+.pks-wrapper .pks-zone-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0 0 12px;
+}
+
+.pks-wrapper .pks-zone-tile {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1px 4px;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 3px 4px;
+  background: var(--pks-bg-card);
+  color: var(--pks-text-primary);
+  border: 1px solid var(--pks-border);
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: var(--pks-font-mono);
+  font-size: 11px;
+  line-height: 14px;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pks-wrapper .pks-zone-tile:hover {
+  border-color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-zone-tile[aria-pressed="true"] {
+  background: var(--pks-bg-selected);
+  border-color: var(--pks-accent-cyan);
+  box-shadow: inset 0 0 0 1px var(--pks-accent-cyan);
+}
+
+.pks-wrapper .pks-zone-tile--locked {
+  background: var(--pks-bg-input);
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-zone-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-zone-num {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.pks-wrapper .pks-zone-tname {
+  display: none;
+  grid-column: 1 / -1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pks-wrapper .pks-zone-stars {
+  grid-column: 1 / -1;
+  white-space: nowrap;
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-zone-tile--locked .pks-zone-stars {
+  color: var(--pks-text-secondary);
+}
+
+/* Wide frames: the zone's name on its tile too, and a bigger icon. */
+.pks-wrapper .pks-frame:not(.pks-frame--small) .pks-zone-tname {
+  display: block;
+}
+
+.pks-wrapper .pks-frame:not(.pks-frame--small) .pks-zone-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.pks-wrapper .pks-zones {
+  margin: 0;
+}
+
+.pks-wrapper .pks-zone {
+  margin-bottom: 14px;
+}
+
+.pks-wrapper .pks-zone-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-zone-name {
+  color: var(--pks-text-primary);
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+}
+
+.pks-wrapper .pks-level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 52px;
+  margin: 0;
+  padding: 4px 2px;
+  background: var(--pks-bg-card);
+  color: var(--pks-text-primary);
+  border: 1px solid var(--pks-border);
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: var(--pks-font-mono);
+  font-size: 16px;
+  line-height: 1.1;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pks-wrapper .pks-level:hover {
+  border-color: var(--pks-accent-cyan);
+}
+
+.pks-wrapper .pks-level--boss {
+  border-color: var(--pks-accent-red);
+}
+
+.pks-wrapper .pks-level--locked,
+.pks-wrapper .pks-level--locked:hover {
+  background: var(--pks-bg-input);
+  border-color: var(--pks-border);
+  color: var(--pks-text-secondary);
+  cursor: not-allowed;
+}
+
+.pks-wrapper .pks-level-num {
+  display: block;
+}
+
+.pks-wrapper .pks-level-stars {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.pks-wrapper .pks-star {
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-star-off {
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-level-lock {
+  display: none;
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-level--locked .pks-level-lock {
+  display: block;
+}
+
+.pks-wrapper .pks-level--locked .pks-level-stars {
+  display: none;
+}
+
+/* ── Loadout ─────────────────────────────────────────────────────────────── */
+
+.pks-wrapper .pks-loadout-count {
+  margin: 0;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-loadout-groups {
+  margin: 0;
+}
+
+.pks-wrapper .pks-loadout-head {
+  margin: 12px 0 6px;
+  font-size: 14px;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-loadout-head:first-child {
+  margin-top: 0;
+}
+
+.pks-wrapper .pks-loadout-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.pks-wrapper .pks-pick {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--pks-bg-card);
+  color: var(--pks-text-primary);
+  border: 1px solid var(--pks-border);
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: var(--pks-font-sans);
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pks-wrapper .pks-pick[aria-pressed="true"] {
+  background: var(--pks-bg-selected);
+  border-color: var(--pks-accent-cyan);
+}
+
+.pks-wrapper .pks-pick-text {
+  display: block;
+  min-width: 0;
+}
+
+.pks-wrapper .pks-pick-name {
+  display: block;
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-pick-desc {
+  display: block;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-pick[aria-pressed="true"] .pks-pick-desc {
+  color: var(--pks-text-primary);
+}
+
+/* ── Level: HUD, field, tray, cards, status ──────────────────────────────── */
+
+.pks-wrapper .pks-hud {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 52px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px 10px;
+  padding: 3px 6px;
+  background: var(--pks-bg-bar);
+  border-bottom: 1px solid var(--pks-border);
+  font-family: var(--pks-font-mono);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* A narrow frame: the level's line over the buttons. */
+.pks-wrapper .pks-hud--two {
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.pks-wrapper .pks-hud-info {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 24px;
+}
+
+.pks-wrapper .pks-hud--two .pks-hud-info {
+  flex: 1 1 100%;
+}
+
+.pks-wrapper .pks-hud-level {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-hud-cycles {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-cycles {
+  min-width: 4ch;
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-cycles-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-hud-surge {
+  flex: none;
+  color: var(--pks-text-secondary);
+  white-space: nowrap;
+}
+
+.pks-wrapper .pks-hud-surge--warn {
+  color: var(--pks-accent-amber);
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-hud-buttons {
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.pks-wrapper .pks-field {
+  position: absolute;
+  overflow: hidden;
+}
+
+.pks-wrapper .pks-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  background: var(--pks-bg-input);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pks-wrapper .pks-canvas:focus {
+  outline: none;
+}
+
+.pks-wrapper .pks-canvas:focus-visible {
+  outline: 2px solid var(--pks-accent-cyan);
+  outline-offset: -2px;
+}
+
+/* The band behind the cards: under the field, or right of it (side). */
+.pks-wrapper .pks-tray {
+  position: absolute;
+  background: var(--pks-bg-bar);
+  border-top: 1px solid var(--pks-border);
+}
+
+.pks-wrapper .pks-frame--side .pks-tray {
+  border-top: 0;
+  border-left: 1px solid var(--pks-border);
+}
+
+.pks-wrapper .pks-cards {
+  position: absolute;
+  display: grid;
+  grid-auto-rows: 56px;
+  gap: 3px;
+  justify-content: center;
+  align-content: start;
+}
+
+.pks-wrapper .pks-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 56px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 2px;
+  overflow: hidden;
+  background: var(--pks-bg-card);
+  color: var(--pks-text-primary);
+  border: 1px solid var(--pks-border);
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: var(--pks-font-mono);
+  font-size: 10px;
+  line-height: 12px;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pks-wrapper .pks-card:hover {
+  border-color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-card[aria-pressed="true"] {
+  background: var(--pks-bg-selected);
+  border-color: var(--pks-accent-cyan);
+  box-shadow: inset 0 0 0 1px var(--pks-accent-cyan);
+}
+
+.pks-wrapper .pks-card-icon {
+  display: block;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+/* One line, never broken or cut: the labels are short enough (ui-text). */
+.pks-wrapper .pks-card-name {
+  display: block;
+  white-space: nowrap;
+  font-family: var(--pks-font-mono);
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.pks-wrapper .pks-card-cost {
+  display: block;
+  font-family: var(--pks-font-mono);
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 700;
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-card--poor .pks-card-cost {
+  color: var(--pks-text-poor);
+}
+
+.pks-wrapper .pks-card--poor .pks-card-icon {
+  filter: grayscale(1);
+}
+
+.pks-wrapper .pks-card-key {
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  font-family: var(--pks-font-mono);
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--pks-text-secondary);
+}
+
+/* The recharge shade: drains from the top as the card recharges. */
+.pks-wrapper .pks-card-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: rgba(10, 15, 30, 0.62);
+  pointer-events: none;
+}
+
+.pks-wrapper .pks-status {
+  position: absolute;
+  margin: 0;
+  padding: 3px 6px;
+  overflow: hidden;
+  color: var(--pks-text-primary);
+  font-family: var(--pks-font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* The zone rules' badges: a row over the canvas's top strip, left of the
+   surge bar (the script places it); names only when the row is high. */
+.pks-wrapper .pks-rules {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pks-wrapper .pks-rule {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  max-height: 32px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0 3px;
+  background: rgba(10, 15, 30, 0.88);
+  color: var(--pks-text-primary);
+  border: 1px solid var(--pks-border);
+  border-radius: 4px;
+  box-shadow: none;
+  font-family: var(--pks-font-mono);
+  font-size: 9px;
+  line-height: 11px;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.pks-wrapper .pks-rules--big .pks-rule {
+  gap: 4px;
+  padding: 0 5px;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.pks-wrapper .pks-rule--alert {
+  border-color: var(--pks-accent-amber);
+  color: var(--pks-accent-amber);
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-rule-icon {
+  display: block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-rules--big .pks-rule-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.pks-wrapper .pks-rule-name {
+  display: none;
+}
+
+.pks-wrapper .pks-rule-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+.pks-wrapper .pks-rules--big .pks-rule-name {
+  display: inline;
+}
+
+.pks-wrapper .pks-paused-rules {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  text-align: left;
+  color: var(--pks-text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pks-wrapper .pks-paused-rule + .pks-paused-rule {
+  margin-top: 4px;
+}
+
+/* The news: a banner over the field (the top, or the bottom while the top
+   lanes are aimed at) that taps pass through; it fades out. */
+.pks-wrapper .pks-news {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 4px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  padding: 4px 8px;
+  background: rgba(17, 24, 39, 0.94);
+  border: 1px solid var(--pks-accent-cyan);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s, visibility 0s;
+}
+
+.pks-wrapper .pks-news--low {
+  top: auto;
+  bottom: 4px;
+}
+
+.pks-wrapper .pks-news--off {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s, visibility 0s 0.4s;
+}
+
+.pks-wrapper .pks-news-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+}
+
+.pks-wrapper .pks-news-item-icon {
+  display: block;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-news-item-text {
+  min-width: 0;
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-news-item-detail {
+  font-weight: 400;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-frame--small .pks-news-item-detail {
+  display: none;
+}
+
+/* ── Overlays: pause, leave?, result (under the HUD), help (whole frame) ─── */
+
+.pks-wrapper .pks-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  padding: 8px;
+  overflow-y: auto;
+  background: rgba(10, 15, 30, 0.8);
+}
+
+/* Pause, leave? and the result: under the HUD (the script sets their top),
+   the field dimmed behind them. */
+.pks-wrapper .pks-overlay--body {
+  z-index: 2;
+}
+
+.pks-wrapper .pks-result {
+  text-align: center;
+}
+
+.pks-wrapper .pks-panel {
+  width: 100%;
+  max-width: 560px;
+  margin: auto;
+  padding: 12px;
+  text-align: center;
+  background: var(--pks-bg-frame);
+  border: 1px solid var(--pks-border);
+  border-radius: var(--pks-radius);
+}
+
+.pks-wrapper .pks-panel--text {
+  text-align: left;
+}
+
+.pks-wrapper .pks-panel--text .pks-actions {
+  justify-content: flex-start;
+}
+
+.pks-wrapper .pks-overlay-title {
+  margin: 0;
+  font-family: var(--pks-font-mono);
+  font-size: 18px;
+  line-height: 1.35;
+  color: var(--pks-text-primary);
+}
+
+.pks-wrapper .pks-result-stars {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.pks-wrapper .pks-result-star {
+  display: block;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-result-text {
+  margin: 0 0 8px;
+  color: var(--pks-text-primary);
+}
+
+.pks-wrapper .pks-unlocks {
+  text-align: left;
+}
+
+.pks-wrapper .pks-unlock {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--pks-bg-card);
+}
+
+.pks-wrapper .pks-unlock-icon {
+  display: block;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-unlock-text {
+  min-width: 0;
+}
+
+.pks-wrapper .pks-help-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--pks-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pks-wrapper .pks-help-list li + li {
+  margin-top: 6px;
+}
+
+.pks-wrapper .pks-warning {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--pks-accent-red);
+  border-radius: var(--pks-radius);
+  background: var(--pks-bg-secondary);
+  color: var(--pks-text-warn);
+  font-size: 13px;
+}
+
+.pks-wrapper .pks-warning-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ── Codex ───────────────────────────────────────────────────────────────── */
+
+.pks-wrapper .pks-codex-head {
+  margin: 12px 0 6px;
+  font-size: 15px;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-codex-head:first-child {
+  margin-top: 0;
+}
+
+.pks-wrapper .pks-codex-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.pks-wrapper .pks-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--pks-bg-card);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.pks-wrapper .pks-entry-pic {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+}
+
+.pks-wrapper .pks-entry-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.pks-wrapper .pks-entry-text {
+  min-width: 0;
+}
+
+.pks-wrapper .pks-entry-name {
+  display: block;
+  font-weight: 700;
+}
+
+.pks-wrapper .pks-entry-stats {
+  display: block;
+  font-family: var(--pks-font-mono);
+  color: var(--pks-accent-amber);
+}
+
+.pks-wrapper .pks-entry-desc {
+  display: block;
+  color: var(--pks-text-secondary);
+}
+
+.pks-wrapper .pks-entry--locked .pks-entry-name {
+  color: var(--pks-text-secondary);
+}
+
+/* ── Widths ──────────────────────────────────────────────────────────────── */
+
+/* Phones: no side padding, so the frame's parent is the whole width (a
+   320 px phone shows the field 1:1); the title and footer keep theirs. */
+@media (max-width: 679px) {
+  .pks-wrapper {
+    padding: 16px 0;
+  }
+
+  .pks-wrapper .pks-header,
+  .pks-wrapper .pks-footer {
+    padding: 0 12px;
+  }
+
+  .pks-wrapper .pks-title {
+    font-size: 26px;
+  }
+
+  .pks-wrapper .pks-frame {
+    border-radius: 0;
+  }
+}
+
+/* Narrow portrait screens: turn the phone and go fullscreen. */
+@media (max-width: 480px) and (orientation: portrait) {
+  .pks-wrapper .pks-rotate {
+    display: block;
+  }
+}
+
+/* No hover (touch screens): the number keys of the cards are hidden. */
+@media (hover: none) {
+  .pks-wrapper .pks-card-key {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pks-wrapper .pks-btn,
+  .pks-wrapper .pks-news,
+  .pks-wrapper .pks-news--off {
+    transition: none;
+  }
+
+  .pks-wrapper .pks-btn:active {
+    transform: none;
+  }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Packet Siege — Logs from VahaC</title>
+  <meta name="description" content="Packet Siege: a lane-defense game in a server room. Malware walks along five lanes toward the rack; spend CPU cycles on firewalls, proxies, honeypots and more to stop it. 150 levels in fifteen zones with their own rules and a boss every tenth, stars, a codex and auto save, even in the middle of a level. Fully client-side and offline compatible.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="pks-wrapper">
+
+  <header class="pks-header">
+    <h1 class="pks-title">Packet Siege</h1>
+    <p class="pks-subtitle">Malware walks in along five lanes toward your server rack. Spend CPU cycles on defenders that shoot, block, trap or make more cycles, and hold the rack through 150 levels.</p>
+  </header>
+
+  <div id="pks-live" class="pks-sr" aria-live="polite"></div>
+
+  <div id="pks-holder" class="pks-holder">
+    <div id="pks-frame" class="pks-frame" role="region" aria-label="Packet Siege">
+
+      <section id="pks-play" class="pks-play pks-hidden" aria-label="Level">
+        <div id="pks-hud" class="pks-hud">
+          <div class="pks-hud-info">
+            <span id="pks-hud-level" class="pks-hud-level">Level 1</span>
+            <span class="pks-hud-cycles"><canvas id="pks-cycles-icon" class="pks-cycles-icon" width="8" height="8" aria-hidden="true"></canvas><span id="pks-cycles" class="pks-cycles">0</span><span class="pks-sr"> cycles</span></span>
+            <span id="pks-surge" class="pks-hud-surge">Surge 0/0</span>
+          </div>
+          <div class="pks-hud-buttons">
+            <button id="pks-pause" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-pressed="false" aria-label="Pause or resume (P)" title="Pause or resume (P)">Pause</button>
+            <button id="pks-speed" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-pressed="false" aria-label="Game speed, 1x or 2x (S)" title="Game speed, 1x or 2x (S)">1x</button>
+            <button id="pks-levels" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-label="Leave the level for the level select" title="Leave the level for the level select">Levels</button>
+            <button id="pks-full" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-pressed="false" aria-label="Fullscreen on or off (F)" title="Fullscreen on or off (F)">Fullscreen</button>
+          </div>
+        </div>
+        <div id="pks-field" class="pks-field">
+          <canvas id="pks-canvas" class="pks-canvas" width="320" height="180" tabindex="0" role="application" aria-label="Packet Siege field: five lanes of nine cells, the rack on the left. Keys: 1 to 9 and 0 pick a card, the arrows move the cell cursor, Enter or Space places, X picks Decommission, P pauses, S changes the speed, F toggles fullscreen."></canvas>
+          <div id="pks-rules" class="pks-rules pks-hidden" role="group" aria-label="Zone rules of this level"></div>
+          <div id="pks-news" class="pks-news pks-news--off"></div>
+        </div>
+        <div id="pks-tray" class="pks-tray"></div>
+        <div id="pks-cards" class="pks-cards" role="group" aria-label="Cards"></div>
+        <p id="pks-status" class="pks-status">Pick a card, then a cell.</p>
+        <div id="pks-paused" class="pks-overlay pks-overlay--body pks-hidden">
+          <div class="pks-panel">
+            <p class="pks-overlay-title">Paused</p>
+            <ul id="pks-paused-rules" class="pks-paused-rules pks-hidden" aria-label="Zone rules of this level"></ul>
+            <div class="pks-actions">
+              <button id="pks-resume" class="pks-btn" type="button" aria-label="Resume the level">Resume</button>
+              <button id="pks-restart" class="pks-btn pks-btn--secondary" type="button" aria-label="Restart the level with the same cards">Restart</button>
+              <button id="pks-pause-help" class="pks-btn pks-btn--secondary" type="button" aria-label="How to play">Help</button>
+              <button id="pks-quit" class="pks-btn pks-btn--secondary" type="button" aria-label="Leave the level for the level select">Levels</button>
+            </div>
+          </div>
+        </div>
+        <div id="pks-confirm" class="pks-overlay pks-overlay--body pks-hidden" role="alertdialog" aria-labelledby="pks-confirm-text">
+          <div class="pks-panel">
+            <p id="pks-confirm-text" class="pks-overlay-title">Leave this level?</p>
+            <div class="pks-actions">
+              <button id="pks-confirm-no" class="pks-btn" type="button" aria-label="Stay in the level">Stay</button>
+              <button id="pks-confirm-yes" class="pks-btn pks-btn--secondary" type="button" aria-label="Leave the level; its progress is lost">Leave</button>
+            </div>
+          </div>
+        </div>
+        <div id="pks-result" class="pks-overlay pks-overlay--body pks-result pks-hidden" role="dialog" aria-labelledby="pks-result-title">
+          <div class="pks-panel">
+            <h2 id="pks-result-title" class="pks-screen-title">Level secured</h2>
+            <div id="pks-result-stars" class="pks-result-stars"></div>
+            <p id="pks-result-text" class="pks-result-text"></p>
+            <div id="pks-result-unlocks" class="pks-unlocks"></div>
+            <div class="pks-actions">
+              <button id="pks-next" class="pks-btn" type="button" aria-label="Play the next level">Next level</button>
+              <button id="pks-replay" class="pks-btn pks-btn--secondary" type="button" aria-label="Play this level again">Replay</button>
+              <button id="pks-result-levels" class="pks-btn pks-btn--secondary" type="button" aria-label="Back to the level select">Levels</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pks-select" class="pks-screen" aria-label="Level select">
+        <div class="pks-screen-head">
+          <p class="pks-total">Stars: <span id="pks-total">0 of 450</span></p>
+          <div class="pks-head-buttons">
+            <button id="pks-codex-open" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-label="Open the codex of defenders and threats">Codex</button>
+            <button id="pks-help-open" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-label="How to play">Help</button>
+            <button id="pks-select-full" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-pressed="false" aria-label="Fullscreen on or off (F)" title="Fullscreen on or off (F)">Fullscreen</button>
+          </div>
+        </div>
+        <div id="pks-select-body" class="pks-screen-body">
+          <p class="pks-rotate">Turn your phone sideways and press Fullscreen for the biggest field.</p>
+          <div id="pks-run" class="pks-run pks-hidden">
+            <p id="pks-run-text" class="pks-run-text">A level in progress is saved.</p>
+            <div class="pks-run-buttons">
+              <button id="pks-run-resume" class="pks-btn" type="button" aria-label="Resume the saved level where it was">Resume</button>
+              <button id="pks-run-fresh" class="pks-btn pks-btn--secondary" type="button" aria-label="Start over: the saved level from its beginning">Start over</button>
+            </div>
+          </div>
+          <div id="pks-zone-tiles" class="pks-zone-tiles" role="group" aria-label="Zones"></div>
+          <div id="pks-zones" class="pks-zones"></div>
+        </div>
+      </section>
+
+      <section id="pks-loadout" class="pks-screen pks-hidden" aria-labelledby="pks-loadout-title">
+        <div class="pks-screen-head pks-screen-head--column">
+          <h2 id="pks-loadout-title" class="pks-screen-title">Loadout</h2>
+          <p id="pks-loadout-count" class="pks-loadout-count">Slots: 0 of 5</p>
+        </div>
+        <div class="pks-screen-body">
+          <div id="pks-loadout-list" class="pks-loadout-groups"></div>
+        </div>
+        <div class="pks-screen-foot">
+          <button id="pks-loadout-start" class="pks-btn" type="button" aria-label="Start the level with these defenders" disabled>Start</button>
+          <button id="pks-loadout-back" class="pks-btn pks-btn--secondary" type="button" aria-label="Back to the level select">Levels</button>
+        </div>
+      </section>
+
+      <section id="pks-codex" class="pks-screen pks-hidden" aria-labelledby="pks-codex-title">
+        <div class="pks-screen-head">
+          <h2 id="pks-codex-title" class="pks-screen-title">Codex</h2>
+          <div class="pks-head-buttons">
+            <button id="pks-codex-back" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-label="Back to the level select">Back</button>
+          </div>
+        </div>
+        <div class="pks-screen-body">
+          <h3 class="pks-codex-head">Defenders</h3>
+          <div id="pks-codex-defenders" class="pks-codex-list"></div>
+          <h3 class="pks-codex-head">Threats</h3>
+          <div id="pks-codex-enemies" class="pks-codex-list"></div>
+          <h3 class="pks-codex-head">Bosses</h3>
+          <div id="pks-codex-bosses" class="pks-codex-list"></div>
+          <h3 class="pks-codex-head">Zones and their rules</h3>
+          <div id="pks-codex-zones" class="pks-codex-list"></div>
+        </div>
+      </section>
+
+      <div id="pks-help" class="pks-overlay pks-hidden" role="dialog" aria-labelledby="pks-help-title">
+        <div class="pks-panel pks-panel--text">
+          <h2 id="pks-help-title" class="pks-screen-title">How to play</h2>
+          <ul class="pks-help-list">
+            <li>Malware walks in from the right along the lanes. Each lane has one breaker at the rack: the first enemy to reach the rack trips it and a surge wipes that lane; the next one there is a breach and ends the level.</li>
+            <li>Cycles pay for defenders. Each level starts you with its own amount, more trickles in over time (not in the Hot aisle), and PSUs and UPSes make more. A card recharges after each use.</li>
+            <li>Mouse or touch: pick a card, then a floor cell. Picking the same card again puts it down. Decommission removes a defender, with no refund.</li>
+            <li>Keyboard, with the field focused (click it or Tab to it): 1 to 9 and 0 pick a card (0 is the tenth), the arrows move the cell cursor, Enter or Space places, X or Delete picks Decommission, P pauses (Esc too, outside fullscreen), S switches between 1x and 2x speed, F toggles fullscreen.</li>
+            <li>Fullscreen (F or the button) gives the biggest field. On a phone, turn it sideways first.</li>
+            <li>A level is won when every enemy is gone: 3 stars with no breaker tripped, 2 with one or two, 1 with more. Winning unlocks new defenders and more card slots; the Codex lists everything you have seen.</li>
+            <li>From zone 6 on every zone has a rule of its own: express lanes, hot cells, power rails, tunnel exits, blackouts, crossovers, upkeep, rolling outages and wider fog; the last zone mixes two of them. The badges over the field show the level's rules and what they do next: tap one for its full line. Blackouts and outages are announced before they strike; in a blackout only what your shooters can see stays lit.</li>
+            <li>The game pauses when the tab is hidden or the window loses the focus. Progress is saved after each level, and a level in progress is saved too: when you pause, leave it for the level select, hide the tab or close the page, and every half minute of play. The level select then offers to resume it; starting any level, winning or losing ends that save.</li>
+          </ul>
+          <div class="pks-actions">
+            <button id="pks-help-close" class="pks-btn" type="button" aria-label="Close the help">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pks-warning" class="pks-warning pks-hidden" role="alert">
+        <span id="pks-warning-text" class="pks-warning-text"></span>
+        <button id="pks-warning-close" class="pks-btn pks-btn--small pks-btn--secondary" type="button" aria-label="Hide this warning">OK</button>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="pks-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

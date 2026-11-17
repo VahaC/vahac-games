@@ -3,7 +3,7 @@
 A collection of standalone browser games by Vahac. Each game is implemented with plain HTML, CSS, and JavaScript, so it can run locally without a backend. The Games section on vahac.com is currently private, so the page below opens only for a logged-in site editor until the section goes public.
 
 Documentation status:
-- Last updated: 2026-11-07 (Bitmap Decoder boards up to 30x30)
+- Last updated: 2026-11-17 (Packet Siege)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -29,6 +29,7 @@ Games are grouped by genre, the same groups the index page (`index.html`) uses.
 - `bad-sector/` - Bad Sector: a brick breaker on an unrolled hard-disk platter: bounce the read head off the carriage through fragmented tracks of plain, bad (2-3 hits) and read-only sectors that flash their LBA when broken, with RAID1, ECC and SLOW-SEEK bonuses, SMART lives, faster tracks, a seeded Daily disk with one scored attempt, a streak and a share line, and auto save to localStorage.
 - `oncall-shift/` - On-Call Shift: a 3-minute night on call on a rack of twelve servers; fix each incident (cleanup, restart, scale or renew) before its SLA runs out, stop cascades from failed databases, and get an uptime score in nines and a postmortem; the shift, the best uptime per level and the last 5 shifts are saved in localStorage.
 - `orphan-process/` - Orphan Process: a side-view platformer for a desktop keyboard through a Linux file system: a forked process whose parent died crosses 15 hand-made rooms of /home and /tmp, reads 12 man pages, sends kill signals, reaps zombies by killing their parent daemon, beats the tmp cleaner for the renice dash and goes back for two secrets, with tty checkpoints and auto save to localStorage.
+- `packet-siege/` - Packet Siege: a lane-defense game in a server room: malware walks in along five lanes toward the rack, and cycles buy defenders that shoot, block, trap or make more cycles, over 150 levels in 15 zones (from zone 6 each with a floor rule of its own) with a boss every tenth, 27 defenders, 25 enemies, 1-3 stars per level, a loadout, a codex and auto save to localStorage, a level in progress included.
 - `snake-game/` - Snake on a 30x30 canvas grid: eat energy nodes for 10 points each, avoid the walls and your own tail, pick one of four speeds, and keep the saved game after a reload.
 
 ### Reflex and Typing
@@ -219,7 +220,142 @@ Features:
 - How to play, open under the game (and shown on a narrow window too): an illustrated guide with the game's own sprites (drawn from its atlas into small canvases at start-up) covering the goal, the keys, the top bar (NICE is the level, not the dash), both capabilities, everything in the world, the enemies, the boss step by step, levels, the map, pause and saving, and a hint about the secrets.
 - Saves in `orp-state` (version 2; any other version counts as no save): the run, the last tty, stats, abilities, collected items, switches, broken walls, the boss, whether the end screen was shown, visited rooms, play time and deaths, written the moment one of them changes. Every field falls back on its own, a tty past the gate turns its switch on, and blocked or full storage never stops the game (Continue still resumes the game of the same page load). Between two tabs, within one run the save with more play time wins; a New game in another tab is a later run, and a tab still on an older one stops saving.
 
-### 13) Patch Panel
+### 13) Packet Siege
+
+Path:
+- `packet-siege/index.html`
+
+Features:
+- A lane-defense game in a server room: malware walks in from the right along five lanes of nine cells toward
+  the rack on the left, and CPU cycles buy defenders that shoot, block, trap or make more cycles. 150 levels in
+  15 zones of ten levels with a boss on every tenth level, and 1-3 stars per level (450 in all). The whole game
+  sits in one frame: the level select (15 zone tiles and the ten levels of the zone picked), the loadout, the
+  codex, the level and its overlays.
+- Cycles: a level starts with 100 (200 in the Hot aisle and the Power plant), 25 more trickle in every 10 s (not
+  in those two zones), and PSUs and UPSes make more. Every card has a cost and a recharge. Decommission removes a
+  defender with no refund.
+- Each lane has one breaker at the rack. The first enemy to reach the rack trips it and every enemy in that lane
+  is wiped (the boss is thrown back and loses a fifth of its HP); the next one there is a breach and the level is
+  lost. A level is won when every enemy has come and none is left: 3 stars with no breaker tripped, 2 with one or
+  two, 1 with more.
+- 27 defenders. PSU (+25 cycles every 10 s) and Firewall (one shot of 20 every 1.5 s) from the start, then one
+  more for winning level 1, 3, 5, 8, 10, 13, 16, 20, 24, 28, 33, 37 and 44: Reverse Proxy (a 2400 HP wall that
+  stops an Exploit's leap), Honeypot (arms in 12 s, then the first touch costs everything in its cell 900),
+  Tarpit (a Firewall whose hits slow to half speed), Null Route (1800 in the 3x3 after a 1 s fuse), IDS (two
+  shots), WAF Grate (a floor grate that burns 20 a second and is never bitten), Rate Limiter (a pulse of 20 into
+  the 3x3 every 1.5 s), Patch Server (repairs the 3x3 by 40 HP/s and clears encryption), Scanner (fires into its
+  lane and both neighbours), UPS (+50 cycles every 10 s), Packet Inspector (a beam of 40 through its lane every
+  3 s, cloaked enemies too), Failover (1800 to every enemy in its lane after 0.5 s) and Quarantine (freezes every
+  enemy on the floor for 5 s). Then one more for winning level 50, 54, 59, 65, 71, 77, 85, 92, 100, 110, 120 and
+  132: Canary (a cheap decoy every enemy stops to bite, even one that would leap or throw), Tracer (150 every 4 s
+  at the toughest enemy in its lane), Batch Job (a shell every 3 s into the densest group 2+ cells away, 60 within
+  1 cell), Loopback (throws the first enemy in its lane back 2 cells every 6 s, each enemy at most twice), Token
+  Ring (an arc of 30 every 2 s that jumps on to up to 3 enemies, across lanes), Signature DB (+50 % damage for the
+  shooters in its 3x3, not stacking), DNS Sinkhole (every 8 s pulls the nearest enemy of each neighbour lane into
+  its own), Air Gap (an 1800 HP wall that sends a thrown shot back at its thrower), Backup (rebuilds a lost
+  defender in its 3x3, at most every 60 s; not a Canary, an instant or a Backup), Scrubber (after 0.5 s destroys
+  every enemy on the floor of 200 full HP or less), Decryptor (a shot of 40 every 1.5 s that strips shields and
+  hits shielded or armoured enemies double) and Honeynet (a Honeypot that arms again 20 s after it goes off).
+- 25 enemies, each first seen on its own level: Bot (1), Script Kiddie (2, twice the pace), Worm (4, 560 HP),
+  DDoS Drone (6, in packs of four to six), Trojan (9, releases two Bots where it dies), Exploit (11, fast until it
+  leaps the first defender it meets), Phisher (14, stops 3 cells short of a defender and throws), Brute Forcer
+  (17, bites three times as hard and crushes grates and honeypots), Ransomware (21, takes the first defender it
+  touches offline for 10 s unless patched), Cryptominer (25, steals 2 cycles a second), Rootkit (31, cloaked from
+  lane shots until it bites, an area effect hits it or it passes the middle), Zero-day (35, cannot be slowed or
+  frozen), Polymorph (41, at half health jumps to a neighbour lane and heals), Keylogger (52, steals 10 cycles a
+  second while it bites), Logic Bomb (56, 300 to every defender in its 3x3 where it dies; a breaker defuses it),
+  Amplifier (62, enemies within 1.5 cells move 30 % faster and take 30 % less damage), Wiper (67, destroys the
+  first defender it touches and dies with it), Hive (73, releases a DDoS Drone every 5 s, up to 4 alive), Hydra
+  (78, heals other enemies within 1.5 cells by 30 HP/s), Encrypted Payload (84, a 600 shield takes lane shots
+  first), Jammer (93, shooters within 2 cells cannot fire), Replicator (103, at half HP splits into two of half
+  size, which split once more), Dropper (112, throws a Bot 3 cells ahead every 8 s, never over an Air Gap),
+  Kernel Panic (123, 4000 HP, bites 300 HP/s, crushes grates and honeypots, takes at most 600 from an instant) and
+  Glitch (134, blinks a cell forward every 4 s, never past a defender).
+- The boss, an APT in 15 tiers (2400 HP on level 10, 7500 on level 50, 9600 to 11350 on levels 60-150), arrives
+  with the final surge. The first five tiers each add an ability: help called in, lane changes, a volley into
+  three lanes, cloak phases. Tiers 6-15 add or combine a shield that takes lane shots first and comes back,
+  healing for its escort, jamming of the shooters near it and a split into two bosses; the last tier is two bosses
+  sharing its HP. An instant defender does at most 300 to it and a freeze holds it for 1 s.
+- Zones 1-5: Server closet (1-10; level 1 uses only the middle lane, levels 2-3 the three middle lanes), DMZ
+  (11-20, cable trays that take nothing), Hot aisle (21-30, no trickle but a bigger start), Cloud edge (31-40, fog
+  over the three right columns) and Core (41-50, enemies 25 % faster, trays on even levels and fog on odd ones
+  and on 50).
+- Zones 6-15 (levels 51-150) use all five lanes and each has a floor rule. Its cells are drawn by the level's own
+  generator, so they too are the same on every run:
+  - Backbone (51-60): express lanes, one or two a level, whose enemies (the boss too) walk 40 % faster.
+  - Storage array (61-70): 3-6 hot cells; a defender on one loses 8 HP a second (a Patch Server out-heals that).
+  - Power plant (71-80): 3-5 power rails; a defender on one works 1.5 times as fast (production, shots, fuses,
+    arming; a grate burns and a Patch Server heals 1.5 times as hard). No trickle, but a start of 200.
+  - VPN tunnel (81-90): a tunnel exit at column 7 in one or two lanes; every 3rd enemy of such a lane (never the
+    boss or the level's new enemy) shimmers on the exit for 2 s and comes out there. Nothing can stand on an
+    exit.
+  - Dark fiber (91-100): every 50 s the lights fail for 10 s after a 3 s warning, and the defenders that aim down
+    their lane see only 4 cells. The Packet Inspector's beam, pulses, grates, traps and instants are not dimmed.
+  - Cross-connect (101-110): 2-4 crossover cells, each with an arrow to a neighbour lane; an enemy stepping on one
+    moves to that lane, once per cell. The boss and a Kernel Panic are too heavy and walk over.
+  - Metered cloud (111-120): upkeep: every 12 s each defender on the floor costs 1 cycle. Cycles never go below
+    0, and an unpaid bill switches nothing off.
+  - Mainframe (121-130): a rolling outage: every 40 s the next lane of a shuffled order goes offline for 10 s
+    after a 5 s warning. Its defenders stop and their timers wait, but they are still bitten; cards may still go
+    there.
+  - Quantum lab (131-140): fog over the five right columns, and express lanes again.
+  - Root (141-150): enemies 10 % faster, and every level brings back a fixed pair of the earlier rules.
+- Overtime on levels 51-150: a defence could hold an enemy forever without killing it, so once every enemy has
+  come and 300 s have passed since the level's nominal end, the enemy nearest the rack breaks through and the
+  level is lost. For the last 60 s the HUD counts down. Levels 1-50 have no overtime.
+- Rule badges over the field name the level's rules and, for blackouts, outages and upkeep, what comes next ("dark
+  in 23s", "L3 in 12s"), in amber while the rule is about to strike or striking. A tap puts the rule's full line
+  in the status line, and the pause overlay lists the rules. In a blackout only what the shooters can see stays lit.
+- Loadout slots: 5, then 6 from level 11, 7 from 31, 8 from 41, 9 from 71 and 10 from 111. The loadout screen
+  comes only when more defenders are owned than the level has slots (first on level 9), groups them by what they
+  do and picks the last loadout again.
+- Levels last from 4 minutes (level 1) through 12 minutes (level 50) to about 21 minutes (level 150). Levels 1-5
+  have 3 surges and every five levels add one, up to 12 on levels 46-50; then 13 on levels 51-60 and one more
+  every ten levels, up to 22 on levels 141-150. Each level is generated from its number (mulberry32), so it is
+  the same on every run: nothing arrives for 25 s, then a trickle thickens toward the end while the surges come
+  from 80 s on, each bigger than the one before, the final one 50 s before the level's nominal end. A new enemy
+  comes early and alone (three of it, or one pack of drones) with nothing else in its lane around it. Within any
+  15 s, the enemy HP entering a lane and the whole floor stays under a cap drawn from what a player can have built
+  by then. A surge is announced 3 s ahead.
+- A pure fixed-step simulation at 60 steps a second, deterministic and seeded, drawn on a 320x180 canvas of 32 px
+  cells. On the page the field is 3x (960x540) in a column of 960 px or more; in a narrower column it is the
+  largest whole multiple when that fills at least 80 % of the width (2x from 640 to 800 px, 1x from 320 to 400 px),
+  else as wide as the column (a 958 px column gets a 958 px field); the HUD, cards and status line are as wide as
+  the field. A frame catches up at most 0.25 s, and 2x speed runs two steps for each one.
+- Mouse or touch: pick a card, then a floor cell (a press that moves is a scroll, not a tap); picking the same
+  card again puts it down. Keys only while the field has the focus: 1-9 and 0 pick a card (0 is the tenth), the
+  arrows move the cell cursor, Enter or Space places, X or Delete picks Decommission, P pauses (Esc too, on the
+  page), S switches between 1x and 2x, F toggles fullscreen (also from any button in the frame). Keys the game
+  takes never scroll the page or reach the host page's shortcuts. The status line names the values behind every
+  refusal (recharge, cycles, a closed lane, a taken cell, a cable tray, a tunnel exit).
+- Fullscreen (F or the button) puts the frame in the browser's fullscreen, with the webkit names too. Where the
+  API is missing or refuses, the frame is maximised over the viewport with the page's scroll locked; the button,
+  F or Esc leaves. In fullscreen, maximised or on a page too short for the frame, the frame fills the screen with
+  the cards under the field or, on a wide and short screen such as a phone held sideways, in columns beside it.
+  The card tray always has room for the most cards a level has (10 and Decommission), so the frame keeps its
+  size from level to level. On a narrow portrait screen the level select says to turn the phone sideways and
+  press Fullscreen.
+- Losing the window focus or hiding the tab pauses. The pause overlay has Resume, Restart, Help and Levels, and
+  leaving or restarting a level in progress asks first. A news banner names a new threat or defender for 10 s of
+  play or until the first placement, and levels 1-3 have a hint. The result comes after a 1.2 s beat and lists
+  what the win opened (the next level, a defender, a slot). The codex lists every defender, threat, boss tier and
+  zone: owned, met or open ones in full, the rest as silhouettes with the level that reveals them.
+- Saves in `pks-state` (version 1): the highest level open, the best stars of each of the 150 levels, the last
+  loadout, the speed and the enemies met, written after each level (a win at once, before its result), when an
+  enemy is first met and when the speed or the loadout changes. Every field falls back on its own, a second tab's
+  progress is merged (the higher level, the best stars, every enemy met), and blocked or full storage shows a
+  warning in the frame naming the error and the key.
+- A level in progress is saved too, as a snapshot in `pks-run`: the level, its loadout and the whole sim as plain
+  data, with a hash of the level and the unit tables. It is written on pause (a lost window focus, a hidden tab,
+  the leave or restart question), when the page is left and after every 30 s of play. There is one snapshot per
+  browser: the level most recently started or resumed in any tab owns it, and a tab that finds another one there
+  plays on without writing. The level select offers "Resume level N" with the time played, or Start over; a
+  resumed level comes back paused and plays on exactly as it would have. Starting any level, a win or a loss
+  drops the snapshot, and one that is stale (the tables changed), broken or of a level not open is dropped
+  quietly. A save or snapshot written by a newer version of the game is never overwritten or dropped: the game
+  plays on in memory and the warning says so.
+
+### 14) Patch Panel
 
 Path:
 - `patch-panel/index.html`
@@ -233,7 +369,7 @@ Features:
 - The Daily is a 7x7 board for everyone, seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload. Its clock runs while it is on screen. A solved Daily offers an unscored practice run, and the result line can be copied to share.
 - Saves the free game and the view (`ppn-state`), the best per board (`ppn-best`) and the Daily attempt, result and streak (`ppn-daily`) to localStorage. A second open tab takes over a newer Daily instead of overwriting it, and never erases another tab's best.
 
-### 14) Pod Packer
+### 15) Pod Packer
 
 Path:
 - `pod-packer/index.html`
@@ -247,7 +383,7 @@ Features:
 - Keyboard with the focus on the cluster: arrows pick a pod, 1-6 run it on that node, E evicts, U undoes, N starts the next level, Escape clears the pick. The game's own buttons and the host page keep their keys.
 - Saves the level in progress (pdp-state) and the best moves and evictions per level (pdp-progress). A damaged field falls back on its own. Blocked or full storage shows a warning naming the key, and the warning goes away once a write works again. A second tab's newer game is taken over before any action, and progress from different tabs is merged.
 
-### 15) Port Knocker
+### 16) Port Knocker
 
 Path:
 - `port-knocker/index.html`
@@ -259,7 +395,7 @@ Features:
 - Daily: one sequence a day, the same for everyone (FNV-1a + mulberry32 from the local date), on 6 ports with the mode rotating Forward/Reverse/Stride. There is one scored attempt, recorded before its first show; a reload resumes it or shows the result. The streak counts consecutive Daily wins, Share copies a result line (or selects it in a field), and a finished Daily can be replayed unscored. A result stored by another tab always stands.
 - Saved in localStorage: the game on screen (`pkn-state`, a reload brings the round back waiting for Start), the best length per mode and panel size (`pkn-best`), the Daily attempt and streak (`pkn-daily`) and the sound switch (`pkn-sound`, off by default; WebAudio tones are optional).
 
-### 16) Rack Reset
+### 17) Rack Reset
 
 Path:
 - `rack-reset/index.html`
@@ -272,7 +408,7 @@ Features:
 - With presses on the rack, a new model or size only chooses the next rack, and New Game or N has to be pressed a second time within 4 s; the toast names the rack that would be thrown away.
 - Saves the rack in play (`rkr-state`) and the fewest presses over par and racks cleared per model and size (`rkr-best`) to localStorage. A second open tab takes over a newer game instead of playing on or dealing over it, and bests from two tabs are merged. Blocked or full storage shows a warning that names the keys, what a reload will show and how to fix it.
 
-### 17) Reaction Time Test
+### 18) Reaction Time Test
 
 Path:
 - `reaction-time/index.html`
@@ -282,7 +418,7 @@ Features:
 - The reaction time comes from `performance.now()`, rounded to ms; it shows the current, best and average time, the attempts and a session timer, and a "Session Complete" summary after 10 successful rounds. The session then stays finished, also after a reload, until Play Again, New Game or Restart; Start or Enter show the summary again.
 - Mouse (the press counts, not the release), touch and keyboard: Enter starts a round, also from the difficulty select, and Space reacts. Keys typed into other page fields, buttons or links are left alone. The difficulty, the stats and the session time are saved in localStorage under `rxt-reaction-state`. The session timer resumes after a reload, and an idle second tab never overwrites a newer save.
 
-### 18) Regex Par
+### 19) Regex Par
 
 Path:
 - `regex-par/index.html`
@@ -295,7 +431,7 @@ Features:
 - The first pattern that holes a hole goes on this round's card; a shorter one later still sets the hole's best. All 18 holes give a round total and the best round. New round asks for a second press within 4 s, then clears the card and drafts and keeps the bests.
 - Saves the hole on screen, the round, the drafts and the card (`rxp-state`) and the shortest pattern per hole plus the best round (`rxp-best`) to localStorage, field by field. A second open tab's card, drafts, newer round and shorter bests are merged in, never written over.
 
-### 19) Snake Game
+### 20) Snake Game
 
 Path:
 - `snake-game/index.html`
@@ -305,7 +441,7 @@ Features:
 - Four speeds (Easy 160 ms, Normal 120 ms, Hard 85 ms, Insane 60 ms per tick), a timer of the time the snake moves (pauses excluded) and a best score.
 - The whole game (snake, food, score, best score, timer, speed) is saved in localStorage under `snp-snake-state` and comes back after a reload: a running or paused game waits for the first key, and a finished game starts over with the best score and speed kept. With storage blocked the game still plays, just without saving.
 
-### 20) Sudoku Game
+### 21) Sudoku Game
 
 Path:
 - `sudoku/index.html`
@@ -315,7 +451,7 @@ Features:
 - Hint fills one empty or wrong cell from the solution, wrong digits turn red as you type, and Restart returns to the original puzzle. Any finished grid that follows the rules wins.
 - Progress is saved in localStorage under `sdk-sudoku-game` after every move that changes the board and comes back after a reload; the save is removed when you win, and a broken save is replaced by a fresh puzzle.
 
-### 21) Swap Space Solitaire
+### 22) Swap Space Solitaire
 
 Path:
 - `swap-space-solitaire/index.html`
@@ -328,7 +464,7 @@ Features:
 - Undo of up to 500 moves. Restart, Give Up and New Deal ask for a second press. A clock runs from the first move, and stats show page faults, won/played, streak and best.
 - Saves the tab and the numbered deal (`swp-state`), the stats (`swp-stats`) and the day's attempt and daily streak (`swp-daily`) in localStorage. A second open tab's newer save is taken over, never written over, and a finished daily stays finished.
 
-### 22) Typing Speed Test
+### 23) Typing Speed Test
 
 Path:
 - `typing-speed-test/index.html`
@@ -339,7 +475,7 @@ Features:
 - A finished round is locked until New Game, Restart or a difficulty change; the live WPM is recomputed every second, so it falls while you pause.
 - The best WPM (the final WPM of a finished round: the text completed, or the 60 s run out, scored over the full minute) and the chosen difficulty are kept in localStorage under `tst-state`. A best saved by an older version came from the live reading and may be higher.
 
-### 23) Uptime Idle
+### 24) Uptime Idle
 
 Path:
 - `uptime-idle/index.html`
@@ -374,10 +510,10 @@ port 5175 (vahac-tools uses 5173), so both repositories can run side by side. `.
 ## Tests
 
 The repository ships with a test suite covering every game and the index
-page (1301 tests across 27 modules: one per game, two for the Reaction Time
-Test and for Orphan Process, `hub.test.js` for the index page and
-`_smoke.test.js` for the test harness), powered by the built-in Node.js test runner — no external
-dependencies required.
+page (1644 tests across 40 modules: one per game, two for the Reaction Time
+Test and for Orphan Process, 13 for Packet Siege, `hub.test.js` for the index
+page and `_smoke.test.js` for the test harness), powered by the built-in
+Node.js test runner — no external dependencies required.
 
 Requirements: Node.js 20 or newer for `npm test` (20.11 or later, because
 several tests use `t.mock.timers.enable({ apis })`); `npm run coverage` needs
@@ -542,6 +678,87 @@ shows up as a test that has to change.
   - Source checks: ids, the orp- prefix, ES5 syntax and the IIFE, embed safety, the sprite block and its atlas, and the 320-1440 px layout with the narrow-window notice.
   - The route played with the real physics: a bot feeds keys to `orpStep` at 1/120 s along waypoints, from the new-game start through every man page, both memory modules and every tty to the boss, wins the fight, and after Continue takes the way onward, the shortcut and the way back through /home for both secrets, without a hit; and with kill only, from /tmp back through the gate room and up its ladder into Downloads, and across .X11-unix from its tty to its west exit. Every jump also lands with the key pressed 4 steps early or late (one jump of a chain or all of them) and with the run-up 3 px off; a failure names the room and the waypoint.
   - 100% lines, branches and functions of `orphan-process/script.js`.
+- Packet Siege (343 tests in 13 modules):
+  - `packet-siege.sim.test.js` (69): the build (`script.js` is `build()` of `src/` byte for byte apart from the
+    checkout's line endings, so a stale copy fails; `PARTS` is the set of files in `src/`; `build.js --check`
+    passes on the repo and on a fresh build checked out with CRLF line endings, and fails on a stale copy without
+    writing; the header and every part's banner in `PARTS` order; no part with an IIFE or exports of its own or of
+    900 lines or more). The tables (27 defenders and their unlocks, 25 enemies in order of first appearance, the
+    boss tiers, zones, slots, mulberry32, every number in a description, a hint or a zone line the table's own),
+    levels 1-50 as plain data with their lengths, unlocks, new enemies and the per-lane cap of zones 1-2, every
+    original defender and enemy on hand-made fields, breakers, stars, surges, refusals and determinism, and the
+    difficulty contract of levels 1-50 (below).
+  - `packet-siege.expansion.test.js` (42): the freeze test first: hashes of levels 1-50 and of the original 15
+    defenders, 13 enemies and 5 boss tiers, taken before levels 51-150 were added, which must never be re-pinned
+    (a red freeze test means a change reached the first 50 levels: undo it and put new content in new rows and
+    levels). Then the 12 later defenders and 12 later enemies, each on hand-made scenarios with its edge cases and
+    its meetings with the older units, determinism and plain data.
+  - `packet-siege.zones.test.js` (31): the level table of 51-150, every zone rule of zones 6-15 on hand-made
+    fields and with the units it meets (express lanes, hot cells, power rails, tunnels, blackouts, crossovers,
+    upkeep, the rolling outage, fog, the root's pairs), boss tiers 6-15 and their shield, healing, jamming and
+    split, determinism over real late levels, the idle player and overtime.
+  - The campaign contract of levels 51-150, split into six modules so that each runs in well under a minute:
+    `packet-siege.campaign.test.js` (5: the threat budgets, the reference bot on 51-100 and the boss levels
+    60-100), `packet-siege.campaign-late.test.js` (3: the bot on 101-150 and the boss levels 110-150),
+    `packet-siege.campaign-players.test.js` (7: the slow bot, the players who must lose everything past 50, the
+    exploits the tuning flagged and a level that always ends), and `packet-siege.campaign-rules.test.js` (11),
+    `packet-siege.campaign-cards.test.js` (3) and `packet-siege.campaign-foes.test.js` (13): over a band of 11
+    enemy toughness values the bot wins clearly more of a level of each zone 6-15 without its rules and of each
+    later enemy's first level without that enemy (the two that do not show it, the Wiper and the Encrypted
+    Payload, are named and pinned all the same). Two later defenders (Token Ring, Signature DB) show over the
+    band that the bot wins clearly more with them; every other later card is pinned to the scripted scenario of
+    the expansion module that proves its job.
+  - `packet-siege.render.test.js` (57): the palette, every sprite's size and characters, the atlas pixel for
+    pixel with its white, blue and tinted copies, zone backdrops and floors, the rule tiles, tunnel shimmers,
+    blackouts and outages on the field, fog, trays, racks and breakers, every frame and state of the defenders,
+    enemies and bosses, shots and effects, the draw order, and whole levels, early and late, played and drawn
+    without the renderer changing the sim.
+  - `packet-siege.storage.test.js` (17): `pks-state` pinned at 150 levels and written back byte for byte,
+    corrupt, foreign and other-version saves, every field on its own, the merge of two tabs, blocked and full
+    storage, a save of a newer version never written over, `pksRecordWin` over the whole campaign (each new
+    level, defender and slot exactly once), enemies met and the loadout; and `pks-run`: the hash of the level
+    tables, a snapshot that is not sound is refused, one slot that never takes another tab's, a newer snapshot
+    never offered, dropped or written over, and a snapshot taken mid-level on late levels with their rules
+    running that plays on exactly like the original.
+  - `packet-siege.pack.test.js` (11): every sprite decoded from the built `script.js` equals its map in `src/`;
+    the packed strings and their alphabet; numbers of every length, edge cases, every palette character, rows
+    repeated across sprites and fuzzed parts round-trip, and packing is deterministic; `packArt` refuses what it
+    cannot pack faithfully; comment stripping keeps code, trailing comments and a `//` inside a string or a
+    regular expression; and `build.js` throws instead of writing a `script.js` that would end its script block.
+  - `packet-siege.test.js` (74): the page booted like a browser from `index.html`: nothing run under Node,
+    DOMContentLoaded, a first visit with level 1 open and 149 locked, the level select of 15 zones, level 1 won
+    with pointer events and with the keyboard alone, a lost level, refusals, a moving press that is not a tap, the
+    keys (9 and 0 on a level with ten cards) and their focus filters, keys kept from the host page, pause on blur
+    and a hidden tab, the leave question, help, one or two sim steps per slot with the 0.25 s catch-up, surge
+    warnings, the result beat, unlocks to the end of the campaign, the news banner, the loadout with all 27
+    defenders, the codex, the rule badges, blackouts, outages, upkeep and tunnel refusals, overtime, the
+    snapshot (written, dropped, one per browser, resumed paused after a reload on a late level, newer ones left
+    alone), reloads, corrupt, blocked and full storage, second tabs, the frame sized from its column, fullscreen,
+    the webkit API and the maximised fallback, and the source checks: ids, the pks- prefix, a CSS rule for every
+    class, embed safety with nothing loaded from the network, ES5 and pks names in every part, 4.5:1 contrast,
+    the 320-1440 px layout (960x540 from a 992 px window, else a whole multiple or the whole column), card labels
+    on one line,
+    landscape phones with the HUD, the field and every card on screen together, and a host page's bare element
+    rules kept out of the game.
+  - The difficulty contract is played by scripted players, and its numbers are pinned. A reference bot (it
+    reacts in 0.5 s) wins all 150 levels with only what is unlocked and the level's slots, with its stars per
+    level pinned, at least 2 a level on average in every zone, and most of its tripped breakers in the last third
+    of a level; the same bot acting only every 2 s (the slow bot, the yardstick of a human) wins all of zone 1,
+    most of zones 2 and 6-8 and half of zones 9-11; a novice (acts every 3 s, reacts only to what it sees) wins
+    all of zone 1 with 2 or more stars on levels 1-6, most of zone 2 and at most 2 of zone 5. A simple build and a
+    fixed weak build win early levels and nothing past level 50, and a player who places nothing (idle) loses
+    every level. The threat budget rises strictly over the non-boss levels, and from level 60 on a boss level is
+    at least as demanding as the level before it.
+  - Two pins files: `tests/packet-siege.early.pins.json` holds, for each of levels 1-50, a hash of the reference
+    bot's and the weak build's whole game (every event and the final state), so a change that reaches the first
+    50 levels shows; it is written with `PKS_WRITE_EARLY_PINS=1` and must not be re-measured to make a test pass.
+    `tests/packet-siege.campaign.pins.json` holds what the campaign modules check on levels 51-150 (the budgets,
+    the bot's and the slow bot's stars, the boss levels' demand, the band and its levels per rule, defender and
+    enemy) and is written by `node .claude/packet-siege/tune.js --pins`. Any change to the sim or the tables
+    needs a re-tune with `.claude/packet-siege/tune.js`, a balance table, budget search and fit over the same
+    scripted players, which exists only in the local folder (`.gitignore` excludes `.claude/`); its header says
+    how to re-measure.
+  - 100% lines, branches and functions of `packet-siege/script.js`.
 - Patch Panel (60 tests):
   - Pure functions checked against an independent board model: rotations and symmetry periods, edges with and without wrap, the rim crossings of wrap boards with the look of each end (a loop across the rim and an open end on boards of their own), the tiles across the rim and the hint, open ends, the switch's network and uplinks, loop cells. 240 seeded boards are spanning trees with at most three links a tile and are never scrambled solved, plus the fallback for a stuck random source and the target count.
   - The Daily: FNV-1a and mulberry32 reference values, the pinned board of 2026-11-05, local day keys counted without a jump at daylight saving changes, the streak, the share line, and which of two tabs' Daily records wins.
@@ -754,3 +971,27 @@ it.
 - Every game needs its own namespace prefix for its CSS classes, element ids and localStorage keys, registered in `css-template.md`. It must also differ from every vahac-tools prefix (listed there too), because games and tools run on the same vahac.com origin and share one localStorage.
 - The folder name must be unique and must not match any vahac-tools folder name. It becomes the `toolFilename` of the page's `wp:vahac/tool-embed` block, and the site writes every embed's assets, games and tools alike, to `wp-content/uploads/vahac-tools/<folder>.css` and `wp-content/uploads/vahac-tools/<folder>.js`, so two embeds with one name would overwrite each other's files.
 - A game reaches the site as its three files copied into that block (the `build-embed.js` script of the vahac-tool-wp-page skill). Keep `<!--`, `-->` and `</script` out of `style.css`, `script.js` and the game's markup in `index.html`, and keep the start-up behind the readyState / `module.exports` guard so the tests can load the script.
+- Packet Siege's `script.js` is generated and committed; nobody edits it by hand. Its source is the 40 parts in
+  `packet-siege/src/*.js`, each a fragment of one closure, and `node packet-siege/build.js` joins them in the
+  order of `PARTS` (in `build.js`) into `script.js`: a header that says the file is generated and names the
+  parts, one strict IIFE, and every part under a `// ── src/<name>.js ──` banner. After a change in `src/`, run
+  the build and commit `src/` and `script.js` together. `node packet-siege/build.js --check` writes nothing and
+  exits 1 when `script.js` differs from the build, and `tests/packet-siege.sim.test.js` fails when `script.js` is
+  stale. To add a part, create `packet-siege/src/<name>.js` with an opening comment that says what it owns and
+  which parts it uses, keep it ES5, pks-named and under 900 lines, without an IIFE or exports of its own
+  (`main.js` exports for Node and stays last), add `<name>` to `PARTS` after every part it uses at load time,
+  and run the build; a file in `src/` that is missing from `PARTS` fails the tests. The site still receives the
+  same three files: `index.html`, `style.css` and the built `script.js`.
+- The build strips full-line `//` comments from `script.js` (each part keeps its opening line; comments after code
+  and a `//` inside a string or a regular expression stay), so the readable source, every comment included, is
+  `src/`. The sprite art is stored compressed in the generated file. The parts `src/sprites-*.js` stay
+  human-editable ASCII maps (one character per pixel), but `node packet-siege/build.js` packs each one on the way
+  into `script.js`. Every sprite becomes a single string, `'name w h pixels'`. Its pixels are a stream of literal
+  pixel characters and short copy codes that reach back into pixels already decoded, earlier sprites of the same
+  part included, which covers runs, repeated rows and animation frames. The codes use a printable alphabet with
+  no quotes, backslashes, spaces or angle brackets, so the data needs no escaping and can never close the script
+  block. At start-up `src/unpack-art.js` (`pksUnpackArt`) restores exactly the original maps before the atlas is
+  built. Edit the maps in `src/` and rebuild; never edit the packed strings by hand. The build also refuses to
+  write a `script.js` that would contain `<!--`, `-->` or `</script`.
+- Packet Siege's `script.js` is 261,266 bytes (about 255 KB; `src/` holds about 619 KB),
+  the largest in the repository. Before publishing it, check the site's embed with a script of this size.

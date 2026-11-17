@@ -4,6 +4,97 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-17] - Packet Siege
+
+Packet Siege joins Arcade: a lane-defense game in a server room, where malware walks along five lanes toward the
+rack and CPU cycles buy defenders, over 150 levels in 15 zones with a boss every tenth level and, from zone 6 on,
+a floor rule per zone. It sits in its own folder with the usual three files, the prefix `pks` and 13 test modules
+at 100 % line, branch and function coverage. It uses no image files, no network call and no outside resource:
+the sprites are character maps in the source. Its `script.js` is the first one in the repository that is built
+rather than written: the source lives in `packet-siege/src/` and `packet-siege/build.js` joins it (README Notes).
+The suite now has 1644 tests in 40 modules.
+
+### Index page
+
+#### Added
+- Packet Siege in Arcade. The page now lists 24 games in 7 genres.
+
+#### Tests
+- `tests/hub.test.js` follows the new lists: the counts, the genre chips, the listing by genre and the card links.
+
+### Packet Siege
+
+#### Added
+- New arcade game `packet-siege/` (prefix `pks`): malware walks in from the right along five lanes of nine cells
+  toward the server rack, and cycles pay for defenders that shoot, block, trap or make more cycles. Each lane has
+  one breaker: the first enemy at the rack trips it and wipes the lane, the next one is a breach and loses the
+  level. A win gives 3 stars with no breaker tripped, 2 with one or two, 1 with more (450 stars in all).
+- 27 defenders: the PSU and the Firewall from the start, then one for winning each of 25 levels, from the Reverse
+  Proxy (level 1) to the Honeynet (level 132). 25 enemies, each first seen on its own level, from the Bot to the
+  Glitch (level 134). The APT boss on every tenth level in 15 tiers, from 2400 to 11350 HP: help called in, lane
+  changes, a volley into three lanes and cloak phases on levels 10-50, then shields, healing, jamming and splits,
+  alone and combined, up to two bosses sharing one HP pool on level 150.
+- 15 zones of ten levels. Zones 1-5 change the floor: fewer lanes on levels 1-3, cable trays, no passive cycles
+  but a bigger start, fog over the three right columns, and enemies 25 % faster with trays and fog back. Zones
+  6-15 each add a rule: express lanes (40 % faster), hot cells (8 HP a second), power rails (1.5 times the work
+  rate, no passive cycles), tunnel exits at column 7, blackouts (every 50 s, shooters see 4 cells), crossover
+  cells, upkeep (1 cycle per defender every 12 s), a rolling outage (a lane offline for 10 s every 40 s), fog
+  over five columns with express lanes, and at the root a fixed pair of earlier rules with enemies 10 % faster.
+  Badges over the field show the rules and their clocks; blackouts and outages are announced before they strike.
+- Levels of 4 to about 21 minutes with 3 to 22 surges, generated from the level number, so each is the same on
+  every run: a quiet 25 s opening, a trickle that thickens, surges that grow up to the final one, a new enemy that
+  comes early and alone, and a cap on the enemy HP entering a lane or the floor within 15 s, drawn from what a
+  player can have built by then. On levels 51-150 an enemy still on the floor 300 s after the level's end breaks
+  through (overtime), so every level ends.
+- Loadout slots grow from 5 to 10 (6 from level 11, 7 from 31, 8 from 41, 9 from 71, 10 from 111); the loadout
+  screen comes only once more defenders are owned than the level has slots (first on level 9).
+- A pure, deterministic simulation at 60 steps a second on a 320x180 canvas, shown at up to 3x: a whole multiple
+  when it fills at least 80 % of the column, else as wide as the column; with 1x and 2x game speed.
+- One frame holds the whole game: the level select (15 zone tiles and their levels, with stars), the loadout, the
+  codex of defenders, threats, bosses and zones, the level with its HUD, cards and status line, and the pause,
+  leave, result and help overlays. Fullscreen (F or the button) uses the browser's Fullscreen API and maximises
+  the frame over the viewport where the API is missing or refuses. Filling the screen, the frame puts the cards
+  in columns beside the field on a wide and short screen such as a phone held sideways.
+- Mouse and touch (pick a card, then a cell) and keys on the focused field: 1-9 and 0 for the cards, the arrows,
+  Enter/Space, X/Delete, P, S and F. A refusal names its values; losing the window focus or hiding the tab pauses.
+- A news banner for a new threat or defender, hints on levels 1-3, and saves in `pks-state` (versioned) parsed
+  field by field, written after each level and when an enemy is first met; a second tab's progress is merged.
+- A level in progress is saved too, as one snapshot per browser in `pks-run`: on pause, when the page is left and
+  every 30 s of play. The level select offers "Resume level N", which brings the level back paused exactly where it
+  was; starting any level, a win or a loss drops the snapshot. A save or snapshot of a newer version of the game
+  is never overwritten.
+- `packet-siege/build.js` builds `script.js` from the 40 parts in `packet-siege/src/` in the order of `PARTS`,
+  strips full-line comments and packs the ASCII sprite maps into short strings that `src/unpack-art.js` restores
+  at start-up; `--check` reports a stale copy without writing anything. The built `script.js` is about 255 KB.
+
+#### Tests
+- `tests/packet-siege.sim.test.js` with 69 tests: the build, the tables, levels 1-50, every original defender and
+  enemy, the boss tiers, breakers, stars, surges and determinism, and the difficulty contract of levels 1-50
+  played by scripted players: a reference bot, the same bot acting every 2 s, a novice, a simple and a weak
+  build, and a player who places nothing.
+- `tests/packet-siege.expansion.test.js` with 42 tests: a freeze of levels 1-50 and the first 15 defenders, 13
+  enemies and 5 boss tiers that must never be re-pinned, then the 12 later defenders and 12 later enemies on
+  hand-made fields.
+- `tests/packet-siege.zones.test.js` with 31 tests: levels 51-150, every zone rule, boss tiers 6-15 and overtime.
+- `tests/packet-siege.campaign.test.js` (5), `campaign-late` (3), `campaign-players` (7), `campaign-rules` (11),
+  `campaign-cards` (3) and `campaign-foes` (13): the campaign contract of levels 51-150, the scripted players on
+  every level and what each zone rule, later defender and later enemy is worth over a band of toughness values,
+  read from `tests/packet-siege.campaign.pins.json` (written by `.claude/packet-siege/tune.js --pins`).
+  `tests/packet-siege.early.pins.json` pins a hash of the reference bot's and the weak build's whole game on each
+  of levels 1-50.
+- `tests/packet-siege.render.test.js` with 57 tests: the palette, sprites and atlas, every unit, rule and effect
+  drawn, fog, trays and the surge strip, and a renderer that never changes the sim.
+- `tests/packet-siege.storage.test.js` with 17 tests: `pks-state` (pinned, field by field, merged between tabs,
+  blocked storage, newer versions, the whole campaign's unlocks) and `pks-run` (validation, one slot per browser,
+  newer versions, a mid-level round trip on late levels that plays on exactly like the original).
+- `tests/packet-siege.pack.test.js` with 11 tests: every packed sprite decodes to its map in `src/`, the encoder's
+  round trips and refusals, comment stripping and the embed-safety check of the build.
+- `tests/packet-siege.test.js` with 74 tests: the page booted from `index.html`: levels won by pointer and by
+  keyboard, a lost level, keys and focus, pause, speed, surges, results, loadout, codex, rule badges, overtime,
+  saves, the snapshot and its resume, second tabs, the frame's layout, fullscreen and the maximised fallback, and
+  the source checks (prefix, ES5, embed safety, contrast, the 320-1440 px layout and landscape phones).
+- 100 % line, branch and function coverage of `packet-siege/script.js`.
+
 ## [2026-11-16] - Orphan Process
 
 Orphan Process joins Arcade: a side-view platformer for a desktop keyboard through /home and /tmp, with 15

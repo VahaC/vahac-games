@@ -258,6 +258,7 @@ and localStorage key of a game (`.{p}-wrapper`, `#{p}-board`, `{p}-state`).
 | `ocs`  | On-Call Shift        | `oncall-shift/`         | Built  |
 | `orp`  | Orphan Process       | `orphan-process/`       | Built  |
 | `pdp`  | Pod Packer           | `pod-packer/`           | Built  |
+| `pks`  | Packet Siege         | `packet-siege/`         | Built  |
 | `pkn`  | Port Knocker         | `port-knocker/`         | Built  |
 | `ppn`  | Patch Panel          | `patch-panel/`          | Built  |
 | `rkr`  | Rack Reset           | `rack-reset/`           | Built  |
