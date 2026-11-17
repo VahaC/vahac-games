@@ -1,7 +1,7 @@
 // tests/packet-siege.campaign-cards.test.js
 // Packet Siege, levels 51-150: contract 5 of phase 4 for the twelve new
 // defenders (see packet-siege.campaign.test.js and, for the band,
-// packet-siege.campaign-rules.test.js): on a level after its unlock the
+// packet-siege.campaign-rules-1.test.js): on a level after its unlock the
 // reference bot, over the band of toughness values, wins clearly more often
 // with the card than without it (the next card of its order in its slot).
 // A card no level shows that for keeps no full-level claim: its pin names

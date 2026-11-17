@@ -510,8 +510,8 @@ port 5175 (vahac-tools uses 5173), so both repositories can run side by side. `.
 ## Tests
 
 The repository ships with a test suite covering every game and the index
-page (1644 tests across 40 modules: one per game, two for the Reaction Time
-Test and for Orphan Process, 13 for Packet Siege, `hub.test.js` for the index
+page (1646 tests across 48 modules: one per game, two for the Reaction Time
+Test and for Orphan Process, 21 for Packet Siege, `hub.test.js` for the index
 page and `_smoke.test.js` for the test harness), powered by the built-in
 Node.js test runner — no external dependencies required.
 
@@ -528,8 +528,8 @@ through `node:test`'s `run()` API with the spec reporter. This works the same
 on Node 20, 22 and 24 under both cmd.exe and POSIX shells — unlike
 `node --test tests/` (a directory argument breaks on Node 21+) or a glob
 (unsupported by `--test` on Node 20, and never expanded by cmd.exe). Every
-test fails after 60 seconds, so a test that hangs fails the run instead of
-blocking the Jenkins build. To run a single module, pass its path directly (on Node 20 add `--test-reporter=spec`,
+test and every module fails after 3 minutes, so a test that hangs fails the
+run instead of blocking the Jenkins build. To run a single module, pass its path directly (on Node 20 add `--test-reporter=spec`,
 or it prints TAP when the output is not a terminal):
 
 ```powershell
@@ -678,7 +678,7 @@ shows up as a test that has to change.
   - Source checks: ids, the orp- prefix, ES5 syntax and the IIFE, embed safety, the sprite block and its atlas, and the 320-1440 px layout with the narrow-window notice.
   - The route played with the real physics: a bot feeds keys to `orpStep` at 1/120 s along waypoints, from the new-game start through every man page, both memory modules and every tty to the boss, wins the fight, and after Continue takes the way onward, the shortcut and the way back through /home for both secrets, without a hit; and with kill only, from /tmp back through the gate room and up its ladder into Downloads, and across .X11-unix from its tty to its west exit. Every jump also lands with the key pressed 4 steps early or late (one jump of a chain or all of them) and with the run-up 3 px off; a failure names the room and the waypoint.
   - 100% lines, branches and functions of `orphan-process/script.js`.
-- Packet Siege (343 tests in 13 modules):
+- Packet Siege (345 tests in 21 modules):
   - `packet-siege.sim.test.js` (69): the build (`script.js` is `build()` of `src/` byte for byte apart from the
     checkout's line endings, so a stale copy fails; `PARTS` is the set of files in `src/`; `build.js --check`
     passes on the repo and on a fresh build checked out with CRLF line endings, and fails on a stale copy without
@@ -697,17 +697,20 @@ shows up as a test that has to change.
     fields and with the units it meets (express lanes, hot cells, power rails, tunnels, blackouts, crossovers,
     upkeep, the rolling outage, fog, the root's pairs), boss tiers 6-15 and their shield, healing, jamming and
     split, determinism over real late levels, the idle player and overtime.
-  - The campaign contract of levels 51-150, split into six modules so that each runs in well under a minute:
-    `packet-siege.campaign.test.js` (5: the threat budgets, the reference bot on 51-100 and the boss levels
-    60-100), `packet-siege.campaign-late.test.js` (3: the bot on 101-150 and the boss levels 110-150),
-    `packet-siege.campaign-players.test.js` (7: the slow bot, the players who must lose everything past 50, the
-    exploits the tuning flagged and a level that always ends), and `packet-siege.campaign-rules.test.js` (11),
-    `packet-siege.campaign-cards.test.js` (3) and `packet-siege.campaign-foes.test.js` (13): over a band of 11
-    enemy toughness values the bot wins clearly more of a level of each zone 6-15 without its rules and of each
-    later enemy's first level without that enemy (the two that do not show it, the Wiper and the Encrypted
-    Payload, are named and pinned all the same). Two later defenders (Token Ring, Signature DB) show over the
-    band that the bot wins clearly more with them; every other later card is pinned to the scripted scenario of
-    the expansion module that proves its job.
+  - The campaign contract of levels 51-150, split into 14 modules so that each runs in a few seconds:
+    `packet-siege.campaign.test.js` (3: the threat budgets and the reference bot on 51-100),
+    `packet-siege.campaign-late.test.js` (1: the bot on 101-150), `packet-siege.campaign-bosses.test.js` (2: the
+    boss levels 60-150), `packet-siege.campaign-margin.test.js` (2: the bot on 51-150 with every enemy 10 %
+    tougher), `packet-siege.campaign-players.test.js` (7: the slow bot, the players who must lose everything past
+    50, the exploits the tuning flagged and a level that always ends), and `packet-siege.campaign-rules-1.test.js`
+    to `-4` (6, 2, 2, 2), `packet-siege.campaign-cards.test.js` (3) and `packet-siege.campaign-foes-1.test.js` to
+    `-4` (5, 3, 3, 2): over a band of 11 enemy toughness values the bot wins clearly more of a level of each zone
+    6-15 without its rules and of each later enemy's first level without that enemy (the two that do not show it,
+    the Wiper and the Encrypted Payload, are named and pinned all the same). Two later defenders (Token Ring,
+    Signature DB) show over the band that the bot wins clearly more with them; every other later card is pinned
+    to the scripted scenario of the expansion module that proves its job. The rules and foes shards share
+    `tests/_packet-siege-band.js`, whose one table says which shard plays which zones and enemies; a test fails
+    when a zone or an enemy is in no shard or in two.
   - `packet-siege.render.test.js` (57): the palette, every sprite's size and characters, the atlas pixel for
     pixel with its white, blue and tinted copies, zone backdrops and floors, the rule tiles, tunnel shimmers,
     blackouts and outages on the field, fog, trays, racks and breakers, every frame and state of the defenders,

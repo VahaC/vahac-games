@@ -1,7 +1,8 @@
 // tests/packet-siege.campaign-late.test.js
 // Packet Siege, levels 51-150: the campaign contract of phase 4, part 2 of 3
 // (see packet-siege.campaign.test.js): the reference bot on levels 101-150
-// and the boss levels 110-150.
+// (their boss levels are in packet-siege.campaign-bosses.test.js, their
+// margin in packet-siege.campaign-margin.test.js).
 'use strict';
 
 const test = require('node:test');
@@ -37,16 +38,4 @@ test('packet-siege campaign: contract 2 (101-150) — the reference bot wins eve
   const trips = [];
   for (const n of HALF) for (const at of res[n - 101].tripped) trips.push(at / pks.pksLevel(n).duration);
   assert.ok(trips.filter((f) => f >= 2 / 3).length >= 0.75 * trips.length, 'late trips: ' + trips.map((f) => f.toFixed(2)).join(' '));
-});
-
-test('packet-siege campaign: contract 2 (101-150) — no razor-thin margin: the bot still wins with every enemy 10 % tougher (sampled: every odd level and every boss level; tune.js --fit checks them all)', () => {
-  for (const n of HALF.filter((m) => m % 2 === 1 || m % 10 === 0)) assert.equal(PLAYERS.playBot(n, { tough: CAMPAIGN.hard }).won, true, 'level ' + n);
-});
-
-test('packet-siege campaign: contract 1b — a boss level 110-150 is at least as demanding as the level before it', () => {
-  for (const n of [110, 120, 130, 140, 150]) {
-    const [k, think] = CAMPAIGN.bossDemand[n];
-    assert.equal(PLAYERS.playBot(n - 1, { tough: k, think }).won, true, (n - 1) + ' at ' + k);
-    assert.equal(PLAYERS.playBot(n, { tough: k, think }).won, false, n + ' at ' + k);
-  }
 });

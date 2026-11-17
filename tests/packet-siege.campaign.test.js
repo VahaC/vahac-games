@@ -1,17 +1,20 @@
 // tests/packet-siege.campaign.test.js
 // Packet Siege, levels 51-150: the campaign contract of phase 4
-// (.claude/packet-siege/spec-150.md, "Balance"), part 1: the budgets, the
-// reference bot on levels 51-100 and the boss levels 60-100.  Part 2
-// (packet-siege.campaign-late.test.js) plays the bot on 101-150, part 3
-// (packet-siege.campaign-players.test.js) the slow bot, the players who must
-// lose, the exploits and the end of every level; contract 5, what every zone
-// rule, new defender and new enemy is worth, is measured over a band of
-// toughness values in packet-siege.campaign-rules, -cards and -foes.  The
-// players are the ones of packet-siege.sim.test.js (its players block), as
-// tune.js reads them; the pins of all of them are in
+// (.claude/packet-siege/spec-150.md, "Balance"), part 1: the budgets and the
+// reference bot on levels 51-100.  Part 2
+// (packet-siege.campaign-late.test.js) plays the bot on 101-150,
+// packet-siege.campaign-bosses.test.js the boss levels 60-150,
+// packet-siege.campaign-margin.test.js the bot on 51-150 with every enemy
+// 10 % tougher, part 3 (packet-siege.campaign-players.test.js) the slow bot,
+// the players who must lose, the exploits and the end of every level;
+// contract 5, what every zone rule, new defender and new enemy is worth, is
+// measured over a band of toughness values in packet-siege.campaign-rules-1
+// to -4, -cards and -foes-1 to -4 (their shared code in _packet-siege-band.js).
+// The players are the ones of packet-siege.sim.test.js (its players block),
+// as tune.js reads them; the pins of all of them are in
 // packet-siege.campaign.pins.json, measured by .claude/packet-siege/tune.js
-// --pins (its header says how to re-measure).  Split so that each runs in
-// well under a minute in its own process.
+// --pins (its header says how to re-measure).  Split so that each runs in a
+// few seconds in its own process.
 'use strict';
 
 const test = require('node:test');
@@ -50,14 +53,6 @@ test('packet-siege campaign: contract 1 (51-150) — the threat budget rises str
   assert.deepEqual(range(51, 150).map((n) => pks.pksLevel(n).budget), CAMPAIGN.budgets, 'the budgets tune.js fitted');
 });
 
-test('packet-siege campaign: contract 1b — a boss level is at least as demanding as the level before it: at a toughness the level before is still won with, the boss level is lost', () => {
-  for (const n of [60, 70, 80, 90, 100]) {
-    const [k, think] = CAMPAIGN.bossDemand[n];
-    assert.equal(PLAYERS.playBot(n - 1, { tough: k, think }).won, true, (n - 1) + ' at ' + k);
-    assert.equal(PLAYERS.playBot(n, { tough: k, think }).won, false, n + ' at ' + k);
-  }
-});
-
 test('packet-siege campaign: contract 2 (51-100) — the reference bot wins every level with only what is unlocked and the level\'s slots, the pinned stars, its breakers mostly in the last third', () => {
   const res = bot();
   for (const n of HALF) {
@@ -85,8 +80,4 @@ test('packet-siege campaign: contract 2 (51-150) — the pinned stars average 2+
     assert.ok(avg[z] <= avg[z - 1], 'zone ' + (z + 5) + ' ' + avg[z] + ' after ' + avg[z - 1]);
   }
   assert.ok(!stars.includes('0') && !stars.includes('1'), 'never a loss, never a single star');
-});
-
-test('packet-siege campaign: contract 2 (51-100) — no razor-thin margin: the bot still wins with every enemy 10 % tougher (sampled: every odd level and every boss level; tune.js --fit checks them all)', () => {
-  for (const n of HALF.filter((m) => m % 2 === 1 || m % 10 === 0)) assert.equal(PLAYERS.playBot(n, { tough: CAMPAIGN.hard }).won, true, 'level ' + n);
 });

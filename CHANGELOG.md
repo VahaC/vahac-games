@@ -8,11 +8,11 @@ games are not versioned, so each entry is dated.
 
 Packet Siege joins Arcade: a lane-defense game in a server room, where malware walks along five lanes toward the
 rack and CPU cycles buy defenders, over 150 levels in 15 zones with a boss every tenth level and, from zone 6 on,
-a floor rule per zone. It sits in its own folder with the usual three files, the prefix `pks` and 13 test modules
+a floor rule per zone. It sits in its own folder with the usual three files, the prefix `pks` and 21 test modules
 at 100 % line, branch and function coverage. It uses no image files, no network call and no outside resource:
 the sprites are character maps in the source. Its `script.js` is the first one in the repository that is built
 rather than written: the source lives in `packet-siege/src/` and `packet-siege/build.js` joins it (README Notes).
-The suite now has 1644 tests in 40 modules.
+The suite now has 1646 tests in 48 modules.
 
 ### Index page
 
@@ -76,10 +76,14 @@ The suite now has 1644 tests in 40 modules.
   enemies and 5 boss tiers that must never be re-pinned, then the 12 later defenders and 12 later enemies on
   hand-made fields.
 - `tests/packet-siege.zones.test.js` with 31 tests: levels 51-150, every zone rule, boss tiers 6-15 and overtime.
-- `tests/packet-siege.campaign.test.js` (5), `campaign-late` (3), `campaign-players` (7), `campaign-rules` (11),
-  `campaign-cards` (3) and `campaign-foes` (13): the campaign contract of levels 51-150, the scripted players on
-  every level and what each zone rule, later defender and later enemy is worth over a band of toughness values,
-  read from `tests/packet-siege.campaign.pins.json` (written by `.claude/packet-siege/tune.js --pins`).
+- `tests/packet-siege.campaign.test.js` (3), `campaign-late` (1), `campaign-bosses` (2), `campaign-margin` (2),
+  `campaign-players` (7), `campaign-rules-1` to `-4` (12), `campaign-cards` (3) and `campaign-foes-1` to `-4` (13):
+  the campaign contract of levels 51-150, the scripted players on every level and what each zone rule, later
+  defender and later enemy is worth over a band of toughness values, read from
+  `tests/packet-siege.campaign.pins.json` (written by `.claude/packet-siege/tune.js --pins`). The rules and foes
+  shards share `tests/_packet-siege-band.js`, whose one table says which shard plays which zones and enemies, and
+  a test checks that each zone and enemy is in exactly one shard. Each module runs in a few seconds;
+  `tests/run.js` fails a test or a module after 3 minutes (a hang), no longer after one.
   `tests/packet-siege.early.pins.json` pins a hash of the reference bot's and the weak build's whole game on each
   of levels 1-50.
 - `tests/packet-siege.render.test.js` with 57 tests: the palette, sprites and atlas, every unit, rule and effect

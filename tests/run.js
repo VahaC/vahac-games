@@ -19,8 +19,9 @@
 // table and exit with code 1.  Plain `npm test` has no thresholds and still
 // runs on Node 20.11+.
 //
-// Every test fails after TEST_TIMEOUT_MS, so a test that waits on a promise
-// that never settles fails the run instead of hanging the CI build.
+// Every test, and every test file as a whole, fails after TEST_TIMEOUT_MS, so
+// a test that waits on a promise that never settles fails the run instead of
+// hanging the CI build.
 
 'use strict';
 
@@ -37,8 +38,11 @@ const COVERAGE_GLOBS = ['*/script.js'];
 // percent.  Update them when the measured totals change.
 const COVERAGE_THRESHOLDS = { lineCoverage: 100, branchCoverage: 100, functionCoverage: 100 };
 
-// The tests take milliseconds each; a minute means something hangs.
-const TEST_TIMEOUT_MS = 60000;
+// Most tests take milliseconds; the Packet Siege campaign modules play whole
+// levels and take seconds each.  Three minutes means something hangs, also on
+// the slow CI machine.  The limit is for hangs, not for speed: it applies to
+// every test and to every test file as a whole.
+const TEST_TIMEOUT_MS = 180000;
 
 const coverage = process.argv.slice(2).includes('--coverage');
 
