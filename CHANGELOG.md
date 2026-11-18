@@ -4,6 +4,115 @@ All notable changes to this repository are recorded here, newest first. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 games are not versioned, so each entry is dated.
 
+## [2026-11-18] - Cold Aisle
+
+Cold Aisle joins Arcade: a first-person raycaster in a data centre for a desktop keyboard and mouse, where the
+night-shift engineer reboots the infected racks of nine floors and takes the lift down, with a rogue chiller as the
+boss of the last floor. It sits in its own folder with the usual three files, the prefix `cda` and 12 test modules
+at 100 % line, branch and function coverage. It uses no image or audio files, no network call and no outside
+resource: the art is character maps in the source and the sounds are synthesised. Like Packet Siege's, its
+`script.js` is built: the source lives in `cold-aisle/src/` and `cold-aisle/build.js` joins it (README Notes).
+The suite now has 1876 tests in 60 modules.
+
+### Index page
+
+#### Added
+- Cold Aisle in Arcade. The page now lists 25 games in 7 genres.
+
+#### Tests
+- `tests/hub.test.js` follows the new lists: the counts, the genre chips, the listing by genre and the card links.
+
+### Cold Aisle
+
+#### Added
+- New arcade game `cold-aisle/` (prefix `cda`): a first-person game for a desktop keyboard and mouse. On every
+  floor the player finds the infected racks, reboots each by holding Use for 1.5 s, and takes the lift, which
+  opens once every rack is clean. Nine levels, from the Loading Dock (24x24, one rack) to the NOC (48x40, four
+  racks) and the Chiller Plant with the boss, each with a briefing and a kit (the least a player has on entering
+  it). A window narrower than 720 px shows a notice instead of the game.
+- Three tools: the Screwdriver (melee, no ammo), the Tone probe (an instant ray, picked up on level 1) and the
+  Degausser (7 rays in an 18 degree fan, picked up on level 3); a tool that runs dry falls back to the
+  screwdriver, and every shot wakes the machines within its noise range.
+- Four enemies, each first met on its own level: the floor scrubber (1), the inventory drone (2, keeps its
+  distance and fires sparks), the camera turret (4, a visible lock-on and a burst of bolts) and the pallet loader
+  (5, a telegraphed charge that leaves it stunned). Every attack shows before it lands and every projectile can be
+  sidestepped, and a melee blow lands only with a clear line to the player. They find the player through a flow
+  field and open plain doors, never locked ones.
+- The boss, the chiller (660 HP), in a plant room with pillars: fans of frost bolts, calls for floor scrubbers
+  (at most 3 alive) and open vents, the only time damage counts, in three phases, each faster.
+- Doors that slide open and close by themselves, blue, yellow and red badges for locked doors, secret walls
+  that open for good on Use, items (cells, coils, coffee, medkits, ESD vests, patches), zones with their own
+  floor, ceiling and light down to pitch dark, a flashlight, and an automap of the tiles seen (Tab).
+- Patches from a won level (1, plus 1 per machine destroyed and per secret, plus those picked up; a replay pays
+  only what beats the best run) buy six upgrade lines of three tiers costing 3, 5 and 8: max health, cell
+  capacity, probe damage, probe speed, degausser rays and flashlight range.
+- A pure, deterministic simulation at 120 steps a second (at most 0.25 s of catch-up a frame), drawn by a
+  raycaster written for the game into a 320x180 framebuffer: textured walls, sliding doors, textured floor and
+  ceiling, billboard sprites clipped against the walls, and 16 light levels by distance, zone and flashlight. The
+  camera, enemies, projectiles and doors are interpolated between steps. On the page the view fills the width of
+  its column at 16:9, with no upper limit, and snaps to a scale of whole device pixels a game pixel when that
+  covers at least 96 % of the width (960x540 in a 1000 px column at 100 % display scaling; a 966 px column filled
+  at 125 %); fullscreen (F) takes the largest 16:9 stage that fits the screen, with the same snap.
+- One frame holds the whole game: the title over a rendered frame of level 1, level select, briefing, the level
+  with its HUD, pause (with the mouse sensitivity and the sound), death, results, upgrades and the end of the
+  episode. The mouse turns the view under Pointer Lock and, where the lock is missing or refused, while the
+  pointer is over the frame (a pointer resting in the outer 15 % of its width keeps turning); a click on the
+  view asks for the lock again. Under the lock the first move is ignored and a single move is clamped. Keys are
+  matched by their physical place (`event.code`); fire is the left mouse button, J or Enter. The view is in the
+  tab order only while a level is live, the page takes no focus at load, and a key held when a level ends does
+  not press the next screen's button. Losing the lock, the focus or the tab pauses.
+- 48 sounds synthesised with Web Audio, placed by distance and side, and M to mute (saved).
+- How to play under the game: an illustrated guide drawn with the game's own sprites, its numbers read from the
+  tables.
+- Saves in `cda-state` (versioned) parsed field by field: an epoch, the highest level open, the best result per
+  level, upgrades, deaths, play time and settings, written when one of them changes; New game raises the epoch,
+  and between two tabs the higher epoch wins outright while saves of the same epoch are merged; blocked or full
+  storage shows a warning and never stops the game, and a newer version's save is never written over. A level in
+  progress is not saved.
+- `cold-aisle/build.js` builds `script.js` from the 38 parts in `cold-aisle/src/` in the order of `PARTS`, made of
+  six groups (simulation, levels, art, renderer, sound, page) and `main`; every part registers what it exports on
+  `CDA_API`, which `main.js` hands to Node. It strips full-line comments and packs the 126 ASCII sprites into short
+  strings that `src/unpack-art.js` restores at start-up; `--check` reports a stale copy without writing anything.
+  The built `script.js` is 237,001 bytes.
+
+#### Tests
+- `tests/cold-aisle.sim.test.js` with 26 tests (one of them skipped): the build, the part rules, the palette and
+  the art decoder, and the simulation around the player: movement and collision, doors, badges, secrets, racks
+  and the lift, items, tools, the carry and upgrades, results, death and determinism. It also checks that every
+  file in `src/` is in `PARTS` and every part is a file.
+- `tests/cold-aisle.map.test.js` with 11 tests: the legend, `cdaParseLevel` and its refusals (a door that does
+  not lead to floor on both sides among them), rays and sight by DDA, collision and the flow field.
+- `tests/cold-aisle.levels.test.js` with 12 tests: the player's body flooded through each level with the real
+  collision functions (no decor seals a passage), no two floor cells touching only at a corner, the nine levels
+  as data, their routes in badge order, every item, enemy and secret reachable, the boss arena and
+  `cdaLevelCarry`.
+- `tests/cold-aisle.sim-enemies.test.js` with 20 tests: the tools (the screwdriver's reach to the target's
+  surface), noise, armour and every ordinary enemy in an arena of its own, tells, sidesteps, melee only with a
+  clear line and doors included.
+- `tests/cold-aisle.sim-boss.test.js` with 5 tests: the chiller's loop, armour, phases and calls, the vents
+  closing when it is killed with them open; a scripted player beats it from behind a pillar and a player who
+  stands still loses.
+- `tests/cold-aisle.route.test.js` with 28 tests: every level played through the real sim by the scripted players
+  of `tests/_cold-aisle-bot.js` from the bare kit: the reference bot wins with its run pinned, the novice wins on
+  5 seeds (levels 1-3 with half its health or more), and a player who stands still dies everywhere but on the
+  quiet start of level 1.
+- `tests/cold-aisle.render.test.js` with 23 tests: the shade table, pinned frames, walls, doors, light, sprites
+  as tall as their table row says, the frame per enemy state, interpolation, the tool in hand, effects, flashes,
+  the Use bar and the automap.
+- `tests/cold-aisle.pack.test.js` with 5 tests: every packed sprite decodes to its map in `src/`, and every sprite
+  the spec and the code name is in the art.
+- `tests/cold-aisle.sfx.test.js` with 19 tests: the event map, the sound table, unlock, mute, the silent
+  fallbacks, the per-step limits, distance and pan, and the voice engine.
+- `tests/cold-aisle.storage.test.js` with 15 tests: `cda-state` pinned, field by field, merged between tabs, the
+  higher epoch winning outright, repaired, blocked, full and newer saves, wins, patches and buying.
+- `tests/cold-aisle.ui-page.test.js` with 55 tests: the page booted from `index.html`: the title's picture, a
+  level won through real input and one lost, keys by physical place, the mouse with and without Pointer Lock,
+  focus and the tab order, pauses, the frame's size on the page and in fullscreen, the HUD, every
+  screen, saves, a second tab and the guide.
+- `tests/cold-aisle.ui-source.test.js` with 11 tests: the prefix, CSS rules, embed safety, the UI parts, the
+  markup, the layout from 320 px up and host styles kept out of the game.
+- 100 % line, branch and function coverage of `cold-aisle/script.js`.
+
 ## [2026-11-17] - Packet Siege
 
 Packet Siege joins Arcade: a lane-defense game in a server room, where malware walks along five lanes toward the

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cold Aisle — Logs from VahaC</title>
+  <meta name="description" content="Cold Aisle: a first-person game in a data centre whose building automation was taken over by a worm. As the night-shift engineer you reboot the infected racks of nine floors, fight the hijacked floor scrubbers, drones, cameras and pallet loaders, spend patches on upgrades and take on the rogue chiller. A raycaster drawn by its own code, fully client-side, made for a desktop keyboard and mouse.">
+  <link rel="stylesheet" href="style.css">
+  <style>body { margin: 0; background: #0a0f1e; }</style>
+</head>
+<body>
+
+<div class="cda-wrapper">
+
+  <header class="cda-header">
+    <h1 class="cda-title">Cold Aisle</h1>
+    <p class="cda-subtitle">The building automation of the data centre was taken over by a worm. You are the night-shift engineer: reboot the infected racks of every floor and take the lift down.</p>
+  </header>
+
+  <p id="cda-narrow" class="cda-narrow">Cold Aisle needs a keyboard, a mouse and a window at least 720 px wide.</p>
+
+  <div id="cda-holder" class="cda-holder">
+    <div id="cda-frame" class="cda-frame" role="region" aria-label="Cold Aisle">
+      <div id="cda-stage" class="cda-stage">
+
+        <canvas id="cda-canvas" class="cda-canvas" width="320" height="180" tabindex="-1" role="application" aria-label="Cold Aisle, the view. Keys: W and S or Up and Down move, A and D strafe, Left and Right or the mouse turn, the left mouse button, J or Enter fire, E or Space use, 1 to 3 or the wheel switch tools, Tab shows the map, P or Esc pause, F fullscreen, M mute."></canvas>
+
+        <div id="cda-hud" class="cda-hud cda-hidden">
+          <p id="cda-msg" class="cda-msg"></p>
+          <div class="cda-hud-left">
+            <span class="cda-hud-item cda-hud-health"><canvas id="cda-health-icon" class="cda-icon" width="8" height="8" data-cda-icon="ic-health" aria-hidden="true"></canvas><span id="cda-health" class="cda-hud-value">0</span><span class="cda-sr"> health</span></span>
+            <span class="cda-hud-item"><canvas id="cda-armour-icon" class="cda-icon" width="8" height="8" data-cda-icon="ic-armor" aria-hidden="true"></canvas><span id="cda-armour" class="cda-hud-value">0</span><span class="cda-sr"> armour</span></span>
+          </div>
+          <div class="cda-hud-right">
+            <span class="cda-hud-item"><span id="cda-tool" class="cda-hud-tool">Screwdriver</span><canvas id="cda-ammo-icon" class="cda-icon" width="8" height="8" aria-hidden="true"></canvas><span id="cda-ammo" class="cda-hud-value">–</span></span>
+            <span class="cda-hud-item cda-hud-badges"><canvas id="cda-badge-blue" class="cda-icon cda-badge cda-badge--off" width="8" height="8" data-cda-icon="ic-key-blue" aria-hidden="true"></canvas><canvas id="cda-badge-yellow" class="cda-icon cda-badge cda-badge--off" width="8" height="8" data-cda-icon="ic-key-yellow" aria-hidden="true"></canvas><canvas id="cda-badge-red" class="cda-icon cda-badge cda-badge--off" width="8" height="8" data-cda-icon="ic-key-red" aria-hidden="true"></canvas><span id="cda-badges" class="cda-sr">No badges</span></span>
+            <span class="cda-hud-item"><canvas id="cda-racks-icon" class="cda-icon" width="8" height="8" data-cda-icon="ic-rack" aria-hidden="true"></canvas><span id="cda-racks" class="cda-hud-value">0/0</span><span class="cda-sr"> racks rebooted</span></span>
+          </div>
+        </div>
+
+        <div id="cda-live" class="cda-sr" aria-live="polite"></div>
+
+        <div id="cda-gate" class="cda-overlay cda-overlay--gate cda-hidden">
+          <div class="cda-panel">
+            <button id="cda-gate-play" class="cda-btn" type="button" aria-label="Click to play: the game takes the mouse and the keyboard">Click to play</button>
+            <p class="cda-panel-text">The mouse turns, the left button fires. Esc gives the mouse back and pauses.</p>
+          </div>
+        </div>
+
+        <section id="cda-title-screen" class="cda-screen cda-screen--over cda-hidden" aria-label="Title">
+          <div class="cda-panel">
+            <h2 class="cda-screen-title cda-screen-title--big">Cold Aisle</h2>
+            <p class="cda-panel-text">Episode 1: the night shift. Nine floors, one rogue chiller.</p>
+            <div class="cda-actions cda-actions--column">
+              <button id="cda-continue" class="cda-btn" type="button" aria-label="Continue: the level select with your progress">Continue</button>
+              <button id="cda-new" class="cda-btn cda-btn--secondary" type="button" aria-label="New game from level 1">New game</button>
+              <button id="cda-help-open" class="cda-btn cda-btn--secondary" type="button" aria-label="How to play">Help</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-select" class="cda-screen cda-hidden" aria-label="Level select">
+          <div class="cda-panel cda-panel--wide">
+            <div class="cda-screen-head">
+              <h2 class="cda-screen-title">Floors</h2>
+              <p class="cda-balance">Patches: <span id="cda-balance">0</span></p>
+            </div>
+            <div id="cda-levels" class="cda-levels" role="group" aria-label="Levels"></div>
+            <div class="cda-actions">
+              <button id="cda-select-upgrades" class="cda-btn" type="button" aria-label="Upgrades: spend patches">Upgrades</button>
+              <button id="cda-select-back" class="cda-btn cda-btn--secondary" type="button" aria-label="Back to the title">Title</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-briefing" class="cda-screen cda-hidden" aria-label="Briefing">
+          <div class="cda-panel cda-panel--wide">
+            <h2 id="cda-brief-name" class="cda-screen-title">Level</h2>
+            <p id="cda-brief-text" class="cda-panel-text"></p>
+            <p class="cda-panel-text">You carry: <span id="cda-brief-kit" class="cda-strong"></span></p>
+            <div class="cda-actions">
+              <button id="cda-brief-start" class="cda-btn" type="button" aria-label="Start the level">Start</button>
+              <button id="cda-brief-back" class="cda-btn cda-btn--secondary" type="button" aria-label="Back to the level select">Levels</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-pause" class="cda-screen cda-screen--over cda-hidden" aria-label="Paused">
+          <div class="cda-panel">
+            <h2 class="cda-screen-title">Paused</h2>
+            <div class="cda-actions cda-actions--column">
+              <button id="cda-resume" class="cda-btn" type="button" aria-label="Resume the level">Resume</button>
+              <button id="cda-restart" class="cda-btn cda-btn--secondary" type="button" aria-label="Restart the level from its beginning">Restart level</button>
+              <button id="cda-pause-help" class="cda-btn cda-btn--secondary" type="button" aria-label="How to play">Help</button>
+              <button id="cda-pause-levels" class="cda-btn cda-btn--secondary" type="button" aria-label="Leave the level for the level select">Levels</button>
+            </div>
+            <div class="cda-setting">
+              <label class="cda-setting-label" for="cda-sens">Mouse sensitivity <span id="cda-sens-value" class="cda-strong">1</span></label>
+              <input id="cda-sens" class="cda-range" type="range" min="0.25" max="3" step="0.05" value="1">
+            </div>
+            <div class="cda-actions">
+              <button id="cda-mute" class="cda-btn cda-btn--secondary" type="button" aria-pressed="false" aria-label="Sound off or on (M)">Sound: on</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-death" class="cda-screen cda-screen--over cda-hidden" aria-label="Session terminated">
+          <div class="cda-panel">
+            <h2 class="cda-screen-title cda-screen-title--bad">Session terminated</h2>
+            <p id="cda-death-text" class="cda-panel-text"></p>
+            <p id="cda-death-count" class="cda-panel-text"></p>
+            <div class="cda-actions">
+              <button id="cda-retry" class="cda-btn" type="button" aria-label="Retry the level with what you carried into it">Retry</button>
+              <button id="cda-death-levels" class="cda-btn cda-btn--secondary" type="button" aria-label="Back to the level select">Levels</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-results" class="cda-screen cda-hidden" aria-label="Results">
+          <div class="cda-panel cda-panel--wide">
+            <h2 id="cda-results-title" class="cda-screen-title">Floor cleared</h2>
+            <ul id="cda-results-list" class="cda-stats"></ul>
+            <ul id="cda-results-new" class="cda-news"></ul>
+            <div class="cda-actions">
+              <button id="cda-next" class="cda-btn" type="button" aria-label="The next level's briefing">Next level</button>
+              <button id="cda-results-upgrades" class="cda-btn cda-btn--secondary" type="button" aria-label="Upgrades: spend patches">Upgrades</button>
+              <button id="cda-results-levels" class="cda-btn cda-btn--secondary" type="button" aria-label="Back to the level select">Levels</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-upgrades" class="cda-screen cda-hidden" aria-label="Upgrades">
+          <div class="cda-panel cda-panel--wide">
+            <div class="cda-screen-head">
+              <h2 class="cda-screen-title">Upgrades</h2>
+              <p class="cda-balance">Patches: <span id="cda-upg-balance">0</span></p>
+            </div>
+            <ul id="cda-upg-list" class="cda-upgrade-list"></ul>
+            <div class="cda-actions">
+              <button id="cda-upg-back" class="cda-btn cda-btn--secondary" type="button" aria-label="Back">Back</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="cda-end" class="cda-screen cda-hidden" aria-label="End of the episode">
+          <div class="cda-panel cda-panel--wide">
+            <h2 class="cda-screen-title">Episode 1 complete</h2>
+            <p class="cda-panel-text">The chiller is down and every floor runs clean. The worm came in from somewhere, though.</p>
+            <ul id="cda-end-list" class="cda-stats"></ul>
+            <p class="cda-panel-text cda-strong">To be continued in episode 2.</p>
+            <div class="cda-actions">
+              <button id="cda-end-levels" class="cda-btn" type="button" aria-label="Back to the level select">Levels</button>
+              <button id="cda-end-home" class="cda-btn cda-btn--secondary" type="button" aria-label="Back to the title">Title</button>
+            </div>
+          </div>
+        </section>
+
+        <div id="cda-help" class="cda-overlay cda-hidden" role="dialog" aria-label="How to play">
+          <div class="cda-panel cda-panel--wide">
+            <h2 class="cda-screen-title">How to play</h2>
+            <ul class="cda-help-list">
+              <li>Reboot every infected rack of the floor (hold E or Space while facing it), then use the lift.</li>
+              <li>W and S or Up and Down move, A and D strafe, the mouse or Left and Right turn.</li>
+              <li>Fire: the left mouse button, J or Enter. Tools: 1 to 3 or the wheel. Use doors and the lift with E or Space.</li>
+              <li>Tab shows the map, P or Esc pause, F is fullscreen, M mutes.</li>
+              <li>The full guide, with every tool, enemy and item, is under the game.</li>
+            </ul>
+            <div class="cda-actions">
+              <button id="cda-help-close" class="cda-btn" type="button" aria-label="Close the help">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="cda-confirm" class="cda-overlay cda-hidden" role="alertdialog" aria-labelledby="cda-confirm-text">
+          <div class="cda-panel">
+            <p id="cda-confirm-text" class="cda-panel-text cda-strong">Are you sure?</p>
+            <div class="cda-actions">
+              <button id="cda-confirm-no" class="cda-btn" type="button" aria-label="No, go back">No</button>
+              <button id="cda-confirm-yes" class="cda-btn cda-btn--danger" type="button" aria-label="Yes, go on">Yes</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="cda-warning" class="cda-warning cda-hidden" role="alert">
+          <span id="cda-warning-text" class="cda-warning-text"></span>
+          <button id="cda-warning-close" class="cda-btn cda-btn--small cda-btn--secondary" type="button" aria-label="Hide this warning">OK</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <details id="cda-guide" class="cda-guide" open>
+    <summary class="cda-guide-title">How to play: the goal, the keys, tools, enemies, items, racks and the lift, upgrades</summary>
+    <div class="cda-guide-body">
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Goal</h3>
+        <p class="cda-guide-para">A worm took over the building automation of the data centre. On each of the <span id="cda-num-levels" data-cda-num="levels"></span> floors, find the infected racks and reboot them by hand, then take the lift down. The last floor is the chiller plant, and its rogue chiller is the boss. Between floors you spend patches on upgrades.</p>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Keys</h3>
+        <p class="cda-guide-para">Captured by Click to play, the mouse turns the view freely; Esc gives it back and pauses, as do switching windows and hiding the tab. Where the browser will not capture it, the mouse turns the view while it is over the frame, and resting it at the left or right edge keeps turning.</p>
+        <table class="cda-guide-keys">
+          <thead><tr><th scope="col">Keys</th><th scope="col">What they do</th></tr></thead>
+          <tbody>
+            <tr><td>W and S, Up and Down</td><td>Walk forward and back (<span id="cda-num-speed" data-cda-num="speed"></span> tiles a second).</td></tr>
+            <tr><td>A and D</td><td>Step sideways.</td></tr>
+            <tr><td>Mouse, Left and Right</td><td>Turn (the arrows at <span id="cda-num-turn" data-cda-num="turn"></span> degrees a second). The pause screen sets the mouse sensitivity.</td></tr>
+            <tr><td>Left mouse button, J, Enter</td><td>Fire the tool in hand.</td></tr>
+            <tr><td>E, Space</td><td>Use: open a door, a secret wall or the lift; hold it on an infected rack to reboot it.</td></tr>
+            <tr><td>1, 2, 3, mouse wheel</td><td>Switch tools.</td></tr>
+            <tr><td>Tab</td><td>Show or hide the map of what you have seen.</td></tr>
+            <tr><td>P, Esc</td><td>Pause.</td></tr>
+            <tr><td>F</td><td>Fullscreen on and off.</td></tr>
+            <tr><td>M</td><td>Sound off and on (saved).</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">You</h3>
+        <ul class="cda-guide-list">
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-ic-health" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-health" width="8" height="8" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Health</strong> starts at <span id="cda-num-health" data-cda-num="health"></span>. At 0 the floor starts again from its beginning with what you carried into it; nothing you bought is lost. A floor always starts with at least <span id="cda-num-entry-health" data-cda-num="entry-health"></span> health.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-ic-armor" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-armor" width="8" height="8" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Armour</strong> (up to <span id="cda-num-armour-max" data-cda-num="armour-max"></span>) takes <span id="cda-num-armour-share" data-cda-num="armour-share"></span> % of each hit while it lasts.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-ic-key-blue" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-key-blue" width="8" height="8" aria-hidden="true"></canvas><canvas id="cda-spr-ic-key-yellow" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-key-yellow" width="8" height="8" aria-hidden="true"></canvas><canvas id="cda-spr-ic-key-red" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-key-red" width="8" height="8" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Badges</strong> open the doors of their colour. They stay on their floor.</span></li>
+        </ul>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Tools</h3>
+        <ul class="cda-guide-list">
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-vw-driver-idle" class="cda-guide-sprite cda-guide-sprite--hand" data-cda-sprite="vw-driver-idle" width="96" height="72" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">1 Screwdriver:</strong> close up only (<span id="cda-num-driver-reach" data-cda-num="driver-reach"></span> tiles), <span id="cda-num-driver-damage" data-cda-num="driver-damage"></span> damage every <span id="cda-num-driver-rate" data-cda-num="driver-rate"></span> s. It needs no ammo, and a tool that runs dry falls back to it.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-probe" class="cda-guide-sprite" data-cda-sprite="it-probe" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-ic-cell" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-cell" width="8" height="8" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">2 Tone probe:</strong> hits the first thing in line, <span id="cda-num-probe-damage" data-cda-num="probe-damage"></span> damage every <span id="cda-num-probe-rate" data-cda-num="probe-rate"></span> s, one cell a shot. You carry up to <span id="cda-num-probe-cap" data-cda-num="probe-cap"></span> cells.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-degausser" class="cda-guide-sprite" data-cda-sprite="it-degausser" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-ic-coil" class="cda-guide-sprite cda-guide-sprite--icon" data-cda-sprite="ic-coil" width="8" height="8" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">3 Degausser:</strong> <span id="cda-num-degausser-rays" data-cda-num="degausser-rays"></span> rays of <span id="cda-num-degausser-damage" data-cda-num="degausser-damage"></span> in a <span id="cda-num-degausser-fan" data-cda-num="degausser-fan"></span> degree fan every <span id="cda-num-degausser-rate" data-cda-num="degausser-rate"></span> s, weaker past <span id="cda-num-degausser-falloff" data-cda-num="degausser-falloff"></span> tiles, one coil a shot. You carry up to <span id="cda-num-degausser-cap" data-cda-num="degausser-cap"></span> coils.</span></li>
+        </ul>
+        <p class="cda-guide-para">Every shot is heard: sleeping machines nearby wake up.</p>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Enemies and their warning signs</h3>
+        <p class="cda-guide-para">Every attack shows before it lands, and every shot can be sidestepped. A machine wakes when it sees you, hears a shot or is hit.</p>
+        <ul class="cda-guide-list">
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-enm-crawler-walk0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-crawler-walk0" width="32" height="32" aria-hidden="true"></canvas><canvas id="cda-spr-enm-crawler-atk0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-crawler-atk0" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Floor scrubber</strong> (<span id="cda-num-crawler-hp" data-cda-num="crawler-hp"></span> HP) rolls at you and strikes for <span id="cda-num-crawler-damage" data-cda-num="crawler-damage"></span>. Sign: it rears up for <span id="cda-num-crawler-windup" data-cda-num="crawler-windup"></span> s (right) before it strikes. Step back.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-enm-drone-walk0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-drone-walk0" width="32" height="32" aria-hidden="true"></canvas><canvas id="cda-spr-enm-drone-atk0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-drone-atk0" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Inventory drone</strong> (<span id="cda-num-drone-hp" data-cda-num="drone-hp"></span> HP) keeps its distance and shoots sparks of <span id="cda-num-drone-damage" data-cda-num="drone-damage"></span>. Sign: the spark charges for <span id="cda-num-drone-windup" data-cda-num="drone-windup"></span> s. Strafe.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-enm-turret-idle" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-turret-idle" width="32" height="32" aria-hidden="true"></canvas><canvas id="cda-spr-enm-turret-aim" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-turret-aim" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Camera turret</strong> (<span id="cda-num-turret-hp" data-cda-num="turret-hp"></span> HP) never moves. Sign: it locks on for <span id="cda-num-turret-windup" data-cda-num="turret-windup"></span> s, then fires <span id="cda-num-turret-burst" data-cda-num="turret-burst"></span> bolts of <span id="cda-num-turret-damage" data-cda-num="turret-damage"></span>. Break its line of sight behind a wall.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-enm-loader-walk0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-loader-walk0" width="48" height="48" aria-hidden="true"></canvas><canvas id="cda-spr-enm-loader-tell" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="enm-loader-tell" width="48" height="48" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Pallet loader</strong> (<span id="cda-num-loader-hp" data-cda-num="loader-hp"></span> HP) charges in a straight line for <span id="cda-num-loader-damage" data-cda-num="loader-damage"></span>. Sign: it flashes for <span id="cda-num-loader-windup" data-cda-num="loader-windup"></span> s before the charge. Step aside; after a charge it stands stunned for <span id="cda-num-loader-stun" data-cda-num="loader-stun"></span> s.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-boss-chiller-idle0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="boss-chiller-idle0" width="64" height="64" aria-hidden="true"></canvas><canvas id="cda-spr-boss-chiller-vent0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="boss-chiller-vent0" width="64" height="64" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">The chiller</strong> (<span id="cda-num-chiller-hp" data-cda-num="chiller-hp"></span> HP), the boss of the last floor: it fires fans of frost bolts, calls floor scrubbers (at most <span id="cda-num-chiller-called" data-cda-num="chiller-called"></span> at a time) and only takes damage while its vents are open (right). Its bolts stop only at walls: keep one between you and it.</span></li>
+        </ul>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Items</h3>
+        <p class="cda-guide-para">Walk over an item to take it. One that would do nothing (health already full) stays where it is.</p>
+        <ul class="cda-guide-list">
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-cell" class="cda-guide-sprite" data-cda-sprite="it-cell" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-it-coil" class="cda-guide-sprite" data-cda-sprite="it-coil" width="16" height="16" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Cells and coils:</strong> <span id="cda-num-cell-amount" data-cda-num="cell-amount"></span> cells for the probe, <span id="cda-num-coil-amount" data-cda-num="coil-amount"></span> coils for the degausser. The tools themselves come with <span id="cda-num-probe-amount" data-cda-num="probe-amount"></span> cells and <span id="cda-num-degausser-amount" data-cda-num="degausser-amount"></span> coils.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-coffee" class="cda-guide-sprite" data-cda-sprite="it-coffee" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-it-medkit" class="cda-guide-sprite" data-cda-sprite="it-medkit" width="16" height="16" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Coffee and medkit:</strong> <span id="cda-num-coffee-health" data-cda-num="coffee-health"></span> and <span id="cda-num-medkit-health" data-cda-num="medkit-health"></span> health.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-vest" class="cda-guide-sprite" data-cda-sprite="it-vest" width="16" height="16" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">ESD vest:</strong> <span id="cda-num-vest-armour" data-cda-num="vest-armour"></span> armour.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-key-blue" class="cda-guide-sprite" data-cda-sprite="it-key-blue" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-it-key-yellow" class="cda-guide-sprite" data-cda-sprite="it-key-yellow" width="16" height="16" aria-hidden="true"></canvas><canvas id="cda-spr-it-key-red" class="cda-guide-sprite" data-cda-sprite="it-key-red" width="16" height="16" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Badges:</strong> blue, yellow and red, for the doors of their colour.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-it-patch" class="cda-guide-sprite" data-cda-sprite="it-patch" width="16" height="16" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Patch:</strong> the currency of upgrades. Some wait behind secret walls.</span></li>
+        </ul>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Racks, secrets and the lift</h3>
+        <ul class="cda-guide-list">
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-wall-rack-infected0" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="wall-rack-infected0" width="32" height="32" aria-hidden="true"></canvas><canvas id="cda-spr-wall-rack-clean" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="wall-rack-clean" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Infected rack:</strong> face it and hold Use for <span id="cda-num-reboot" data-cda-num="reboot"></span> s; a bar fills, and the rack turns green. Letting go or turning away stops the reboot.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-wall-secret" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="wall-secret" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Secret wall:</strong> concrete with a small tell. Use it and it opens for good.</span></li>
+          <li class="cda-guide-item"><span class="cda-guide-pics"><canvas id="cda-spr-lift-locked" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="lift-locked" width="32" height="32" aria-hidden="true"></canvas><canvas id="cda-spr-lift-open" class="cda-guide-sprite cda-guide-sprite--big" data-cda-sprite="lift-open" width="32" height="32" aria-hidden="true"></canvas></span><span class="cda-guide-text"><strong class="cda-guide-name">Lift:</strong> locked until every infected rack of the floor is clean (and, on the last floor, the chiller is down). Use it to end the floor.</span></li>
+        </ul>
+        <p class="cda-guide-para">The flashlight lights <span id="cda-num-flashlight" data-cda-num="flashlight"></span> tiles ahead; dark rooms are only a look, the machines see you just the same.</p>
+      </section>
+      <section class="cda-guide-section">
+        <h3 class="cda-guide-heading">Patches and upgrades</h3>
+        <p class="cda-guide-para">A cleared floor pays <span id="cda-num-reward-finish" data-cda-num="reward-finish"></span> patch, <span id="cda-num-reward-kill" data-cda-num="reward-kill"></span> more for every machine destroyed and <span id="cda-num-reward-secret" data-cda-num="reward-secret"></span> for every secret, plus the patches you picked up. Clearing a floor again pays only what beats your best run there. Between floors, spend them on <span id="cda-num-upgrade-lines" data-cda-num="upgrade-lines"></span> lines of upgrades:</p>
+        <ul id="cda-guide-upgrades" class="cda-guide-upgrades"></ul>
+        <p class="cda-guide-para">Your progress is saved in this browser after every floor; a floor in progress is not.</p>
+      </section>
+    </div>
+  </details>
+
+  <footer class="cda-footer">
+    Built by VahaC — 100% client-side, no data sent anywhere.
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

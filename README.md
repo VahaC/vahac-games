@@ -3,7 +3,7 @@
 A collection of standalone browser games by Vahac. Each game is implemented with plain HTML, CSS, and JavaScript, so it can run locally without a backend. The Games section on vahac.com is currently private, so the page below opens only for a logged-in site editor until the section goes public.
 
 Documentation status:
-- Last updated: 2026-11-17 (Packet Siege)
+- Last updated: 2026-11-18 (Cold Aisle)
 - Scope synchronized with current repository structure
 
 ## Repository Structure
@@ -27,6 +27,7 @@ Games are grouped by genre, the same groups the index page (`index.html`) uses.
 ### Arcade
 
 - `bad-sector/` - Bad Sector: a brick breaker on an unrolled hard-disk platter: bounce the read head off the carriage through fragmented tracks of plain, bad (2-3 hits) and read-only sectors that flash their LBA when broken, with RAID1, ECC and SLOW-SEEK bonuses, SMART lives, faster tracks, a seeded Daily disk with one scored attempt, a streak and a share line, and auto save to localStorage.
+- `cold-aisle/` - Cold Aisle: a first-person raycaster in a data centre for a desktop keyboard and mouse: the night-shift engineer reboots the infected racks of nine floors and takes the lift down, against hijacked floor scrubbers, inventory drones, camera turrets and pallet loaders, with a screwdriver, a tone probe and a degausser, badges for locked doors, secret walls, an automap, upgrades bought with patches between floors, a rogue chiller as the boss of the last floor and auto save to localStorage (a floor in progress is not saved).
 - `oncall-shift/` - On-Call Shift: a 3-minute night on call on a rack of twelve servers; fix each incident (cleanup, restart, scale or renew) before its SLA runs out, stop cascades from failed databases, and get an uptime score in nines and a postmortem; the shift, the best uptime per level and the last 5 shifts are saved in localStorage.
 - `orphan-process/` - Orphan Process: a side-view platformer for a desktop keyboard through a Linux file system: a forked process whose parent died crosses 15 hand-made rooms of /home and /tmp, reads 12 man pages, sends kill signals, reaps zombies by killing their parent daemon, beats the tmp cleaner for the renice dash and goes back for two secrets, with tty checkpoints and auto save to localStorage.
 - `packet-siege/` - Packet Siege: a lane-defense game in a server room: malware walks in along five lanes toward the rack, and cycles buy defenders that shoot, block, trap or make more cycles, over 150 levels in 15 zones (from zone 6 each with a floor rule of its own) with a boss every tenth, 27 defenders, 25 enemies, 1-3 stars per level, a loadout, a codex and auto save to localStorage, a level in progress included.
@@ -114,7 +115,120 @@ Features:
 - The pace rises quickly over four minutes and slowly up to ten, with per-mode floors set by the taps a packet needs
 - Keys only while the focus is on the console (1-8 or A S D F J K L ; for bits, 1-9 for the grid and mask octets, digits, Enter, Backspace, Up/Down during a run, P); pauses on a hidden tab, comes back paused after a reload, and takes over a run another tab saved instead of writing over it
 
-### 5) Cyberpunk Wordle
+### 5) Cold Aisle
+
+Path:
+- `cold-aisle/index.html`
+
+Features:
+- A first-person game for a desktop keyboard and mouse in a data centre whose building automation a worm has
+  taken over. You are the night-shift engineer: on each floor you find the infected racks, reboot them by hand
+  and take the lift down, while the floor scrubbers, inventory drones, camera mounts and pallet loaders attack.
+  Episode 1 is nine levels, the last one a boss, with upgrades bought between levels, and it ends with the totals
+  and "To be continued in episode 2". A window narrower than 720 px shows a notice instead of the game.
+- Keys only while the view has the focus and a level is live ("Click to play" gives it and asks for Pointer
+  Lock): W/S or Up/Down move, A/D strafe, the mouse or Left/Right turn (the arrows at 150 degrees a second), the
+  left mouse button, J or Enter fire (never Ctrl: Ctrl+W closes the tab), E or Space use (doors, secret walls,
+  racks, the lift), 1-3 or the mouse wheel switch tools, Tab shows or hides the automap, P or Esc pause, F toggles
+  fullscreen, M mutes (saved). Keys are matched by their physical place (`event.code`), so they sit in the same
+  place on Dvorak, Colemak or a Ukrainian layout; the key's value is read only for an event without a code. Keys
+  the game takes never scroll the page or reach the host page. The view is in the tab order only while a level
+  is live, the page takes no focus when it loads, and Enter or Space held when a level ends never presses the
+  button of the next screen. Turning is yaw only, with no looking up or down.
+- The mouse turns the view with Pointer Lock and without it. Under the lock every move turns; the first move
+  after the lock is taken is ignored and a single move counts for at most 250 px. Without the lock (not asked
+  yet, refused, or no API) the mouse turns the view while the pointer is over the frame, and a pointer resting
+  in the outer 15 % of the frame's width on either side keeps turning toward that side, up to the arrows' rate;
+  the game says so once. A click on the view asks for the lock again, at the earliest 1.5 s after a refusal.
+  Losing the lock, the window focus or the view's focus, or hiding the tab, pauses and lets go of held keys.
+- The player: health 100 (a level is always entered with at least 50), armour up to 100 from ESD vests (it takes
+  half of each hit while it lasts), 3.4 tiles a second. At health 0 the level starts again from its beginning
+  with what the player carried into it; nothing bought is lost, and the death counter goes up. Blue, yellow and
+  red badges open the doors of their colour and stay on their level.
+- Three tools: the Screwdriver (key 1, close up within 1.1 tiles of the target's surface, 20 damage every
+  0.35 s, no ammo), the Tone probe (key 2, an instant ray of 12 every 0.28 s, one cell a shot, up to 120 cells;
+  picked up on level 1) and the Degausser (key 3, 7 rays of 8 in an 18 degree fan every 0.9 s, weaker past 6
+  tiles, one coil a shot, up to 30 coils; picked up on level 3). A tool that runs dry falls back to the
+  screwdriver. Every shot makes noise: asleep machines within its range in steps of the flow field wake up.
+- Enemies, each first met on its own level: Floor scrubber (1; 30 HP, 2.2 tiles a second, strikes for 8 after a
+  0.3 s wind-up), Inventory drone (2; 20 HP, hovers 4-7 tiles away and strafes, a spark of 10 after a 0.35 s
+  charge), Camera turret (4; 40 HP, never moves, locks on visibly for 0.8 s, then fires a burst of 3 bolts of 6;
+  cover breaks the lock) and Pallet loader (5; 120 HP, with a clear straight line it telegraphs for 0.6 s,
+  charges at 5 tiles a second for 25 damage and is then stunned for 1 s). Every attack shows before it lands
+  and every projectile can be sidestepped. A melee blow (the scrubber's strike, the loader's charge) lands only
+  with a clear line to the player, never through a wall corner. An asleep machine wakes when it sees the
+  player, is hit or hears a shot; then it follows a flow field to the player and opens plain doors, never locked
+  ones. Darkness is only a look: it does not change what the machines see.
+- The boss, the Chiller (level 9, 660 HP), a rogue air-conditioning unit in a plant room with pillars for cover.
+  It never moves. Its loop: a frost wind-up, fans of frost bolts of 8 (5, 7 and 9 bolts by phase, two fans from
+  phase 2), a call for floor scrubbers (1, 2, 2; at most 3 alive), open vents for 5, 4.5 and 4 s, the only time
+  damage counts, and a breather. Each phase (at 2/3 and 1/3 of its HP) is faster. With the chiller down and the
+  pump rack rebooted, the lift opens.
+- Items: cells (+10), coils (+4), coffee (+15 health), a medkit (+40), an ESD vest (+50 armour), the three
+  badges, patches, and the probe (with 40 cells) and the degausser (with 8 coils) themselves. An item that would
+  do nothing (health already full) stays on the floor.
+- A level is a grid of tiles: walls, sliding doors (plain or locked by a badge) that close by themselves when
+  nothing stands in them, secret walls that open for good on Use, infected racks (face one within reach and
+  hold Use for 1.5 s; letting go or turning away stops the reboot; it turns into a clean rack) and the lift,
+  locked until every infected rack is clean and, on level 9, the chiller is down. Zones give parts of a level
+  their own floor, ceiling and light from 3 (lit) to 0 (pitch dark); the flashlight lights 6 tiles ahead. Solid
+  decor (carts, spools, crates, pillars) stops bodies, never sight or shots.
+- Nine hand-made levels, each with a briefing and a kit (the tools and ammo a player has at the least on
+  entering it): Loading Dock (24x24, 1 rack, 3 scrubbers, the probe), Meet-Me Room (28x26, 2 racks, the drones,
+  the blue badge, a secret), Cold Aisle A (34x28, 2 racks, the degausser, a secret), Hot Aisle (36x30, 3 racks,
+  the turrets, dim light, the yellow badge), Tape Vault (40x32, 3 racks, the loaders, a pitch-dark zone, a
+  secret), UPS Hall (42x34, 3 racks, dark battery rooms, the red badge, a secret), Cable Vault (44x35, 3 racks,
+  dark tunnels, 23 scrubbers, 2 secrets), NOC (48x40, 4 racks, every kind of machine, all three badges, a
+  secret) and Chiller Plant (36x30, the pump rack and the boss). Played straight on after a win, a level starts
+  with the better of its kit and what the player brought (tools, ammo, health, armour, field by field); any
+  other start uses the kit with full health.
+- Patches and upgrades: a won level pays 1 patch, 1 more for every machine destroyed and every secret found,
+  plus the patches picked up (some lie behind secret walls). The save keeps the most patches a win of each level
+  earned, so a replay pays only what beats the best run there. Six upgrade lines of three tiers, costing 3, 5
+  and 8: max health +15, cell capacity +30, probe damage +2, probe cooldown 10 % shorter, one more degausser ray
+  and the flashlight +2 tiles, each per tier, applied when a level starts.
+- Everything sits in one frame: the title (Continue, New game, Help, over a frame of level 1 drawn by the
+  renderer), the level select (each won level with its
+  best time, enemies and secrets, and the patch balance), the briefing with what you carry, the level with its
+  HUD (health, armour, the tool and its ammo, badges, racks rebooted of the total and a message line; at 25 % of
+  the maximum health or less it turns red and pulses), pause (Resume, Restart level, Help, Levels, the mouse
+  sensitivity from 0.25 to 3 and the sound), death (Retry with the same carry, or Levels), results (time,
+  enemies destroyed, secrets, patches earned), upgrades and the end of the episode.
+- How to play, open under the game (and shown on a narrow window too): an illustrated guide with the game's own
+  sprites drawn into small canvases, covering the goal, the keys, the player, the tools, the enemies and their
+  warning signs, the items, racks, secrets and the lift, and the upgrades; its numbers are filled in from the
+  tables at start-up.
+- Sound: 48 short sounds synthesised with Web Audio (no audio files), quieter with distance and panned by side,
+  started on the first click or key and silent where Web Audio is missing.
+- A pure fixed-step simulation at 120 steps a second (at most 0.25 s of catch-up a frame), deterministic and
+  seeded; each frame interpolates the camera, the enemies, the projectiles and the doors between the last two
+  steps.
+- The view is a raycaster written for the game (no WebGL, no libraries) into a 320x180 framebuffer, a
+  Uint32Array that goes onto the canvas with putImageData: one ray per column by DDA, 32x32 wall textures with
+  one wall axis darker, doors as thin slabs that slide into their jamb, floor and ceiling textured per pixel,
+  billboard sprites sorted far to near and clipped per column against the walls, and 16 light levels from the
+  distance, the zone's light and the flashlight, with lamps, LEDs, eyes and projectiles glowing in the dark. On
+  the page the view fills the width of its column at 16:9 (rounded down to whole device pixels, no upper
+  limit), except that it snaps to a scale of whole device pixels a game pixel when that covers at least 96 % of
+  the width (`CDA_SNAP`): 960x540 in a 1000 px column at 100 % display scaling, the full column at 125 %, 900 px
+  in a 900 px column; in fullscreen (F) the largest 16:9 stage that fits the screen, with the same snap, centred
+  on black.
+- The art is 126 sprites as ASCII maps in nine `src/art-*.js` parts, in Packet Siege's 47-colour palette: 20
+  wall, door and lift textures, 8 floor and ceiling textures, 9 decor billboards, 11 items, 9 HUD icons, 23
+  frames of the three small machines, 9 of the loader, 11 of the chiller, 10 frames of the tools in hand and 16
+  projectiles and effects. The build packs them into short strings in `script.js` as it does for Packet Siege.
+- `script.js` is generated from the 38 parts in `cold-aisle/src/` by `node cold-aisle/build.js`, in six part
+  groups and `main` (see Notes).
+- Saves in `cda-state` (version 1): an epoch, the highest level open, the best result of each level (time, kills,
+  secrets, patches; each field the best of its own), the upgrades bought, deaths, play time, whether the end
+  was shown, and the settings (mouse sensitivity, mute), written when any of them changes. New game writes a
+  fresh save one epoch above every save it knows. Every field falls back on its own; between two tabs the save
+  with the higher epoch wins outright (a New game in one tab is not undone by the other tab's progress), and
+  saves of the same epoch are merged field by field; blocked or full storage shows one warning
+  naming the error and never stops the game, and a save written by a newer version is never written over. A
+  level in progress is not saved.
+
+### 6) Cyberpunk Wordle
 
 Path:
 - `wordle-game/index.html`
@@ -124,7 +238,7 @@ Features:
 - Type on the physical keyboard or tap the on-screen QWERTY keyboard with Enter and Backspace.
 - A round timer and a win counter; the current round, the timer and the wins are saved in localStorage under `wrd-state` and restored after a reload.
 
-### 6) Defrag
+### 7) Defrag
 
 Path:
 - `defrag/index.html`
@@ -138,7 +252,7 @@ Features:
 - The Daily is one disk for everyone (6 files on 8 tracks), seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload, a streak of consecutive Dailies and an unscored practice run. The share line names the moves, undos and hints, with a selected-text fallback when the clipboard is unavailable.
 - Saves the level game and the view (`dfg-state`), the highest level and fewest moves per level (`dfg-progress`) and the Daily attempt, result and streak (`dfg-daily`), each field checked on its own. A second open tab takes over a newer Daily, or a game of the same level that is further along, instead of overwriting it, and never erases another tab's best. Blocked or full storage shows a warning naming the keys.
 
-### 7) Flip-Flop
+### 8) Flip-Flop
 
 Path:
 - `flip-flop/index.html`
@@ -154,7 +268,7 @@ Features:
 - Wins, losses and draws per CPU level under `ffl-stats`, re-read before each result so a second open tab never overwrites it
 - Blocked or full storage never stops the game, and a warning names each key that is not saved
 
-### 8) Hash Cracker
+### 9) Hash Cracker
 
 Path:
 - `hash-cracker/index.html`
@@ -166,7 +280,7 @@ Features:
 - New Game or another mode switches at once while no attempt is made. Otherwise a second press within 4 s gives the key up, which counts as a loss. After a win or loss, Enter starts the next key.
 - The game in progress (mode, key, attempts and the key being typed) is saved after every change under `hcr-state`. Wins, losses, the current streak and the best streak per mode are saved under `hcr-stats`. Both are restored after a reload, and a damaged save falls back field by field.
 
-### 9) Lost in /var
+### 10) Lost in /var
 
 Path:
 - `lost-in-var/index.html`
@@ -179,7 +293,7 @@ Features:
 - Keys work only in the command field: Enter runs, Up and Down browse the history, and Tab completes a command or path when the field is not empty (on an empty field Tab moves the focus on). On phones, command chips, chips for the paths and process ids in the last output, and the ↑, ↓, Tab and Run keys solve a case by taps alone. A chip clicked with a mouse or the keyboard gives the focus back to the field.
 - Saves each case's folder, kills, goals met, history, command count and hints (`liv-state`) and the best score per case (`liv-progress`). Every field falls back on its own, and blocked or full storage shows a warning naming the key. A second tab's sessions are taken over, with a note in the terminal of every case that changed, and scores from two tabs are merged, never lowered.
 
-### 10) Minesweeper Game
+### 11) Minesweeper Game
 
 Path:
 - `minesweeper/index.html`
@@ -189,7 +303,7 @@ Features:
 - Right-click flags with a live mine counter; an empty cell opens outward until it reaches numbered cells; a timer runs while you play.
 - The game, its timer and its result are saved in localStorage (`msp-save-state`) on every move and every second, so a reload brings back a game in progress with its clock running or a finished game as it ended; the best time is kept per difficulty (`msp-best-easy`, `msp-best-medium`, `msp-best-hard`).
 
-### 11) On-Call Shift
+### 12) On-Call Shift
 
 Path:
 - `oncall-shift/index.html`
@@ -202,7 +316,7 @@ Features:
 - Keyboard while the rack has the focus: 1 to 4 choose an action, the arrows move the cursor, Enter applies, Space pauses and Escape clears. The shift pauses when the tab is hidden.
 - Saved in localStorage: the shift in progress (`ocs-state`, which comes back paused after a reload), the best uptime per level (`ocs-best`) and the last 5 shifts (`ocs-history`).
 
-### 12) Orphan Process
+### 13) Orphan Process
 
 Path:
 - `orphan-process/index.html`
@@ -220,7 +334,7 @@ Features:
 - How to play, open under the game (and shown on a narrow window too): an illustrated guide with the game's own sprites (drawn from its atlas into small canvases at start-up) covering the goal, the keys, the top bar (NICE is the level, not the dash), both capabilities, everything in the world, the enemies, the boss step by step, levels, the map, pause and saving, and a hint about the secrets.
 - Saves in `orp-state` (version 2; any other version counts as no save): the run, the last tty, stats, abilities, collected items, switches, broken walls, the boss, whether the end screen was shown, visited rooms, play time and deaths, written the moment one of them changes. Every field falls back on its own, a tty past the gate turns its switch on, and blocked or full storage never stops the game (Continue still resumes the game of the same page load). Between two tabs, within one run the save with more play time wins; a New game in another tab is a later run, and a tab still on an older one stops saving.
 
-### 13) Packet Siege
+### 14) Packet Siege
 
 Path:
 - `packet-siege/index.html`
@@ -355,7 +469,7 @@ Features:
   quietly. A save or snapshot written by a newer version of the game is never overwritten or dropped: the game
   plays on in memory and the warning says so.
 
-### 14) Patch Panel
+### 15) Patch Panel
 
 Path:
 - `patch-panel/index.html`
@@ -369,7 +483,7 @@ Features:
 - The Daily is a 7x7 board for everyone, seeded from the local date (#1 is 2026-11-01). It gets one scored attempt, written when it begins and resumed after a reload. Its clock runs while it is on screen. A solved Daily offers an unscored practice run, and the result line can be copied to share.
 - Saves the free game and the view (`ppn-state`), the best per board (`ppn-best`) and the Daily attempt, result and streak (`ppn-daily`) to localStorage. A second open tab takes over a newer Daily instead of overwriting it, and never erases another tab's best.
 
-### 15) Pod Packer
+### 16) Pod Packer
 
 Path:
 - `pod-packer/index.html`
@@ -383,7 +497,7 @@ Features:
 - Keyboard with the focus on the cluster: arrows pick a pod, 1-6 run it on that node, E evicts, U undoes, N starts the next level, Escape clears the pick. The game's own buttons and the host page keep their keys.
 - Saves the level in progress (pdp-state) and the best moves and evictions per level (pdp-progress). A damaged field falls back on its own. Blocked or full storage shows a warning naming the key, and the warning goes away once a write works again. A second tab's newer game is taken over before any action, and progress from different tabs is merged.
 
-### 16) Port Knocker
+### 17) Port Knocker
 
 Path:
 - `port-knocker/index.html`
@@ -395,7 +509,7 @@ Features:
 - Daily: one sequence a day, the same for everyone (FNV-1a + mulberry32 from the local date), on 6 ports with the mode rotating Forward/Reverse/Stride. There is one scored attempt, recorded before its first show; a reload resumes it or shows the result. The streak counts consecutive Daily wins, Share copies a result line (or selects it in a field), and a finished Daily can be replayed unscored. A result stored by another tab always stands.
 - Saved in localStorage: the game on screen (`pkn-state`, a reload brings the round back waiting for Start), the best length per mode and panel size (`pkn-best`), the Daily attempt and streak (`pkn-daily`) and the sound switch (`pkn-sound`, off by default; WebAudio tones are optional).
 
-### 17) Rack Reset
+### 18) Rack Reset
 
 Path:
 - `rack-reset/index.html`
@@ -408,7 +522,7 @@ Features:
 - With presses on the rack, a new model or size only chooses the next rack, and New Game or N has to be pressed a second time within 4 s; the toast names the rack that would be thrown away.
 - Saves the rack in play (`rkr-state`) and the fewest presses over par and racks cleared per model and size (`rkr-best`) to localStorage. A second open tab takes over a newer game instead of playing on or dealing over it, and bests from two tabs are merged. Blocked or full storage shows a warning that names the keys, what a reload will show and how to fix it.
 
-### 18) Reaction Time Test
+### 19) Reaction Time Test
 
 Path:
 - `reaction-time/index.html`
@@ -418,7 +532,7 @@ Features:
 - The reaction time comes from `performance.now()`, rounded to ms; it shows the current, best and average time, the attempts and a session timer, and a "Session Complete" summary after 10 successful rounds. The session then stays finished, also after a reload, until Play Again, New Game or Restart; Start or Enter show the summary again.
 - Mouse (the press counts, not the release), touch and keyboard: Enter starts a round, also from the difficulty select, and Space reacts. Keys typed into other page fields, buttons or links are left alone. The difficulty, the stats and the session time are saved in localStorage under `rxt-reaction-state`. The session timer resumes after a reload, and an idle second tab never overwrites a newer save.
 
-### 19) Regex Par
+### 20) Regex Par
 
 Path:
 - `regex-par/index.html`
@@ -431,7 +545,7 @@ Features:
 - The first pattern that holes a hole goes on this round's card; a shorter one later still sets the hole's best. All 18 holes give a round total and the best round. New round asks for a second press within 4 s, then clears the card and drafts and keeps the bests.
 - Saves the hole on screen, the round, the drafts and the card (`rxp-state`) and the shortest pattern per hole plus the best round (`rxp-best`) to localStorage, field by field. A second open tab's card, drafts, newer round and shorter bests are merged in, never written over.
 
-### 20) Snake Game
+### 21) Snake Game
 
 Path:
 - `snake-game/index.html`
@@ -441,7 +555,7 @@ Features:
 - Four speeds (Easy 160 ms, Normal 120 ms, Hard 85 ms, Insane 60 ms per tick), a timer of the time the snake moves (pauses excluded) and a best score.
 - The whole game (snake, food, score, best score, timer, speed) is saved in localStorage under `snp-snake-state` and comes back after a reload: a running or paused game waits for the first key, and a finished game starts over with the best score and speed kept. With storage blocked the game still plays, just without saving.
 
-### 21) Sudoku Game
+### 22) Sudoku Game
 
 Path:
 - `sudoku/index.html`
@@ -451,7 +565,7 @@ Features:
 - Hint fills one empty or wrong cell from the solution, wrong digits turn red as you type, and Restart returns to the original puzzle. Any finished grid that follows the rules wins.
 - Progress is saved in localStorage under `sdk-sudoku-game` after every move that changes the board and comes back after a reload; the save is removed when you win, and a broken save is replaced by a fresh puzzle.
 
-### 22) Swap Space Solitaire
+### 23) Swap Space Solitaire
 
 Path:
 - `swap-space-solitaire/index.html`
@@ -464,7 +578,7 @@ Features:
 - Undo of up to 500 moves. Restart, Give Up and New Deal ask for a second press. A clock runs from the first move, and stats show page faults, won/played, streak and best.
 - Saves the tab and the numbered deal (`swp-state`), the stats (`swp-stats`) and the day's attempt and daily streak (`swp-daily`) in localStorage. A second open tab's newer save is taken over, never written over, and a finished daily stays finished.
 
-### 23) Typing Speed Test
+### 24) Typing Speed Test
 
 Path:
 - `typing-speed-test/index.html`
@@ -475,7 +589,7 @@ Features:
 - A finished round is locked until New Game, Restart or a difficulty change; the live WPM is recomputed every second, so it falls while you pause.
 - The best WPM (the final WPM of a finished round: the text completed, or the 60 s run out, scored over the full minute) and the chosen difficulty are kept in localStorage under `tst-state`. A best saved by an older version came from the live reading and may be higher.
 
-### 24) Uptime Idle
+### 25) Uptime Idle
 
 Path:
 - `uptime-idle/index.html`
@@ -510,9 +624,9 @@ port 5175 (vahac-tools uses 5173), so both repositories can run side by side. `.
 ## Tests
 
 The repository ships with a test suite covering every game and the index
-page (1646 tests across 48 modules: one per game, two for the Reaction Time
-Test and for Orphan Process, 21 for Packet Siege, `hub.test.js` for the index
-page and `_smoke.test.js` for the test harness), powered by the built-in
+page (1876 tests across 60 modules: one per game, two for the Reaction Time
+Test and for Orphan Process, 12 for Cold Aisle, 21 for Packet Siege,
+`hub.test.js` for the index page and `_smoke.test.js` for the test harness), powered by the built-in
 Node.js test runner — no external dependencies required.
 
 Requirements: Node.js 20 or newer for `npm test` (20.11 or later, because
@@ -588,6 +702,78 @@ shows up as a test that has to change.
   - The page booted from index.html: key filters (help summary, Start and New run, pad keys, arrows only in a running run), held keys, hidden tab, writes only on a change, toasts keep their 2 s
   - Source checks: ids, byc- prefix, ES5 IIFE, embed safety, CSS rules for every class, contrast of the key hints, and the 320-414 px layout with the console and its status line within 568 px
   - 100% lines, branches and functions of `byte-catcher/script.js`.
+- Cold Aisle (230 tests in 12 modules; one of them, a start-up check written before the page part existed, is
+  skipped):
+  - `cold-aisle.sim.test.js` (26): the build (`script.js` is `build()` of `src/` byte for byte apart from the
+    checkout's line endings; `PARTS` is the set of files in `src/`, in its six groups and `main`; `build.js
+    --check` passes on the repo and fails on a stale copy without writing; the header and every part's banner in
+    `PARTS` order; no part with an IIFE or exports of its own or of 900 lines or more; ES5, cda names, embed
+    safety and no DOM, clock or randomness in the simulation parts; the art packed and restored exactly; Packet
+    Siege's palette), the constants and the fixed step, the tables, and the simulation around the player: the
+    carry and upgrades, movement and collision with sliding along walls, tool switches, doors, locked doors and
+    badges, secret walls, rack reboots and the lift, items, death and results, determinism (a JSON copy plays on
+    identically) and the cells the automap has seen.
+  - `cold-aisle.map.test.js` (11): the legend against the art and the tables, `cdaParseLevel` and every refusal
+    (naming the level, the cell and the problem; a door that does not lead to floor or another door on both sides), rays and sight by DDA with doors as thin sliding walls, circle
+    collision, and the flow field (8 directions, no cut corners, around solid decor, through plain doors, through
+    locked ones only while they are open).
+  - `cold-aisle.levels.test.js` (12): the player's body flooded through each level with the real collision
+    functions reaches every floor cell, both sides of every door, every item, rack, lift and secret, so no decor
+    seals a passage; no two open cells touch only at a corner (secrets shut or open); the nine levels as data:
+    sizes, racks, kits and enemy kinds, a closed grid, the zones, a route in the order the badges allow and never
+    through a secret wall, every item, enemy and secret reachable with a patch behind each secret, the boss
+    arena, and `cdaLevelCarry` (also with a missing or partial kit).
+  - `cold-aisle.sim-enemies.test.js` (20): the three tools (reach, the screwdriver's measured to the target's
+    surface, rays, the degausser's fan and falloff, ammo and the fall back to the screwdriver), noise, armour,
+    and every ordinary enemy in an arena of its own: it wakes, comes through a door, shows its tell, attacks,
+    flinches and dies; sparks and bolts can be sidestepped, cover breaks a turret's lock-on, a sidestepped charge
+    stuns the loader, melee needs a clear line (no blow through the gap between two wall corners, no harm from a
+    charge that ends against a wall with the player beyond it), and no enemy opens a locked door.
+  - `cold-aisle.sim-boss.test.js` (5): the chiller's loop, its armour outside the vents, the phases at 2/3 and
+    1/3, the vents closing before it dies when killed with them open, the crawlers it calls (on free spots, at
+    most `maxCalled` alive, not counted), the screwdriver's reach to its body, one tile wide, and a scripted
+    player that wins from behind a pillar while one that stands still loses.
+  - `cold-aisle.route.test.js` (28): every level played through the real `cdaStep` by the scripted players of
+    `tests/_cold-aisle-bot.js` from the level's bare kit with no upgrades. The reference bot wins every level
+    with its final state pinned (`CDA_PIN=1` prints new pins after a deliberate change); the novice (it notices
+    things 0.5 s late, aims with a seeded error, never sidesteps a shot and never opens a secret) wins every
+    level on 5 seeds and ends levels 1-3 with at least half its health, never below 15; a player who stands still
+    dies on every level but the Loading Dock, whose start is quiet on purpose; and the bots only read the sim.
+  - `cold-aisle.render.test.js` (23): the shade table, whole frames of fixed scenes pinned by hash, a nearer
+    wall taller and no fisheye, the darker wall axis, doors and their jambs, light by distance, zone and
+    flashlight, machines that never vanish in the dark, animated and rebooting racks, sprites on the floor,
+    clipped by walls and corners, sorted and drawn as tall as their table row (`tall`) says, the frame for each
+    enemy state, interpolation, a renderer that never changes the sim and allocates its buffers once, the tool
+    in hand with its switch and bob, effects, flashes, the Use bar, and the automap, with no holes in seen walls.
+  - `cold-aisle.pack.test.js` (5): every sprite decoded from the built `script.js` equals its map in `src/`;
+    every sprite the spec names exists at its size, every texture, frame and sprite the code asks for is in the
+    art, and `cdaSpritePixels`.
+  - `cold-aisle.sfx.test.js` (19): every sim event has a sound or is silent on purpose, the sound table, unlock,
+    mute, the silent fallbacks (no Web Audio, a constructor or node that throws, a context that stays
+    suspended), one sound per name and at most `CDA_SFX_PER_STEP` a step, loudness by distance and pan by
+    side, and the voice engine's graph, with no timers and no clock but `currentTime`.
+  - `cold-aisle.storage.test.js` (15): `cda-state` pinned and written back byte for byte, every field's
+    fallback, garbage and other versions, repairs, the merge of two tabs, a New game's higher epoch winning
+    outright both ways, blocked and full storage, a newer save never written over, recorded wins, the patch
+    arithmetic over the whole upgrade table, and buying.
+  - `cold-aisle.ui-page.test.js` (55): the page booted like a browser from `index.html`: nothing run under
+    Node, both start-up paths, the title's picture of level 1 drawn once, a small level won through real input
+    (walking, a door, a rack rebooted by holding Use, the mouse, the lift) and one lost, every key and the mouse,
+    keys by their physical place (Dvorak, Colemak and Ukrainian), Pointer Lock granted, refused and missing, the
+    mouse turning without the lock (over the stage, the edges, a spike clamped, a click asking again 1.5 s after
+    a refusal), pauses that let go of held keys (a blur, a hidden tab, a lost lock, a narrow window), the
+    canvas in the tab order only while the level is live, no focus taken at load, a held Enter or Space that
+    never presses the next screen's button, the frame filling its column on the page and the screen in
+    fullscreen with the 96 % snap to whole device pixels (125 %, 150 % and 200 % scaling), the HUD and its message line, reduced motion, the level select, the
+    briefing and the carry, pause, results, upgrades, the end of the episode, New game (and its higher epoch in
+    a second tab), mute and sensitivity, blocked, full and newer saves, a second tab, and the guide's numbers and
+    sprites against the tables.
+  - `cold-aisle.ui-source.test.js` (11): ids, classes, custom properties and the storage key under the cda-
+    prefix, a CSS rule for every class, the three files safe to embed and loading nothing from the network, the
+    UI parts' rules, the markup with one frame for the game, the CSS from 320 px up with the notice below
+    720 px, the pixelated stage, a host theme's button and heading styles kept out of the game, the cursor
+    hidden over a live level, and reduced motion.
+  - 100% lines, branches and functions of `cold-aisle/script.js`.
 - Cyberpunk Wordle (52 tests): the embedded word list kept intact (701
   five-letter entries; the ethnic slur KRAUT was removed), the answer picked
   with `Math.random`, `wrdScoreGuess` colouring repeated letters by the
@@ -985,6 +1171,16 @@ it.
   (`main.js` exports for Node and stays last), add `<name>` to `PARTS` after every part it uses at load time,
   and run the build; a file in `src/` that is missing from `PARTS` fails the tests. The site still receives the
   same three files: `index.html`, `style.css` and the built `script.js`.
+- Cold Aisle's `script.js` is built the same way: `node cold-aisle/build.js` joins the 38 parts in
+  `cold-aisle/src/*.js` (`--check`, the banners, the stripped comments, the 900-line limit and the packed art of
+  `src/art-*.js`, restored by `cdaUnpackArt`, work as above, with cda names), and `tests/cold-aisle.sim.test.js`
+  fails when `script.js` is stale or a file in `src/` is missing from `PARTS`. Two things differ. Exports:
+  `core.js` declares `var CDA_API = {};` and every part ends by registering on it what the tests and later parts
+  need (`CDA_API.cdaStep = cdaStep;`), and `main.js` only hands `CDA_API` to `module.exports` under Node and runs
+  `cdaInit` in a browser, so no two parts edit one export list. `PARTS`: it is `[].concat(SIM_PARTS,
+  LEVEL_PARTS, ART_PARTS, RENDER_PARTS, SFX_PARTS, UI_PARTS, ['main'])`, one group per owner, each on its own
+  line (9 simulation parts, 4 level parts, 9 art parts, 5 renderer parts, 1 sound part and 9 page parts); a new
+  part goes into its group after every part it uses at load time, and `build.js` exports the groups too.
 - The build strips full-line `//` comments from `script.js` (each part keeps its opening line; comments after code
   and a `//` inside a string or a regular expression stay), so the readable source, every comment included, is
   `src/`. The sprite art is stored compressed in the generated file. The parts `src/sprites-*.js` stay
@@ -997,4 +1193,4 @@ it.
   built. Edit the maps in `src/` and rebuild; never edit the packed strings by hand. The build also refuses to
   write a `script.js` that would contain `<!--`, `-->` or `</script`.
 - Packet Siege's `script.js` is 261,266 bytes (about 255 KB; `src/` holds about 619 KB),
-  the largest in the repository. Before publishing it, check the site's embed with a script of this size.
+  the largest in the repository. Cold Aisle's is 237,001 bytes (about 231 KB; `src/` holds about 517 KB). Before publishing it, check the site's embed with a script of this size.

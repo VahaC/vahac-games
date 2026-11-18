@@ -250,6 +250,7 @@ and localStorage key of a game (`.{p}-wrapper`, `#{p}-board`, `{p}-state`).
 | `bds`  | Bad Sector           | `bad-sector/`           | Built  |
 | `bmd`  | Bitmap Decoder       | `bitmap-decoder/`       | Built  |
 | `byc`  | Byte Catcher         | `byte-catcher/`         | Built  |
+| `cda`  | Cold Aisle           | `cold-aisle/`           | Built  |
 | `dfg`  | Defrag               | `defrag/`               | Built  |
 | `ffl`  | Flip-Flop            | `flip-flop/`            | Built  |
 | `hcr`  | Hash Cracker         | `hash-cracker/`         | Built  |
